@@ -117,9 +117,9 @@ export default function ResponsiveDrawer({
         color="inherit"
         position="fixed"
         sx={{
-          display: { xs: 'block', sm: 'none' },
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` }
+          display: { xs: 'block', sm: 'block', md: 'none' },
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` }
         }}
       >
         <Toolbar>
@@ -128,11 +128,11 @@ export default function ResponsiveDrawer({
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { md: 'none' } }}
           >
-            <MenuIcon />
+            <MenuIcon style={{ color: 'black' }} />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" color="black">
             {pathname === '/'
               ? 'Inicio'
               : pathname === '/transactions'
@@ -145,7 +145,7 @@ export default function ResponsiveDrawer({
           </Typography>
         </Toolbar>
       </AppBar>
-      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
+      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }} aria-label="mailbox folders">
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -155,7 +155,7 @@ export default function ResponsiveDrawer({
             keepMounted: true
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
+            display: { xs: 'block', sm: 'block', md: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
           }}
         >
@@ -164,7 +164,7 @@ export default function ResponsiveDrawer({
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
+            display: { xs: 'none', sm: 'none', md: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
           }}
           open
@@ -174,11 +174,11 @@ export default function ResponsiveDrawer({
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)`, backgroundColor: 'white' } }}
+        sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)`, backgroundColor: '#F7F9FB' } }}
       >
         <Toolbar
           sx={{
-            display: { xs: 'block', sm: 'none' }
+            display: { xs: 'block', sm: 'block', md: 'none' }
           }}
         />
         {children}
