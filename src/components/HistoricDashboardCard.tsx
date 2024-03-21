@@ -25,55 +25,56 @@ export default function HistoricDashboardCard() {
     height: isTablet ? '400px' : '350px'
   }
 
+  // mock data (replace with last 12 months data from the API)
   const data = [
     {
-      name: 'Enero',
-      'Gastado (€)': 500
-    },
-    {
-      name: 'Febrero',
-      'Gastado (€)': 800
-    },
-    {
-      name: 'Marzo',
-      'Gastado (€)': 1200
-    },
-    {
-      name: 'Abril',
+      name: 'Abril 23',
       'Gastado (€)': 1500
     },
     {
-      name: 'Mayo',
+      name: 'Mayo 23',
       'Gastado (€)': 1000
     },
     {
-      name: 'Junio',
+      name: 'Junio 23',
       'Gastado (€)': 1800
     },
     {
-      name: 'Julio',
+      name: 'Julio 23',
       'Gastado (€)': 2000
     },
     {
-      name: 'Agosto',
+      name: 'Agosto 23',
       'Gastado (€)': 2500
     },
     {
-      name: 'Septiembre',
+      name: 'Septiembre 23',
       'Gastado (€)': 3000
     },
     {
-      name: 'Octubre',
+      name: 'Octubre 23',
       'Gastado (€)': 2800
     },
     {
-      name: 'Noviembre',
-      'Gastado (€)': 2200
+      name: 'Noviembre 23',
+      'Gastado (€)': 2020
     },
     {
-      name: 'Diciembre',
+      name: 'Diciembre 23',
       'Gastado (€)': 1800
-    }
+    },
+    {
+      name: 'Enero 24',
+      'Gastado (€)': 500
+    },
+    {
+      name: 'Febrero 24',
+      'Gastado (€)': 800
+    },
+    {
+      name: 'Marzo 24',
+      'Gastado (€)': 2010
+    },
   ]
 
   return (

@@ -14,8 +14,9 @@ import ListItemText from '@mui/material/ListItemText'
 import MenuIcon from '@mui/icons-material/Menu'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { Calculate, CreditCard, CurrencyExchange, Home, Settings } from '@mui/icons-material'
+import { Add, Calculate, CreditCard, CurrencyExchange, Home, Settings } from '@mui/icons-material'
 import { usePathname } from 'next/navigation'
+import { Fab } from '@mui/material'
 
 const drawerWidth = 240
 
@@ -183,6 +184,13 @@ export default function ResponsiveDrawer({
         />
         {children}
       </Box>
+      <Fab style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px'      
+      }} color="error" aria-label="add">
+        <Add />
+      </Fab>
     </Box>
   )
 }

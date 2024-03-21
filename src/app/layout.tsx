@@ -20,6 +20,13 @@ export default function RootLayout({
     <html lang="es">
       <body className={inter.className}>
         <ResponsiveDrawer>{children}</ResponsiveDrawer>
+      <style>
+        {`
+          body {
+            padding: 0 !important;
+          }
+        `}
+      </style>
       </body>
     </html>
   )
