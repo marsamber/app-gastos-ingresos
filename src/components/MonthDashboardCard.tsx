@@ -1,7 +1,8 @@
 import { CSSProperties } from 'react'
 import BasicCard from './BasicCard'
 import { useMediaQuery } from '@mui/material'
-import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts'
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 
 export default function MonthDashboardCard() {
   const isMobile = useMediaQuery('(max-width: 600px)')
@@ -28,25 +29,39 @@ export default function MonthDashboardCard() {
   const data = [
     {
       name: '1',
-      'Gastado (€)': 200
+      Gastado: 200
     },
     {
       name: '2',
-      'Gastado (€)': 300
+      Gastado: 300
     },
     {
       name: '3',
-      'Gastado (€)': 100
+      Gastado: 100
     },
     {
       name: '4',
-      'Gastado (€)': 400
+      Gastado: 400
     },
     {
       name: '5',
-      'Gastado (€)': 200
+      Gastado: 200
     }
   ]
+
+
+  const CustomTooltip = ({ active, payload, label }:TooltipProps<ValueType, NameType>) => {
+    if (active && payload && payload.length) {
+      const gastado: number  = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0;
+  
+      return (
+        <div className="custom-tooltip" style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
+          <b className="label">{`Semana ${label}`}</b>
+          <p className="intro" style={{color: '#FF6384'}}>{`Gastado: ${gastado} €`}</p>
+        </div>
+      );
+    }
+  }
 
   return (
     <BasicCard style={cardStyle}>
@@ -66,10 +81,10 @@ export default function MonthDashboardCard() {
             style={{ fontSize: '14px' }}
           >
             <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
+            <YAxis unit=" €" />
+            <Tooltip content={(props) => <CustomTooltip {...props} />} />
             <Legend />
-            <Bar dataKey="Gastado (€)" barSize={50} fill="#36A2EB" />
+            <Bar dataKey="Gastado" barSize={50} fill="#FF6384" />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -7,6 +7,7 @@ import MonthDashboardCard from '@/components/MonthDashboardCard'
 import StatisticsCard from '@/components/StatisticsCard'
 import BudgetCard from '@/components/BudgetCard'
 import HistoricDashboardCard from '@/components/HistoricDashboardCard'
+import MonthRangePicker from '@/components/MonthRangePicker'
 
 export default function Home() {
   const currentMonth = new Date().toLocaleString('default', { month: 'long' })
@@ -43,7 +44,7 @@ export default function Home() {
   const rowStyle: CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     flexDirection: isMobile ? 'column' : 'row',
     gap: '10px',
     width: '100%'
@@ -52,13 +53,21 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div style={headerStyle}>
-        <h2 style={titleStyle}>Dashboard {currentMonth}</h2>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'unset' : 'center',
+            gap: isMobile ? 0 : '10px'
+          }}
+        >
+          <h2 style={titleStyle}>Dashboard</h2>
+          <MonthRangePicker />
+        </div>
         <h3 style={budgetStyle}>Presupuesto restante: {budget}€</h3>
       </div>
       <div style={containerStyle}>
-        <div style={rowStyle}>
-          <BudgetCard />
-        </div>
+        <BudgetCard />
         <div style={rowStyle}>
           <TransactionsCard />
           <MonthDashboardCard />

@@ -1,7 +1,8 @@
 import { CSSProperties } from 'react'
 import BasicCard from './BasicCard'
 import { useMediaQuery } from '@mui/material'
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, XAxis, YAxis, Tooltip, TooltipProps } from 'recharts'
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 
 export default function BudgetCard() {
   const isMobile = useMediaQuery('(max-width: 600px)')
@@ -26,6 +27,21 @@ export default function BudgetCard() {
   }
 
   const data = [
+    {
+      name: 'Compras online',
+      Gastado: 200,
+      Presupuestado: 500
+    },
+    {
+      name: 'Entretenimiento',
+      Gastado: 150,
+      Presupuestado: 500
+    },
+    {
+      name: 'Viajes',
+      Gastado: 300,
+      Presupuestado: 500
+    },
     {
       name: 'Compras varias',
       Gastado: 400,
@@ -68,6 +84,23 @@ export default function BudgetCard() {
     }
   ]
 
+  const CustomTooltip = ({ active, payload, label }:TooltipProps<ValueType, NameType>) => {
+    if (active && payload && payload.length) {
+      const gastado: number  = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0;
+      const presupuestado: number = Number(payload.find(entry => entry.name === 'Presupuestado')?.value) || 0;
+      const restante: number  = presupuestado - gastado;
+  
+      return (
+        <div className="custom-tooltip" style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
+          <b className="label">{`${label}`}</b>
+          <p className="intro" style={{color: '#00C49F'}}>{`Presupuestado: ${presupuestado} €`}</p>
+          <p className="intro" style={{color: '#FF6384'}}>{`Gastado: ${gastado} €`}</p>
+          <p className="intro" style={{color: restante <=0 ?  'red': 'black'}}>{`Restante: ${restante} €`}</p>
+        </div>
+      );
+    }
+  }
+
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Presupuesto</h3>
@@ -88,12 +121,13 @@ export default function BudgetCard() {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
+            <XAxis dataKey="name" xAxisId={0} />
+            <XAxis dataKey="name" xAxisId={1} hide />
+            <YAxis unit={' €'} />
+            <Tooltip content={(props) => <CustomTooltip {...props} />} />
             <Legend />
-            <Bar dataKey="Gastado" barSize={50} stackId="a" fill="#FF6384" />
-            <Bar dataKey="Presupuestado" barSize={50} stackId="a" fill="#00C49F" />
+            <Bar dataKey="Presupuestado" barSize={40} xAxisId={0} fill="#00C49F" />
+            <Bar dataKey="Gastado" barSize={40} xAxisId={1} fill="#FF6384" />
           </BarChart>
         </ResponsiveContainer>
       </div>

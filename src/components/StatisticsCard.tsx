@@ -1,7 +1,8 @@
 import { useMediaQuery } from '@mui/material'
 import { CSSProperties } from 'react'
 import BasicCard from './BasicCard'
-import { Legend, ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from 'recharts'
+import { Legend, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, TooltipProps } from 'recharts'
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 
 export default function StatisticsCard() {
   const isMobile = useMediaQuery('(max-width: 600px)')
@@ -26,6 +27,9 @@ export default function StatisticsCard() {
   }
 
   const data = [
+    { name: 'Compras online', value: 200 },
+    { name: 'Entretenimiento', value: 150 },
+    { name: 'Viajes', value: 300 },
     { name: 'Compras varias', value: 400 },
     { name: 'Alimentación', value: 300 },
     { name: 'Restaurantes', value: 300 },
@@ -36,7 +40,31 @@ export default function StatisticsCard() {
     { name: 'Educación', value: 100 }
   ]
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6384', '#36A2EB', '#FF9F40', '#4BC0C0']
+  const COLORS = [
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#FF8042',
+    '#FF6384',
+    '#36A2EB',
+    '#FF9F40',
+    '#4BC0C0',
+    '#FFD700',
+    '#FF69B4',
+    '#90EE90'
+  ]
+
+  const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload
+
+      return (
+        <div className="custom-tooltip" style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
+          <p className="label"><b>{data.name}</b>: {data.value} €</p>
+        </div>
+      )
+    }
+  }
 
   return (
     <BasicCard style={cardStyle}>
@@ -65,7 +93,7 @@ export default function StatisticsCard() {
               ))}
             </Pie>
             <Legend />
-            <Tooltip />
+            <Tooltip content={props => <CustomTooltip {...props} />} />
           </PieChart>
         </ResponsiveContainer>
       </div>

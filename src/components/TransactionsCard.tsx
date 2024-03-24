@@ -112,7 +112,7 @@ function Transaction({ transaction }: { transaction: { id: number; title: string
         <p style={titleStyle}>{transaction.title}</p>
         <span style={dateStyle}>{transaction.date.toLocaleDateString()}</span>
       </div>
-      <p style={amountStyle}>{transaction.amount}</p>
+      <p style={amountStyle}>{transaction.amount} €</p>
     </div>
   )
 }

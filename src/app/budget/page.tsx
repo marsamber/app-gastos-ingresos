@@ -7,16 +7,11 @@ import HistoricBudgetTable from '@/components/HistoricBudgetTable'
 
 export default function Budget() {
   const [value, setValue] = useState(0)
-  const [filter, setFilter] = useState('this_month')
   const isMobile = useMediaQuery('(max-width: 600px)')
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)
-  }
-
-  const handleChangeFilter = (event: SelectChangeEvent<string>) => {
-    setFilter(event.target.value as string)
-  }
+  } 
 
   // STYLES
   const titleStyle = {

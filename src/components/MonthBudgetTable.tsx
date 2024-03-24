@@ -10,7 +10,7 @@ export default function MonthBudgetTable() {
     { id: 'category', label: 'Categoría' },
     { id: 'spent', label: 'Gastado' },
     { id: 'remaining', label: 'Restante' },
-    { id: 'total', label: 'Total' }
+    { id: 'total', label: 'Presupuestado' }
   ]
 
 const rows = [

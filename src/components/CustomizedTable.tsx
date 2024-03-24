@@ -95,8 +95,15 @@ export default function CustomizedTable({
                   {Object.keys(row)
                     .filter(cell => cell != 'id')
                     .map((cell, index) =>
-                      (cell === 'amount' || cell === 'total') ? (
-                        <TableCell key={index} align="left" style={{ color: row[cell] > 0 ? 'green' : 'red' }}>
+                     typeof row[cell]=== 'number' ? (
+                        <TableCell
+                          key={index}
+                          align="left"
+                          style={{
+                            color:
+                              cell === 'amount' || cell === 'remaining' ? (row[cell] > 0 ? 'green' : 'red') : 'black'
+                          }}
+                        >
                           {row[cell]} €
                         </TableCell>
                       ) : row[cell] instanceof Date ? (
