@@ -55,9 +55,9 @@ export default function MonthDashboardCard() {
       const gastado: number  = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0;
   
       return (
-        <div className="custom-tooltip" style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
-          <b className="label">{`Semana ${label}`}</b>
-          <p className="intro" style={{color: '#FF6384'}}>{`Gastado: ${gastado} €`}</p>
+        <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
+          <b>{`Semana ${label}`}</b>
+          <p style={{color: '#FF6384'}}>{`Gastado: ${gastado} €`}</p>
         </div>
       );
     }

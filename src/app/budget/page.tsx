@@ -1,9 +1,9 @@
 'use client'
 import { SelectChangeEvent, Tab, Tabs, useMediaQuery } from '@mui/material'
-import styles from '../page.module.css'
 import { useState } from 'react'
 import MonthBudgetTable from '@/components/MonthBudgetTable'
 import HistoricBudgetTable from '@/components/HistoricBudgetTable'
+import '../../styles.css'
 
 export default function Budget() {
   const [value, setValue] = useState(0)
@@ -28,7 +28,7 @@ export default function Budget() {
   }
 
   return (
-    <main className={styles.main}>
+    <main className='main'>
       <h2 style={titleStyle}>Presupuesto</h2>
       <div>
         <div style={tabsStyle}>

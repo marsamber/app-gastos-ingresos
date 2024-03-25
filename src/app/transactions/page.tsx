@@ -11,12 +11,12 @@ import {
   Tabs,
   useMediaQuery
 } from '@mui/material'
-import styles from '../page.module.css'
 import { useState } from 'react'
 import { Add } from '@mui/icons-material'
 import AllTransactionsTable from '@/components/AllTransactionsTable'
 import OutcomesTable from '@/components/OutcomesTable'
 import IncomesTable from '@/components/IncomesTable'
+import '../../styles.css'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
@@ -53,7 +53,7 @@ export default function Transactions() {
   }
 
   return (
-    <main className={styles.main}>
+    <main className='main'>
       <h2 style={titleStyle}>Transacciones</h2>
       <div>
         {isMobile && (

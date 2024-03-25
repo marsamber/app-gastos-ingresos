@@ -1,5 +1,4 @@
 'use client'
-import styles from './page.module.css'
 import { useMediaQuery } from '@mui/material'
 import { CSSProperties } from 'react'
 import TransactionsCard from '@/components/TransactionsCard'
@@ -8,6 +7,7 @@ import StatisticsCard from '@/components/StatisticsCard'
 import BudgetCard from '@/components/BudgetCard'
 import HistoricDashboardCard from '@/components/HistoricDashboardCard'
 import MonthRangePicker from '@/components/MonthRangePicker'
+import '../styles.css'
 
 export default function Home() {
   const currentMonth = new Date().toLocaleString('default', { month: 'long' })
@@ -51,7 +51,7 @@ export default function Home() {
   }
 
   return (
-    <main className={styles.main}>
+    <main className='main'>
       <div style={headerStyle}>
         <div
           style={{

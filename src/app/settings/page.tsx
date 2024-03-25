@@ -1,9 +1,7 @@
 'use client'
-import { SelectChangeEvent, Tab, Tabs, useMediaQuery } from '@mui/material'
-import styles from '../page.module.css'
-import { useState } from 'react'
-import MonthBudgetTable from '@/components/MonthBudgetTable'
-import HistoricBudgetTable from '@/components/HistoricBudgetTable'
+import { useMediaQuery } from '@mui/material'
+import { CSSProperties, useState } from 'react'
+import '../../styles.css'
 
 export default function Settings() {
   const [value, setValue] = useState(0)
@@ -11,7 +9,7 @@ export default function Settings() {
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)
-    }
+  }
 
   // STYLES
   const titleStyle = {
@@ -28,10 +26,9 @@ export default function Settings() {
   }
 
   return (
-    <main className={styles.main}>
+    <main className='main'>
       <h2 style={titleStyle}>Configuración</h2>
-      <div style={containerStyle}>
-      </div>
+      <div style={containerStyle}></div>
     </main>
   )
 }

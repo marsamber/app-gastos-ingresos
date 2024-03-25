@@ -69,8 +69,8 @@ export default function TransactionsCard() {
       <div style={containerStyle}>
         {transactions.slice(0, 5).map((transaction, index) => (
           <>
-            <Transaction transaction={transaction} />
-            {index !== 5 - 1 && <hr />}
+            <Transaction key={transaction.id} transaction={transaction} />
+            {index !== transactions.slice(0, 5).length - 1 && <hr />}
           </>
         ))}
       </div>

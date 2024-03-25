@@ -96,11 +96,11 @@ export default function HistoricDashboardCard() {
       const restante: number  = presupuestado - gastado;
   
       return (
-        <div className="custom-tooltip" style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
-          <b className="label">{`${label}`}</b>
-          <p className="intro" style={{color: '#00C49F'}}>{`Presupuestado: ${presupuestado} €`}</p>
-          <p className="intro" style={{color: '#FF6384'}}>{`Gastado: ${gastado} €`}</p>
-          <p className="intro" style={{color: restante <=0 ?  'red': 'black'}}>{`Restante: ${restante} €`}</p>
+        <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
+          <b>{`${label}`}</b>
+          <p style={{color: '#00C49F'}}>{`Presupuestado: ${presupuestado} €`}</p>
+          <p style={{color: '#FF6384'}}>{`Gastado: ${gastado} €`}</p>
+          <p style={{color: restante <=0 ?  'red': 'black'}}>{`Restante: ${restante} €`}</p>
         </div>
       );
     }

@@ -59,8 +59,8 @@ export default function StatisticsCard() {
       const data = payload[0].payload
 
       return (
-        <div className="custom-tooltip" style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
-          <p className="label"><b>{data.name}</b>: {data.value} €</p>
+        <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
+          <p><b>{data.name}</b>: {data.value} €</p>
         </div>
       )
     }
