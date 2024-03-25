@@ -1,5 +1,5 @@
 import { useMediaQuery } from '@mui/material'
-import CustomizedTable from './CustomizedTable'
+import BasicTable from './BasicTable'
 import OneCategoryCard from '../card/OneCategoryCard'
 
 
@@ -67,7 +67,7 @@ const rows = [
 
   return (
     <>
-      {!isMobile && <CustomizedTable headCells={headCells} rows={rows} keyOrder="category" numRowsPerPage={10} />}
+      {!isMobile && <BasicTable headCells={headCells} rows={rows} keyOrder="category" numRowsPerPage={10} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {isMobile &&
           rows

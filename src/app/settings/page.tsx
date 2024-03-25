@@ -8,7 +8,7 @@ import CategoriesCard from '@/components/card/CategoriesCard'
 
 export default function Settings() {
   const isTablet = useMediaQuery('(max-width: 1024px)')
-
+  
   // STYLES
   const titleStyle = {
     margin: '10px 0',

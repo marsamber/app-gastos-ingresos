@@ -17,17 +17,21 @@ import Typography from '@mui/material/Typography'
 import { Add, Calculate, CreditCard, CurrencyExchange, Home, Settings } from '@mui/icons-material'
 import { usePathname } from 'next/navigation'
 import { Fab } from '@mui/material'
+import { ReactNode, useState } from 'react'
+import BasicModal from './modal/BasicModal'
+import AddTransactionModal from './modal/AddTransactionModal'
 
 const drawerWidth = 240
 
 export default function ResponsiveDrawer({
   children
 }: Readonly<{
-  children: React.ReactNode
+  children: ReactNode
 }>) {
-  const [mobileOpen, setMobileOpen] = React.useState(false)
-  const [isClosing, setIsClosing] = React.useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
   const pathname = usePathname()
+  const [addTransaction, setAddTransaction] = useState(false)
 
   const handleDrawerClose = () => {
     setIsClosing(true)
@@ -184,13 +188,18 @@ export default function ResponsiveDrawer({
         />
         {children}
       </Box>
-      <Fab style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px'      
-      }} color="error" aria-label="add">
+      <Fab
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px'
+        }}
+        color="error"
+        onClick={() => setAddTransaction(true)}
+      >
         <Add />
       </Fab>
+      <AddTransactionModal open={addTransaction} handleClose={() => setAddTransaction(false)} />
     </Box>
   )
 }

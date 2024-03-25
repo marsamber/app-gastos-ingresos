@@ -1,12 +1,12 @@
-import { CSSProperties } from 'react'
+import { CSSProperties, useState } from 'react'
 import BasicCard from './BasicCard'
 import { Button, useMediaQuery } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import FixedIncomesTable from '../table/FixedIncomesTable'
+import AddFixedTransactionModal from '../modal/AddFixedTransactionModal'
 
 export default function FixedIncomesCard() {
-  const isMobile = useMediaQuery('(max-width: 600px)')
-  const isTablet = useMediaQuery('(max-width: 1024px)')
+  const [addFixedIncomeTransaction, setAddFixedIncomeTransaction] = useState(false)
 
   // STYLES
   const titleStyle = {
@@ -35,13 +35,18 @@ export default function FixedIncomesCard() {
     <BasicCard style={cardStyle}>
       <div style={headerStyle}>
         <h3 style={titleStyle}>Ingresos fijos</h3>
-        <Button variant="contained" color="error" endIcon={<Add />}>
+        <Button variant="contained" color="error" endIcon={<Add />} onClick={() => setAddFixedIncomeTransaction(true)}>
           Añadir
         </Button>
       </div>
       <div style={containerStyle}>
         <FixedIncomesTable />
       </div>
+      <AddFixedTransactionModal
+        open={addFixedIncomeTransaction}
+        handleClose={() => setAddFixedIncomeTransaction(false)}
+        transactionType="income"
+      />
     </BasicCard>
   )
 }

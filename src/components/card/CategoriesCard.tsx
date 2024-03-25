@@ -1,12 +1,13 @@
-import { CSSProperties } from 'react'
+import { CSSProperties, useState } from 'react'
 import BasicCard from './BasicCard'
 import { Button, useMediaQuery } from '@mui/material'
 import { Add } from '@mui/icons-material'
 import CategoriesTable from '../table/CategoriesTable'
+import AddCategoryBudgetModal from '../modal/AddCategoryBudgetModal'
 
 export default function CategoriesCard() {
-  const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1024px)')
+  const [addCategoryBudget, setAddCategoryBudget] = useState(false)
 
   // STYLES
   const titleStyle = {
@@ -36,13 +37,18 @@ export default function CategoriesCard() {
     <BasicCard style={cardStyle}>
       <div style={headerStyle}>
         <h3 style={titleStyle}>Presupuesto por categorías</h3>
-        <Button variant="contained" color="error" endIcon={<Add />}>
+        <Button variant="contained" color="error" endIcon={<Add />}
+        onClick={() => setAddCategoryBudget(true)}>
           Añadir
         </Button>
       </div>
       <div style={containerStyle}>
         <CategoriesTable />
       </div>
+      <AddCategoryBudgetModal
+        open={addCategoryBudget}
+        handleClose={() => setAddCategoryBudget(false)}
+        />
     </BasicCard>
   )
 }

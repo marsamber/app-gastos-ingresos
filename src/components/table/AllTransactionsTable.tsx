@@ -1,5 +1,5 @@
 import { useMediaQuery } from '@mui/material'
-import CustomizedTable from './CustomizedTable'
+import BasicTable from './BasicTable'
 import OneTransactionCard from '../card/OneTransactionCard'
 
 export interface AllTransactionsTableProps {
@@ -46,7 +46,7 @@ export default function AllTransactionsTable({filter = 'this_month'}: AllTransac
 
   return (
     <>
-      {!isMobile && <CustomizedTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={10} />}
+      {!isMobile && <BasicTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={10} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {isMobile &&
           rows

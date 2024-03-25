@@ -1,5 +1,5 @@
 import { useMediaQuery } from '@mui/material'
-import CustomizedTable from './CustomizedTable'
+import BasicTable from './BasicTable'
 import OneCategoryBudgetCard from '../card/OneCategoryBudgetCard'
 
 export default function CategoriesTable() {
@@ -26,7 +26,7 @@ export default function CategoriesTable() {
 
   return (
     <>
-      {!isMobile && <CustomizedTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={15} />}
+      {!isMobile && <BasicTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={15} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {isMobile &&
           rows

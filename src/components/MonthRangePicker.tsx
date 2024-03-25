@@ -1,5 +1,7 @@
 import { KeyboardArrowRight } from '@mui/icons-material'
 import { DatePicker } from 'antd'
+import locale from 'antd/es/date-picker/locale/es_ES';
+import 'dayjs/locale/es';
 import dayjs from 'dayjs'
 import '../styles.css'
 
@@ -9,7 +11,7 @@ export default function MonthRangePicker() {
       className='monthRangePicker'
       picker="month"
       placeholder={['Inicio', 'Fin']}
-      lang="es"
+      locale={locale}
       disabledDate={current => current && current.toDate() > new Date()}
       defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
       format={'MMM YY'}

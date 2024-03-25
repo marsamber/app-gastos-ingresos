@@ -11,19 +11,21 @@ import {
   Tabs,
   useMediaQuery
 } from '@mui/material'
-import { useState } from 'react'
+import { SyntheticEvent, useState } from 'react'
 import { Add } from '@mui/icons-material'
 import AllTransactionsTable from '@/components/table/AllTransactionsTable'
 import OutcomesTable from '@/components/table/OutcomesTable'
 import IncomesTable from '@/components/table/IncomesTable'
 import '../../styles.css'
+import AddTransactionModal from '@/components/modal/AddTransactionModal'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
   const [filter, setFilter] = useState('this_month')
   const isMobile = useMediaQuery('(max-width: 600px)')
+  const [addTransactionTable, setAddTransactionTable] = useState(false)
 
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
   }
 
@@ -104,7 +106,8 @@ export default function Transactions() {
                   <MenuItem value="all">Todo</MenuItem>
                 </Select>
               </FormControl>
-              <Button variant="contained" color="error" endIcon={<Add />}>
+              <Button variant="contained" color="error" endIcon={<Add />}
+              onClick = {() => setAddTransactionTable(true)}>
                 Añadir
               </Button>
             </div>
@@ -116,6 +119,8 @@ export default function Transactions() {
           {value === 2 && <IncomesTable filter={filter} />}
         </div>
       </div>
+      <AddTransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)}
+      transactionType={value === 2 ? 'income' : 'outcome'} />
     </main>
   )
 }

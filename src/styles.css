@@ -4,6 +4,7 @@
   background-color: #f7f9fb;
 }
 
+/* Month range picker */
 .ant-picker-input > input {
   cursor: pointer;
   font-size: 1.5em !important;
@@ -100,4 +101,10 @@
   .ant-picker-panel-container .ant-picker-footer-extra > div {
     flex-wrap: wrap !important;
   }
+}
+
+/* Modal */
+.css-i9fmh8-MuiBackdrop-root-MuiModal-backdrop {
+  background-color: #fff !important;
+  border-radius: 4px !important;
 }

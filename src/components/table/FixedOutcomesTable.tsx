@@ -1,5 +1,5 @@
 import { useMediaQuery } from '@mui/material'
-import CustomizedTable from './CustomizedTable'
+import BasicTable from './BasicTable'
 import OneTransactionCard from '../card/OneTransactionCard'
 import OneFixedTransactionCard from '../card/OneFixedTransactionCard'
 
@@ -21,7 +21,7 @@ export default function FixedOutcomesTable() {
 
   return (
     <>
-      {!isMobile && <CustomizedTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={5} />}
+      {!isMobile && <BasicTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={5} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {isMobile &&
           rows

@@ -1,6 +1,6 @@
 'use client'
 import { SelectChangeEvent, Tab, Tabs, useMediaQuery } from '@mui/material'
-import { useState } from 'react'
+import { SyntheticEvent, useState } from 'react'
 import MonthBudgetTable from '@/components/table/MonthBudgetTable'
 import HistoricBudgetTable from '@/components/table/HistoricBudgetTable'
 import '../../styles.css'
@@ -9,7 +9,7 @@ export default function Budget() {
   const [value, setValue] = useState(0)
   const isMobile = useMediaQuery('(max-width: 600px)')
 
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
   } 
 
