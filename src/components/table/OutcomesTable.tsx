@@ -1,6 +1,6 @@
 import { useMediaQuery } from '@mui/material'
 import CustomizedTable from './CustomizedTable'
-import OneTransactionCard from './OneTransactionCard'
+import OneTransactionCard from '../card/OneTransactionCard'
 
 export interface OutcomesTableProps {
     filter?: string

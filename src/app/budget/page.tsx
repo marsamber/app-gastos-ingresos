@@ -1,8 +1,8 @@
 'use client'
 import { SelectChangeEvent, Tab, Tabs, useMediaQuery } from '@mui/material'
 import { useState } from 'react'
-import MonthBudgetTable from '@/components/MonthBudgetTable'
-import HistoricBudgetTable from '@/components/HistoricBudgetTable'
+import MonthBudgetTable from '@/components/table/MonthBudgetTable'
+import HistoricBudgetTable from '@/components/table/HistoricBudgetTable'
 import '../../styles.css'
 
 export default function Budget() {

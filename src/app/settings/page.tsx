@@ -2,14 +2,12 @@
 import { useMediaQuery } from '@mui/material'
 import { CSSProperties, useState } from 'react'
 import '../../styles.css'
+import FixedIncomesCard from '@/components/card/FixedIncomesCard'
+import FixedOutcomesCard from '@/components/card/FixedOutcomesCard'
+import CategoriesCard from '@/components/card/CategoriesCard'
 
 export default function Settings() {
-  const [value, setValue] = useState(0)
-  const isMobile = useMediaQuery('(max-width: 600px)')
-
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue)
-  }
+  const isTablet = useMediaQuery('(max-width: 1024px)')
 
   // STYLES
   const titleStyle = {
@@ -21,14 +19,31 @@ export default function Settings() {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
+    flexDirection: isTablet ? 'column' : 'row',
+    gap: '10px',
+    width: '100%'
+  }
+
+  const columnStyle: CSSProperties = {
+    display: 'flex',
     flexDirection: 'column',
-    gap: '10px'
+    gap: '10px',
+    width: isTablet ? '100%' : '50%',
+    height: '100%'
   }
 
   return (
-    <main className='main'>
+    <main className="main">
       <h2 style={titleStyle}>Configuración</h2>
-      <div style={containerStyle}></div>
+      <div style={containerStyle}>
+        <div style={columnStyle}>
+          <FixedIncomesCard />
+          <FixedOutcomesCard />
+        </div>
+        <div style={columnStyle}>
+          <CategoriesCard />
+        </div>
+      </div>
     </main>
   )
 }

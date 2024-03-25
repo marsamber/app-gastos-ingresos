@@ -13,9 +13,9 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 import { Add } from '@mui/icons-material'
-import AllTransactionsTable from '@/components/AllTransactionsTable'
-import OutcomesTable from '@/components/OutcomesTable'
-import IncomesTable from '@/components/IncomesTable'
+import AllTransactionsTable from '@/components/table/AllTransactionsTable'
+import OutcomesTable from '@/components/table/OutcomesTable'
+import IncomesTable from '@/components/table/IncomesTable'
 import '../../styles.css'
 
 export default function Transactions() {

@@ -86,7 +86,7 @@ export default function CustomizedTable({
   return (
     <Paper sx={{ width: '100%', mb: 2 }}>
       <TableContainer>
-        <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
+        <Table aria-labelledby="tableTitle">
           <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} headCells={headCells} />
           <TableBody>
             {visibleRows.map(row => {
@@ -132,7 +132,7 @@ export default function CustomizedTable({
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[5, 10, 15, 20, 25]}
         component="div"
         count={rows.length}
         rowsPerPage={rowsPerPage}

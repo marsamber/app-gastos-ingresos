@@ -1,6 +1,6 @@
 import { useMediaQuery } from '@mui/material'
 import CustomizedTable from './CustomizedTable'
-import OneCategoryCard from './OneCategoryCard'
+import OneCategoryCard from '../card/OneCategoryCard'
 
 
 export default function MonthBudgetTable() {
