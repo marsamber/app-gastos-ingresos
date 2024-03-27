@@ -1,6 +1,7 @@
-import { useMediaQuery } from '@mui/material'
+import { IconButton, useMediaQuery } from '@mui/material'
 import BasicTable from './BasicTable'
 import OneCategoryBudgetCard from '../card/OneCategoryBudgetCard'
+import { Delete, Edit } from '@mui/icons-material'
 
 export default function CategoriesTable() {
   const isMobile = useMediaQuery('(max-width: 600px)')
@@ -24,12 +25,27 @@ export default function CategoriesTable() {
     { id: 10, description: 'Otros', budget: 50 }
   ]
 
+  headCells.push({ id: 'actions', label: 'Acciones' })
+  const dataRows = rows.map(row => ({
+    ...row,
+    actions: (
+      <div key={row.id}>
+        <IconButton>
+          <Edit color='error' />
+        </IconButton>
+        <IconButton>
+          <Delete color='error' />
+        </IconButton>
+      </div>
+    )
+  }))
+
   return (
     <>
-      {!isMobile && <BasicTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={15} />}
+      {!isMobile && <BasicTable headCells={headCells} rows={dataRows} keyOrder="date" numRowsPerPage={15} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {isMobile &&
-          rows
+          dataRows
             .map(row => <OneCategoryBudgetCard data={row} />)}
       </div>
     </>

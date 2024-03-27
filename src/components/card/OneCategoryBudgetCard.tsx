@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import BasicCard from './BasicCard'
 
 export interface OneCategoryBudgetCardProps {
@@ -5,6 +6,7 @@ export interface OneCategoryBudgetCardProps {
     id: number
     description: string
     budget: number
+    actions: ReactNode
   }
 }
 
@@ -19,13 +21,24 @@ export default function OneCategoryBudgetCard({ data }: OneCategoryBudgetCardPro
     padding: '0 10px'
   }
 
+  const contentStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }
+
   return (
     <BasicCard>
       <p>
         <b>{data.description}</b>
       </p>
-      <b style={titleStyle}>Presupuesto</b>
-      <p>{data.budget} €</p>
+      <div style={contentStyle}>
+        <div>
+          <b style={titleStyle}>Presupuesto</b>
+          <p style={dataStyle}>{data.budget} €</p>
+        </div>
+        {data.actions}
+      </div>
     </BasicCard>
   )
 }

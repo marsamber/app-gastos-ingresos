@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import BasicCard from './BasicCard'
 
 export interface OneFixedTransactionCardProps {
@@ -5,6 +6,7 @@ export interface OneFixedTransactionCardProps {
     id: number
     description: string
     amount: number
+    actions: ReactNode
   }
 }
 
@@ -19,20 +21,31 @@ export default function OneFixedTransactionCard({ data }: OneFixedTransactionCar
     padding: '0 10px'
   }
 
+  const contentStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }
+
   return (
     <BasicCard>
       <p>
         <b>{data.description}</b>
       </p>
-      <b style={titleStyle}>Cantidad</b>
-      <p
-        style={{
-          ...dataStyle,
-          color: data.amount > 0 ? 'green' : 'red'
-        }}
-      >
-        {data.amount} €
-      </p>
+      <div style={contentStyle}>
+        <div>
+          <b style={titleStyle}>Cantidad</b>
+          <p
+            style={{
+              ...dataStyle,
+              color: data.amount > 0 ? 'green' : 'red'
+            }}
+          >
+            {data.amount} €
+          </p>
+        </div>
+        {data.actions}
+      </div>
     </BasicCard>
   )
 }

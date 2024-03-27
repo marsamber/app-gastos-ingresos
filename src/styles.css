@@ -4,6 +4,15 @@
   background-color: #f7f9fb;
 }
 
+/* Tabs */
+.css-1a4cg4j-MuiButtonBase-root-MuiTab-root.Mui-selected {
+  color: #d32f2f !important;
+}
+
+.css-11yukd5-MuiTabs-indicator{
+  background-color: #d32f2f !important;
+}
+
 /* Month range picker */
 .ant-picker-input > input {
   cursor: pointer;

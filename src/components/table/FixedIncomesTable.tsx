@@ -35,7 +35,7 @@ export default function FixedIncomesTable() {
     <>
       {!isMobile && <BasicTable headCells={headCells} rows={dataRows} keyOrder="date" numRowsPerPage={5} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {isMobile && rows.map(row => <OneFixedTransactionCard data={row} />)}
+        {isMobile && dataRows.map(row => <OneFixedTransactionCard data={row} />)}
       </div>
     </>
   )
