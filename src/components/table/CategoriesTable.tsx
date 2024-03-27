@@ -7,22 +7,22 @@ export default function CategoriesTable() {
   const isMobile = useMediaQuery('(max-width: 600px)')
 
   const headCells = [
-    { id: 'description', label: 'Descripción' },
+    { id: 'category', label: 'Categoría' },
     { id: 'budget', label: 'Presupuesto' }
   ]
 
   const rows = [
-    { id: 0, description: 'Comida', budget: 300 },
-    { id: 1, description: 'Ocio', budget: 100 },
-    { id: 2, description: 'Transporte', budget: 50 },
-    { id: 3, description: 'Ropa', budget: 50 },
-    { id: 4, description: 'Salud', budget: 50 },
-    { id: 5, description: 'Hogar', budget: 50 },
-    { id: 6, description: 'Educación', budget: 50 },
-    { id: 7, description: 'Regalos', budget: 50 },
-    { id: 8, description: 'Viajes', budget: 50 },
-    { id: 9, description: 'Ahorro', budget: 50 },
-    { id: 10, description: 'Otros', budget: 50 }
+    { id: 0, category: 'Comida', budget: 300 },
+    { id: 1, category: 'Ocio', budget: 100 },
+    { id: 2, category: 'Transporte', budget: 50 },
+    { id: 3, category: 'Ropa', budget: 50 },
+    { id: 4, category: 'Salud', budget: 50 },
+    { id: 5, category: 'Hogar', budget: 50 },
+    { id: 6, category: 'Educación', budget: 50 },
+    { id: 7, category: 'Regalos', budget: 50 },
+    { id: 8, category: 'Viajes', budget: 50 },
+    { id: 9, category: 'Ahorro', budget: 50 },
+    { id: 10, category: 'Otros', budget: 50 }
   ]
 
   headCells.push({ id: 'actions', label: 'Acciones' })

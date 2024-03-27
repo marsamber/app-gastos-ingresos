@@ -4,7 +4,7 @@ import BasicCard from './BasicCard'
 export interface OneCategoryBudgetCardProps {
   data: {
     id: number
-    description: string
+    category: string
     budget: number
     actions: ReactNode
   }
@@ -30,7 +30,7 @@ export default function OneCategoryBudgetCard({ data }: OneCategoryBudgetCardPro
   return (
     <BasicCard>
       <p>
-        <b>{data.description}</b>
+        <b>{data.category}</b>
       </p>
       <div style={contentStyle}>
         <div>

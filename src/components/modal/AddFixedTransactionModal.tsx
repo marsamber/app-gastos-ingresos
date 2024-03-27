@@ -21,7 +21,7 @@ export interface AddFixedTransactionModalProps {
 
 export default function AddFixedTransactionModal({ open, handleClose, transactionType }: AddFixedTransactionModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const [type, setType] = useState(transactionType || 'outcome')
+  const [type, setType] = useState(transactionType || 'expense')
   const [amount, setAmount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -33,7 +33,7 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
   // const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   useEffect(() => {
-    setType(transactionType || 'outcome')
+    setType(transactionType || 'expense')
   }, [transactionType])
 
   const handleAddTransaction = async () => {
@@ -106,7 +106,7 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
               color="error"
             >
               <MenuItem value="income">Ingreso</MenuItem>
-              <MenuItem value="outcome">Gasto</MenuItem>
+              <MenuItem value="expense">Gasto</MenuItem>
             </Select>
           </FormControl>
           <TextField

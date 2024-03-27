@@ -1,14 +1,12 @@
-import { CSSProperties, useEffect, useState } from 'react'
+import { CSSProperties, useState } from 'react'
 import BasicModal from './BasicModal'
 import {
   Button,
   FormControl,
-  Input,
   InputLabel,
   MenuItem,
   Select,
   TextField,
-  Typography,
   useMediaQuery
 } from '@mui/material'
 import { format } from 'path'
@@ -20,7 +18,7 @@ export interface AddCategoryBudgetModalProps {
 
 export default function AddCategoryBudgetModal({ open, handleClose }: AddCategoryBudgetModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const [category, setCategory] = useState('outcome')
+  const [category, setCategory] = useState('shopping')
   const [amount, setAmount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)

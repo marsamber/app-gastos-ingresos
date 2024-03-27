@@ -11,7 +11,7 @@ export default function Budget() {
 
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
-  } 
+  }
 
   // STYLES
   const titleStyle = {
@@ -28,24 +28,31 @@ export default function Budget() {
   }
 
   return (
-    <main className='main'>
+    <main className="main">
       <h2 style={titleStyle}>Presupuesto</h2>
       <div>
         <div style={tabsStyle}>
           <Tabs
+            classes={{
+              indicator: 'indicator'
+            }}
             textColor="secondary"
             indicatorColor="secondary"
             value={value}
             onChange={handleChangeTab}
             variant={isMobile ? 'fullWidth' : 'standard'}
           >
-            <Tab label="Este mes" value={0} />
-            <Tab label="Historial" value={1} />
+            <Tab classes={{
+              selected: 'tabSelected'
+            }} label="Este mes" value={0} />
+            <Tab classes={{
+              selected: 'tabSelected'
+            }} label="Historial" value={1} />
           </Tabs>
         </div>
         <div>
           {value === 0 && <MonthBudgetTable />}
-          {value === 1 && <HistoricBudgetTable/>}
+          {value === 1 && <HistoricBudgetTable />}
         </div>
       </div>
     </main>

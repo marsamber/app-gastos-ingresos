@@ -2,11 +2,11 @@ import { useMediaQuery } from '@mui/material'
 import BasicTable from './BasicTable'
 import OneTransactionCard from '../card/OneTransactionCard'
 
-export interface OutcomesTableProps {
+export interface ExpensesTableProps {
     filter?: string
 }
 
-export default function OutcomesTable({filter = 'this_month'}: OutcomesTableProps) {
+export default function ExpensesTable({filter = 'this_month'}: ExpensesTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
 
   const headCells = [

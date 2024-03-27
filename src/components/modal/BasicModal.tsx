@@ -19,7 +19,9 @@ export default function BasicModal({ open, style, children }: BasicModalProps) {
   }
 
   return (
-    <Modal sx={{...defaultStyle, ...style }} open={open}>
+    <Modal sx={{...defaultStyle, ...style }} classes={{
+      backdrop: 'backdrop'
+    }} open={open}>
       {children}
     </Modal>
   )

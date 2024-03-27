@@ -3,27 +3,25 @@ import BasicModal from './BasicModal'
 import {
   Button,
   FormControl,
-  Input,
   InputLabel,
   MenuItem,
   Select,
   TextField,
-  Typography,
   useMediaQuery
 } from '@mui/material'
-import { format } from 'path'
 
 export interface AddTransactionModalProps {
   open: boolean
   handleClose: () => void
-  transactionType?: string
+  transactionType?: 'income' | 'expense'
 }
 
 export default function AddTransactionModal({ open, handleClose, transactionType }: AddTransactionModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const [type, setType] = useState(transactionType || 'outcome')
+  const [type, setType] = useState<'income' | 'expense'>(transactionType || 'expense')
   const [amount, setAmount] = useState<number | null>(null)
   const [description, setDescription] = useState('')
+  const [category, setCategory] = useState('')
   const [date, setDate] = useState(new Date())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -35,11 +33,11 @@ export default function AddTransactionModal({ open, handleClose, transactionType
   // const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   useEffect(() => {
-    setType(transactionType || 'outcome')
+    setType(transactionType || 'expense')
   }, [transactionType])
 
   const handleAddTransaction = async () => {
-    if (!amount || !description) {
+    if (!amount || !description || !category) {
       setError(true)
       return
     }
@@ -86,7 +84,7 @@ export default function AddTransactionModal({ open, handleClose, transactionType
 
   const modalStyle: CSSProperties = {
     width: isMobile ? '80%' : '500px',
-    height: isMobile ? '415px' : '300px'
+    height: isMobile ? '480px' : '300px'
   }
 
   const firstRowStyle: CSSProperties = {
@@ -115,11 +113,11 @@ export default function AddTransactionModal({ open, handleClose, transactionType
               labelId="type-label"
               value={type}
               label="Tipo"
-              onChange={e => setType(e.target.value)}
+              onChange={e => setType(e.target.value as 'income' | 'expense')}
               color="error"
             >
               <MenuItem value="income">Ingreso</MenuItem>
-              <MenuItem value="outcome">Gasto</MenuItem>
+              <MenuItem value="expense">Gasto</MenuItem>
             </Select>
           </FormControl>
           <TextField
@@ -144,7 +142,7 @@ export default function AddTransactionModal({ open, handleClose, transactionType
         </div>
         <div style={firstRowStyle}>
           <TextField
-            style={{ width: isMobile ? '192px' : '420px', margin: '8px' }}
+            style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
             size="small"
             color="error"
             label="Descripción"
@@ -152,6 +150,27 @@ export default function AddTransactionModal({ open, handleClose, transactionType
             error={error}
             onChange={e => setDescription(e.target.value)}
           />
+          <FormControl style={{ width: isMobile ? '192px' : '200px', margin: '8px' }} size="small">
+            <InputLabel id="category-label" color="error">
+              Categoría
+            </InputLabel>
+            <Select
+              labelId="category-label"
+              value={category}
+              label="Categoría"
+              onChange={e => setCategory(e.target.value)}
+              color="error"
+            >
+              <MenuItem value='shopping'>Compras</MenuItem>
+              <MenuItem value='food'>Comida</MenuItem>
+              <MenuItem value='transport'>Transporte</MenuItem>
+              <MenuItem value='services'>Servicios</MenuItem>
+              <MenuItem value='entertainment'>Entretenimiento</MenuItem>
+              <MenuItem value='health'>Salud</MenuItem>
+              <MenuItem value='education'>Educación</MenuItem>
+              <MenuItem value='others'>Otros</MenuItem>
+            </Select>
+          </FormControl>
         </div>
         <div style={actionsStyle}>
           <Button variant="contained" color="error" onClick={handleAddTransaction} disabled={loading}>

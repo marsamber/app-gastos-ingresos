@@ -3,7 +3,7 @@ import BasicTable from './BasicTable'
 import OneFixedTransactionCard from '../card/OneFixedTransactionCard'
 import { Delete, Edit } from '@mui/icons-material'
 
-export default function FixedOutcomesTable() {
+export default function FixedExpensesTable() {
   const isMobile = useMediaQuery('(max-width: 600px)')
 
   const headCells = [

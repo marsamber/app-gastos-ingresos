@@ -3,7 +3,7 @@ import { useMediaQuery } from '@mui/material'
 import { CSSProperties, useState } from 'react'
 import '../../styles.css'
 import FixedIncomesCard from '@/components/card/FixedIncomesCard'
-import FixedOutcomesCard from '@/components/card/FixedOutcomesCard'
+import FixedExpensesCard from '@/components/card/FixedExpensesCard'
 import CategoriesCard from '@/components/card/CategoriesCard'
 
 export default function Settings() {
@@ -38,7 +38,7 @@ export default function Settings() {
       <div style={containerStyle}>
         <div style={columnStyle}>
           <FixedIncomesCard />
-          <FixedOutcomesCard />
+          <FixedExpensesCard />
         </div>
         <div style={columnStyle}>
           <CategoriesCard />

@@ -2,11 +2,11 @@ import { CSSProperties, useState } from 'react'
 import BasicCard from './BasicCard'
 import { Button, useMediaQuery } from '@mui/material'
 import { Add } from '@mui/icons-material'
-import FixedOutcomesTable from '../table/FixedOutcomesTable'
+import FixedExpensesTable from '../table/FixedExpensesTable'
 import AddFixedTransactionModal from '../modal/AddFixedTransactionModal'
 
-export default function FixedOutcomesCard() {
-  const [addFixedOutcomeTransaction, setAddFixedOutcomeTransaction] = useState(false)
+export default function FixedExpensesCard() {
+  const [addFixedExpenseTransaction, setAddFixedExpenseTransaction] = useState(false)
 
   // STYLES
   const titleStyle = {
@@ -36,17 +36,17 @@ export default function FixedOutcomesCard() {
       <div style={headerStyle}>
         <h3 style={titleStyle}>Gastos fijos</h3>
         <Button variant="contained" color="error" endIcon={<Add />}
-        onClick={() => setAddFixedOutcomeTransaction(true)}>
+        onClick={() => setAddFixedExpenseTransaction(true)}>
           Añadir
         </Button>
       </div>
       <div style={containerStyle}>
-        <FixedOutcomesTable />
+        <FixedExpensesTable />
       </div>
       <AddFixedTransactionModal
-        open={addFixedOutcomeTransaction}
-        handleClose={() => setAddFixedOutcomeTransaction(false)}
-        transactionType="outcome"/>
+        open={addFixedExpenseTransaction}
+        handleClose={() => setAddFixedExpenseTransaction(false)}
+        transactionType="expense"/>
     </BasicCard>
   )
 }

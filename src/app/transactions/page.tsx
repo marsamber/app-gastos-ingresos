@@ -14,7 +14,7 @@ import {
 import { SyntheticEvent, useState } from 'react'
 import { Add } from '@mui/icons-material'
 import AllTransactionsTable from '@/components/table/AllTransactionsTable'
-import OutcomesTable from '@/components/table/OutcomesTable'
+import ExpensesTable from '@/components/table/ExpensesTable'
 import IncomesTable from '@/components/table/IncomesTable'
 import '../../styles.css'
 import AddTransactionModal from '@/components/modal/AddTransactionModal'
@@ -76,15 +76,24 @@ export default function Transactions() {
         )}
         <div style={tabsStyle}>
           <Tabs
+            classes={{
+              indicator: 'indicator'
+            }}
             textColor="secondary"
             indicatorColor="secondary"
             value={value}
             onChange={handleChangeTab}
             variant={isMobile ? 'fullWidth' : 'standard'}
           >
-            <Tab label="Todo" value={0} />
-            <Tab label="Gastos" value={1} />
-            <Tab label="Ingresos" value={2} />
+            <Tab classes={{
+              selected: 'tabSelected'
+            }} label="Todo" value={0} />
+            <Tab classes={{
+              selected: 'tabSelected'
+            }} label="Gastos" value={1} />
+            <Tab classes={{
+              selected: 'tabSelected'
+            }} label="Ingresos" value={2} />
           </Tabs>
           {!isMobile && (
             <div style={buttonsStyle}>
@@ -115,12 +124,12 @@ export default function Transactions() {
         </div>
         <div>
           {value === 0 && <AllTransactionsTable filter={filter} />}
-          {value === 1 && <OutcomesTable filter={filter} />}
+          {value === 1 && <ExpensesTable filter={filter} />}
           {value === 2 && <IncomesTable filter={filter} />}
         </div>
       </div>
       <AddTransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)}
-      transactionType={value === 2 ? 'income' : 'outcome'} />
+      transactionType={value === 2 ? 'income' : 'expense'} />
     </main>
   )
 }
