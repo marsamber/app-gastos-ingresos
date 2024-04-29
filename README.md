@@ -2,7 +2,30 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+`npm install`
+
+Make sure the database is running
+
+`docker-compose up -d`
+
+Configure the .env with the database 
+
+`
+POSTGRES_PRISMA_URL="postgresql://postgresuser:postgrespassword@localhost:5432/postgresdb?schema=public"
+`
+
+
+Run the migrations
+
+`npx prisma migrate dev`
+
+Generate the Prisma client
+
+`npx prisma generate`
+
+Then, run the development server
 
 ```bash
 npm run dev
