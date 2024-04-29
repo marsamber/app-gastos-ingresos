@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my_postgres_container
+    environment:
+      POSTGRES_USER: postgresuser  # Replace 'myuser' with your desired username
+      POSTGRES_PASSWORD: postgrespassword  # Replace 'mypassword' with your desired password
+      POSTGRES_DB: postgresdb  # Replace 'mydatabase' with your desired database name
+    volumes:
+      - my_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+volumes:
+  my_postgres_data:
+    driver: local

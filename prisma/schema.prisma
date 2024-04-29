@@ -1,0 +1,52 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  title String
+  type        String
+  date        DateTime
+  category  String
+  Category    Category @relation(fields: [category], references: [id])
+}
+
+model MonthlyTransaction {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  title String
+  type        String
+  category  String
+  Category    Category @relation(fields: [category], references: [id])
+}
+
+model Budget {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  category  String
+  Category    Category @relation(fields: [category], references: [id])
+}
+
+model BudgetHistoric {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  date        DateTime
+  category  String
+  Category    Category @relation(fields: [category], references: [id])
+}
+
+model Category {
+  id       String         @id
+  deleted  Boolean    @default(false)
+  Transactions Transaction[]
+  MonthlyTransactions MonthlyTransaction[]
+  Budgets       Budget[]
+  BudgetHistorics BudgetHistoric[]
+}

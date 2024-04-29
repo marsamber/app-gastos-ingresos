@@ -1,50 +1,16 @@
 import { CSSProperties } from 'react'
 import BasicCard from './BasicCard'
 import { useMediaQuery } from '@mui/material'
+import useFetch from '@/hooks/useFetch'
+import { ITransaction } from '@/types/index'
 
 export default function TransactionsCard() {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1024px)')
 
   // MOCK DATA
-  const transactions = [
-    {
-      id: 1,
-      title: 'Compra de supermercado',
-      amount: -100,
-      date: new Date()
-    },
-    {
-      id: 2,
-      title: 'Pago de factura',
-      amount: -50,
-      date: new Date()
-    },
-    {
-      id: 3,
-      title: 'Retiro de efectivo',
-      amount: -200,
-      date: new Date()
-    },
-    {
-      id: 4,
-      title: 'Pago de deuda',
-      amount: -150,
-      date: new Date()
-    },
-    {
-      id: 5,
-      title: 'Pago de alquiler de apartamento',
-      amount: -800,
-      date: new Date()
-    },
-    {
-      id: 6,
-      title: 'Ingreso de salario',
-      amount: 1000,
-      date: new Date()
-    }
-  ]
+
+  const { data, error, loading } = useFetch<ITransaction[]>('/api/transactions')
 
   // STYLES
   const titleStyle = {
@@ -67,12 +33,15 @@ export default function TransactionsCard() {
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Transacciones recientes</h3>
       <div style={containerStyle}>
-        {transactions.slice(0, 5).map((transaction, index) => (
-          <>
-            <Transaction key={transaction.id} transaction={transaction} />
-            {index !== transactions.slice(0, 5).length - 1 && <hr />}
-          </>
-        ))}
+        {loading && <p>Cargando...</p>}
+        {!loading &&
+          data &&
+          data.slice(0, 5).map((transaction, index) => (
+            <>
+              <Transaction key={transaction.id} transaction={{ ...transaction, date: new Date(transaction.date) }} />
+              {index !== data.slice(0, 5).length - 1 && <hr />}
+            </>
+          ))}
       </div>
     </BasicCard>
   )
