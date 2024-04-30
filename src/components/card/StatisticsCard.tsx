@@ -1,12 +1,61 @@
-import { useMediaQuery } from '@mui/material'
-import { CSSProperties } from 'react'
+import { CircularProgress, useMediaQuery } from '@mui/material'
+import { CSSProperties, use, useContext, useEffect, useState } from 'react'
 import BasicCard from './BasicCard'
 import { Legend, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, TooltipProps } from 'recharts'
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
+import { HomeContext } from '@/contexts/HomeContext'
+
+interface IStatisticsChart {
+  name: string
+  value: number
+}
 
 export default function StatisticsCard() {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1024px)')
+  const [data, setData] = useState<IStatisticsChart[]>([])
+
+  const { transactions, budgets, budgetHistorics, loadingTransactions, loadingBudgets, loadingBudgetHistorics } =
+    useContext(HomeContext)
+
+  // DATA
+  const mergeStatisticsData = (statisticsData: Map<string, IStatisticsChart>) => {
+    // Safe check and merge both budgets and budget historics if they are not null
+    ;[...(budgets ?? []), ...(budgetHistorics ?? [])].forEach(item => {
+      if (item.amount > 0) {
+        const existingEntry = statisticsData.get(item.category)
+        if (!existingEntry) {
+          statisticsData.set(item.category, { name: item.category, value: 0 })
+        }
+      }
+    })
+  }
+
+  const addTransactionData = (statisticsData: Map<string, IStatisticsChart>) => {
+    // Safe check and aggregate transactions if they are not null
+    ;(transactions ?? []).forEach(transaction => {
+      const category = statisticsData.get(transaction.category)
+      if (category) {
+        category.value += transaction.amount
+      } else {
+        // If there's a transaction without a corresponding budget/budget historic, create a new category entry
+        statisticsData.set(transaction.category, {
+          name: transaction.category,
+          value: transaction.amount
+        })
+      }
+    })
+  }
+
+  useEffect(() => {
+    const statisticsData = new Map<string, IStatisticsChart>()
+
+    // Assuming budgets, transactions, and budgetHistorics can all potentially be null
+    mergeStatisticsData(statisticsData)
+    addTransactionData(statisticsData)
+
+    setData(Array.from(statisticsData.values())) // Convert map values to array for rendering or further processing
+  }, [budgets, transactions, budgetHistorics])
 
   // STYLES
   const titleStyle = {
@@ -26,23 +75,16 @@ export default function StatisticsCard() {
     height: isTablet ? '400px' : '350px'
   }
 
-  const data = [
-    { name: 'Compras online', value: 200 },
-    { name: 'Entretenimiento', value: 150 },
-    { name: 'Viajes', value: 300 },
-    { name: 'Compras varias', value: 400 },
-    { name: 'Alimentación', value: 300 },
-    { name: 'Restaurantes', value: 300 },
-    { name: 'Gastos inesperados', value: 200 },
-    { name: 'Ocio', value: 100 },
-    { name: 'Transporte', value: 100 },
-    { name: 'Salud', value: 100 },
-    { name: 'Educación', value: 100 }
-  ]
+  const circularProgressStyle: CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%'
+  }
 
   const COLORS = [
-    '#0088FE',
     '#00C49F',
+    '#0088FE',
     '#FFBB28',
     '#FF8042',
     '#FF6384',
@@ -51,7 +93,15 @@ export default function StatisticsCard() {
     '#4BC0C0',
     '#FFD700',
     '#FF69B4',
-    '#90EE90'
+    '#90EE90',
+    '#FFC0CB',
+    '#ADD8E6',
+    '#FFA07A',
+    '#7B68EE',
+    '#00FF7F',
+    '#FF1493',
+    '#FFDAB9',
+    '#00FFFF'
   ]
 
   const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) => {
@@ -60,7 +110,9 @@ export default function StatisticsCard() {
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
-          <p><b>{data.name}</b>: {data.value} €</p>
+          <p>
+            <b>{data.name}</b>: {data.value} €
+          </p>
         </div>
       )
     }
@@ -69,33 +121,42 @@ export default function StatisticsCard() {
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Estadísticas por categoría</h3>
+      {(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && (
+        <div style={circularProgressStyle}>
+          <CircularProgress />
+        </div>
+      )}
       <div style={containerStyle}>
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart
-            width={400}
-            height={isTablet ? 500 : 300}
-            style={{
-              fontSize: '14px'
-            }}
-          >
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={({ percent }: any) => `${(percent * 100).toFixed(0)}%`}
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey="value"
+        {!(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && data.length === 0 ? (
+          <p>No hay datos para mostrar</p>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart
+              width={400}
+              height={isTablet ? 500 : 300}
+              style={{
+                fontSize: '14px'
+              }}
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Legend />
-            <Tooltip content={props => <CustomTooltip {...props} />} />
-          </PieChart>
-        </ResponsiveContainer>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ percent }: any) => `${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend />
+              <Tooltip content={props => <CustomTooltip {...props} />} />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </BasicCard>
   )

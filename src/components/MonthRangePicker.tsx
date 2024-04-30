@@ -1,14 +1,24 @@
 import { KeyboardArrowRight } from '@mui/icons-material'
 import { DatePicker } from 'antd'
-import locale from 'antd/es/date-picker/locale/es_ES';
-import 'dayjs/locale/es';
-import dayjs from 'dayjs'
+import locale from 'antd/es/date-picker/locale/es_ES'
+import 'dayjs/locale/es'
+import dayjs, { Dayjs } from 'dayjs'
 import '../styles.css'
 
-export default function MonthRangePicker() {
+interface MonthRangePickerProps {
+  monthsSelected: [string, string]
+  setMonthsSelected: (dates: [string, string]) => void
+}
+
+export default function MonthRangePicker({ monthsSelected: dates, setMonthsSelected: setDates }: MonthRangePickerProps) {
+
+  const handleOnChangeDates = (dates: [Dayjs, Dayjs]) => {
+    setDates([dates[0].startOf('month').format('YYYY-MM-DD'), dates[1].endOf('month').format('YYYY-MM-DD')])
+  }
+
   return (
     <DatePicker.RangePicker
-      className='monthRangePicker'
+      className="monthRangePicker"
       picker="month"
       placeholder={['Inicio', 'Fin']}
       locale={locale}
@@ -22,6 +32,7 @@ export default function MonthRangePicker() {
       separator={<KeyboardArrowRight />}
       allowEmpty={[false, false]}
       inputReadOnly
+      onChange={(dates) => handleOnChangeDates(dates as [Dayjs, Dayjs])}
       style={{
         width: '200px',
         marginBottom: '5px',

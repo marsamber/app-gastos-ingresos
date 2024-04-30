@@ -1,16 +1,13 @@
-import { CSSProperties } from 'react'
+import { HomeContext } from '@/contexts/HomeContext'
+import { CircularProgress, useMediaQuery } from '@mui/material'
+import { CSSProperties, useContext, useEffect } from 'react'
 import BasicCard from './BasicCard'
-import { useMediaQuery } from '@mui/material'
-import useFetch from '@/hooks/useFetch'
-import { ITransaction } from '@/types/index'
 
 export default function TransactionsCard() {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1024px)')
 
-  // MOCK DATA
-
-  const { data, error, loading } = useFetch<ITransaction[]>('/api/transactions')
+  const { loadingTransactions, transactions } = useContext(HomeContext)
 
   // STYLES
   const titleStyle = {
@@ -29,19 +26,33 @@ export default function TransactionsCard() {
     height: isTablet ? '400px' : '350px'
   }
 
+  const circularProgressStyle: CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%'
+  }
+
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Transacciones recientes</h3>
+      {loadingTransactions && (
+        <div style={circularProgressStyle}>
+          <CircularProgress />
+        </div>
+      )}
       <div style={containerStyle}>
-        {loading && <p>Cargando...</p>}
-        {!loading &&
-          data &&
-          data.slice(0, 5).map((transaction, index) => (
+        {!loadingTransactions && transactions && transactions.length == 0 ? (
+          <p>No hay datos para mostrar</p>
+        ) : (
+          transactions &&
+          transactions.slice(0, 5).map((transaction, index) => (
             <>
               <Transaction key={transaction.id} transaction={{ ...transaction, date: new Date(transaction.date) }} />
-              {index !== data.slice(0, 5).length - 1 && <hr />}
+              {index !== transactions.slice(0, 5).length - 1 && <hr />}
             </>
-          ))}
+          ))
+        )}
       </div>
     </BasicCard>
   )
@@ -59,7 +70,8 @@ function Transaction({ transaction }: { transaction: { id: number; title: string
   const descriptionStyle: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    gap: '5px'
+    gap: '5px',
+    maxWidth: '70%'
   }
 
   const titleStyle = {

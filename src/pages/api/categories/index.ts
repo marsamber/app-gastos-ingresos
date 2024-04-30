@@ -19,21 +19,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case 'POST':
       try {
-        // Extract category details from request body
-        const { category, deleted } = req.body
+        // Verify if the request body is an array or a single object
+        const categoriesInput = Array.isArray(req.body) ? req.body : [req.body]
 
-        // Create a new category in the database
-        const newCategory = await prisma.category.create({
-          data: {
-            id: category,
-            deleted
-          }
+        // Map incoming category details to the format expected by the Prisma createMany
+        const categoryData = categoriesInput.map(cat => ({
+          id: cat.category,
+          deleted: cat.deleted
+        }))
+
+        // Use Prisma's createMany to insert multiple categories
+        const newCategories = await prisma.category.createMany({
+          data: categoryData,
+          skipDuplicates: true // Optional: skips entries that would cause duplicate ID errors
         })
 
-        res.status(201).json(newCategory)
+        res.status(201).json(newCategories)
       } catch (error) {
-        console.error('Failed to create category:', error)
-        res.status(400).json({ error: 'Failed to create category' })
+        console.error('Failed to create categories:', error)
+        res.status(400).json({ error: 'Failed to create categories' })
       }
       break
 

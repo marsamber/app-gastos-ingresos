@@ -1,5 +1,7 @@
 'use client'
-import * as React from 'react'
+import { Add, Calculate, CreditCard, CurrencyExchange, Home, Settings } from '@mui/icons-material'
+import MenuIcon from '@mui/icons-material/Menu'
+import { Fab } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -11,14 +13,10 @@ import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import MenuIcon from '@mui/icons-material/Menu'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { Add, Calculate, CreditCard, CurrencyExchange, Home, Settings } from '@mui/icons-material'
 import { usePathname } from 'next/navigation'
-import { Fab } from '@mui/material'
-import { ReactNode, useState } from 'react'
-import BasicModal from './modal/BasicModal'
+import { ReactNode, useEffect, useState } from 'react'
 import AddTransactionModal from './modal/AddTransactionModal'
 
 const drawerWidth = 240
@@ -47,6 +45,12 @@ export default function ResponsiveDrawer({
       setMobileOpen(!mobileOpen)
     }
   }
+
+  useEffect(() => {
+    if (!localStorage.getItem('token') && pathname !== '/login') {
+      window.location.href = '/login'
+    }
+  }, [])
 
   const drawer = (
     <div>
@@ -115,7 +119,9 @@ export default function ResponsiveDrawer({
     </div>
   )
 
-  return (
+  const isLogin = pathname === '/login'
+
+  return isLogin ? children : (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar

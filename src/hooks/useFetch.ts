@@ -19,7 +19,7 @@ export default function useFetch<D = any, E = unknown>(url: string, options?: Re
 
   useEffect(() => {
     refetch()
-  }, [])
+  }, [url])
 
   return { data, error, loading, refetch }
 }
