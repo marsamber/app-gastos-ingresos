@@ -29,7 +29,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const transaction = await prisma.transaction.update({
           where: { id: Number(id) },
-          data: req.body,
+          data: 
+          {
+            title: req.body.title,
+            amount: req.body.amount,
+            date: req.body.date,
+            category: req.body.category,
+            type: req.body.amount < 0 ? 'EXPENSE' : 'INCOME',
+          },
         });
         res.status(200).json(transaction);
       } catch (error: any) {

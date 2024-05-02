@@ -5,13 +5,13 @@ import HistoricDashboardCard from '@/components/card/HistoricDashboardCard'
 import MonthDashboardCard from '@/components/card/MonthDashboardCard'
 import StatisticsCard from '@/components/card/StatisticsCard'
 import TransactionsCard from '@/components/card/TransactionsCard'
+import { HomeContext } from '@/contexts/HomeContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
 import { useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
-import { CSSProperties, use, useEffect, useState } from 'react'
+import { CSSProperties, useEffect, useState } from 'react'
 import '../styles.css'
-import { HomeContext } from '@/contexts/HomeContext'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -54,7 +54,7 @@ export default function Home() {
           .reduce((acc, budget) => acc + budget.amount, 0)
       }
 
-      setBudget(totalBudget + totalHistorics - totalSpent)
+      setBudget(totalBudget + totalHistorics + totalSpent)
     }
   }, [budgets, transactions, budgetHistorics])
 
@@ -68,8 +68,8 @@ export default function Home() {
   }, [monthsSelected])
 
   useEffect(() => {
-    if (transactions){
-    transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (transactions) {
+      transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     }
   }, [transactions])
 

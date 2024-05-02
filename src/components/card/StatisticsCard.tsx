@@ -36,12 +36,12 @@ export default function StatisticsCard() {
     ;(transactions ?? []).forEach(transaction => {
       const category = statisticsData.get(transaction.category)
       if (category) {
-        category.value += transaction.amount
+        category.value -= transaction.amount
       } else {
         // If there's a transaction without a corresponding budget/budget historic, create a new category entry
         statisticsData.set(transaction.category, {
           name: transaction.category,
-          value: transaction.amount
+          value: -transaction.amount
         })
       }
     })

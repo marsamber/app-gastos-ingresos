@@ -84,7 +84,7 @@ export default function HistoricDashboardCard() {
       .forEach(transaction => {
         const monthKey = formatMonthYear(transaction.date as string)
         const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
-        entry.Gastado += transaction.amount
+        entry.Gastado -= transaction.amount
         dataMap.set(monthKey, entry)
       })
 

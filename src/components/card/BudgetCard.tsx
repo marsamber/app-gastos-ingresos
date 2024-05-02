@@ -50,12 +50,12 @@ export default function BudgetCard() {
     ;(transactions ?? []).forEach(transaction => {
       const category = budgetData.get(transaction.category)
       if (category) {
-        category.Gastado += transaction.amount
+        category.Gastado -= transaction.amount
       } else {
         // If there's a transaction without a corresponding budget/budget historic, create a new category entry
         budgetData.set(transaction.category, {
           name: transaction.category,
-          Gastado: transaction.amount,
+          Gastado: -transaction.amount,
           Presupuestado: 0
         })
       }

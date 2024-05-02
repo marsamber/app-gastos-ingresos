@@ -32,9 +32,9 @@ export default function MonthDashboardCard() {
       const weekKey = week.toString()
       const existingEntry = dataMap.get(weekKey)
       if (existingEntry) {
-        existingEntry.Gastado += transaction.amount
+        existingEntry.Gastado -= transaction.amount
       } else {
-        dataMap.set(weekKey, { name: `Sem. ${weekKey}`, Gastado: transaction.amount })
+        dataMap.set(weekKey, { name: `Sem. ${weekKey}`, Gastado: -transaction.amount })
       }
     })
 
@@ -66,7 +66,7 @@ export default function MonthDashboardCard() {
       const month = getMonthName(new Date(transaction.date))
       const existingEntry = dataMap.get(month)
       if (existingEntry) {
-        existingEntry.Gastado += transaction.amount
+        existingEntry.Gastado -= transaction.amount
       }
     })
 

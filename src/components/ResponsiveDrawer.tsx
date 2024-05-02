@@ -49,6 +49,11 @@ export default function ResponsiveDrawer({
   useEffect(() => {
     if (!localStorage.getItem('token') && pathname !== '/login') {
       window.location.href = '/login'
+      return
+    }
+    if (localStorage.getItem('token') && localStorage.getItem('token') !== 'my-password'){
+      window.location.href = '/login'
+      return
     }
   }, [])
 
