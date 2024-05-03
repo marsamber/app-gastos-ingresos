@@ -22,7 +22,7 @@ export interface AddTransactionModalProps {
 export default function AddTransactionModal({ open, handleClose }: AddTransactionModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [type, setType] = useState<'income' | 'expense'>('income')
-  const [amount, setAmount] = useState<number | null>(0)
+  const [amount, setAmount] = useState<string>('')
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('')
   const [date, setDate] = useState(new Date())
@@ -38,7 +38,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
 
   const handleAddTransaction = async () => {
     if (!amount || !title || !category || !date) {
-      setErrorAmount(!amount)
+      setErrorAmount(!amount || amount === '-')
       setErrorTitle(!title)
       setErrorCategory(!category)
       setErrorDate(!date || date.toString() === 'Invalid Date')
@@ -54,7 +54,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
 
     const newTransaction = {
       title,
-      amount,
+      amount: parseFloat(amount),
       category,
       date: date.toISOString()
     }
@@ -86,7 +86,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
     setErrorCategory(false)
     setErrorDate(false)
 
-    setAmount(0)
+    setAmount('')
     setTitle('')
     setCategory('')
     setDate(new Date())
@@ -107,13 +107,20 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
   }
 
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const value = parseFloat(e.target.value)
-    if (value < 0) {
-      setType('expense')
-    } else {
-      setType('income')
+    const newValue = e.target.value
+    if (newValue === '' || newValue === '-') {
+      setAmount(newValue)
     }
-    setAmount(value)
+    if (/^-?\d*\.?\d*$/.test(newValue)) {
+      setAmount(newValue)
+      
+      const value = parseFloat(newValue)
+      if (value < 0) {
+        setType('expense')
+      } else {
+        setType('income')
+      }
+    }
   }
 
   // STYLES
@@ -172,10 +179,13 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
             size="small"
             color="error"
             label="Cantidad"
-            type="number"
+            type="text"
             value={amount}
             error={errorAmount}
             onChange={e => handleChangeAmount(e)}
+            inputProps={{
+              pattern: '^-?\\d*\\.?\\d*$'
+            }}
           />
           <TextField
             style={{ width: isMobile ? '192px' : '143px', margin: '8px' }}
