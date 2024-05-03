@@ -3,10 +3,10 @@ import dayjs from 'dayjs';
 import { createContext } from 'react';
 
 interface HomeContextType {
-  monthsSelected: [string, string];
-  setMonthsSelected: (value: [string, string]) => void;
-  budget: number;
-  setBudget: (value: number) => void;
+  monthsSelected?: [string, string];
+  setMonthsSelected?: (value: [string, string]) => void;
+  budget?: number;
+  setBudget?: (value: number) => void;
   transactions: ITransaction[] | null;
   budgets: IBudget[] | null;
   budgetHistorics: IBudgetHistoric[] | null;

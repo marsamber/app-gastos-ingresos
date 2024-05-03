@@ -12,7 +12,7 @@ import {
 import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
 import { ITransaction } from '@/types/index'
-import { TransactionContext } from '@/contexts/TransactionContext'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 
 export interface AddTransactionModalProps {
   open: boolean
@@ -34,7 +34,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
 
   const { data: categories, loading: loadingCategories } = useFetch<string[]>('/api/categories')
 
-  const { refreshTransactions } = useContext(TransactionContext)
+  const { refreshTransactions } = useContext(RefreshTransactionsContext)
 
   const handleAddTransaction = async () => {
     if (!amount || !title || !category || !date) {

@@ -2,7 +2,7 @@ import BasicCard from './BasicCard'
 
 export interface OneCategoryCardProps {
   data: {
-    id: number
+    id: string
     category: string
     spent: number
     remaining: number

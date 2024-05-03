@@ -1,4 +1,4 @@
-import { TransactionContext } from '@/contexts/TransactionContext'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
 import {
   Button,
@@ -35,7 +35,7 @@ export default function EditTransactionModal({ open, handleClose, transaction }:
 
   const { data: categories, loading: loadingCategories } = useFetch<string[]>('/api/categories')
 
-  const { refreshTransactions } = useContext(TransactionContext)
+  const { refreshTransactions } = useContext(RefreshTransactionsContext)
 
   useEffect(() => {
     if (transaction) {

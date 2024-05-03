@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
 import { ReactNode, use, useCallback, useEffect, useState } from 'react'
 import AddTransactionModal from './modal/AddTransactionModal'
-import { TransactionContext } from '@/contexts/TransactionContext'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 
 const drawerWidth = 240
 
@@ -133,7 +133,7 @@ export default function ResponsiveDrawer({
   const isLogin = pathname === '/login'
 
   return (
-    <TransactionContext.Provider value={{ refreshKey, refreshTransactions }}>
+    <RefreshTransactionsContext.Provider value={{ refreshKey, refreshTransactions }}>
       {isLogin ? (
         children
       ) : (
@@ -223,6 +223,6 @@ export default function ResponsiveDrawer({
           <AddTransactionModal open={addTransaction} handleClose={() => setAddTransaction(false)} />
         </Box>
       )}
-    </TransactionContext.Provider>
+    </RefreshTransactionsContext.Provider>
   )
 }

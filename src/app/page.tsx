@@ -12,7 +12,7 @@ import { useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
-import { TransactionContext } from '@/contexts/TransactionContext'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -31,7 +31,7 @@ export default function Home() {
   }, [])
 
   // DATA
-  const {refreshKey} = useContext(TransactionContext)
+  const {refreshKey} = useContext(RefreshTransactionsContext)
 
   useEffect(() => {
     const fetchTransactions = async () => {

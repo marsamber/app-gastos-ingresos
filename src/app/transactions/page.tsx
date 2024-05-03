@@ -20,7 +20,7 @@ import {
 } from '@mui/material'
 import { SyntheticEvent, use, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
-import { TransactionContext } from '@/contexts/TransactionContext'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import EditTransactionModal from '@/components/modal/EditTransactionModal'
 
 export default function Transactions() {
@@ -32,7 +32,7 @@ export default function Transactions() {
   ])
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [addTransactionTable, setAddTransactionTable] = useState(false)
-  const { refreshKey, refreshTransactions } = useContext(TransactionContext)
+  const { refreshKey, refreshTransactions } = useContext(RefreshTransactionsContext)
   const [transactions, setTransactions] = useState<ITransaction[] | null>([])
   const [loadingTransactions, setLoadingTransactions] = useState(true)
   const [editTransaction, setEditTransaction] = useState(false)
