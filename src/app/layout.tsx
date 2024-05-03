@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useContext } from 'react'
 import ResponsiveDrawer from '@/components/ResponsiveDrawer'
 
 const inter = Inter({ subsets: ['latin'] })

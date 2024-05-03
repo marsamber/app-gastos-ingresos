@@ -3,10 +3,11 @@ import BasicCard from './BasicCard'
 export interface OneTransactionCardProps {
   data: {
     id: number
-    description: string
+    title: string
     category: string
     date: Date
-    amount: number
+    amount: number,
+    actions: JSX.Element
   }
 }
 
@@ -23,18 +24,20 @@ export default function OneTransactionCard({ data }: OneTransactionCardProps) {
 
   return (
     <BasicCard>
-      <p><b>{data.description}</b></p>
+      <p><b>{data.title}</b></p>
       <p style={dataStyle}>{data.category}</p>
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          width: '100%'
+          width: '100%',
+          marginTop: '10px'
         }}
       >
         <b style={titleStyle}>Fecha</b>
         <b style={titleStyle}>Cantidad</b>
+        <b style={{...titleStyle, color: 'white'}}>Acciones</b>
       </div>
       <div
         style={{
@@ -53,6 +56,7 @@ export default function OneTransactionCard({ data }: OneTransactionCardProps) {
         >
           {data.amount} €
         </p>
+        {data.actions}
       </div>
     </BasicCard>
   )

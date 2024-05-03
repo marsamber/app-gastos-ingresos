@@ -47,19 +47,21 @@ export default function BudgetCard() {
 
   const addTransactionData = (budgetData: Map<string, IBudgetChart>) => {
     // Safe check and aggregate transactions if they are not null
-    ;(transactions ?? []).forEach(transaction => {
-      const category = budgetData.get(transaction.category)
-      if (category) {
-        category.Gastado -= transaction.amount
-      } else {
-        // If there's a transaction without a corresponding budget/budget historic, create a new category entry
-        budgetData.set(transaction.category, {
-          name: transaction.category,
-          Gastado: -transaction.amount,
-          Presupuestado: 0
-        })
-      }
-    })
+    ;(transactions ?? [])
+      .filter(transaction => transaction.category !== 'Ingresos fijos')
+      .forEach(transaction => {
+        const category = budgetData.get(transaction.category)
+        if (category) {
+          category.Gastado -= transaction.amount
+        } else {
+          // If there's a transaction without a corresponding budget/budget historic, create a new category entry
+          budgetData.set(transaction.category, {
+            name: transaction.category,
+            Gastado: -transaction.amount,
+            Presupuestado: 0
+          })
+        }
+      })
   }
 
   useEffect(() => {

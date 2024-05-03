@@ -33,7 +33,9 @@ export default function StatisticsCard() {
 
   const addTransactionData = (statisticsData: Map<string, IStatisticsChart>) => {
     // Safe check and aggregate transactions if they are not null
-    ;(transactions ?? []).forEach(transaction => {
+    ;(transactions ?? [])
+    .filter(transaction => transaction.category !== 'Ingresos fijos')
+    .forEach(transaction => {
       const category = statisticsData.get(transaction.category)
       if (category) {
         category.value -= transaction.amount
@@ -126,10 +128,11 @@ export default function StatisticsCard() {
           <CircularProgress />
         </div>
       )}
-      <div style={containerStyle}>
-        {!(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && data.length === 0 ? (
-          <p>No hay datos para mostrar</p>
-        ) : (
+      {(!(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && !data.some(item => item.value !== 0))
+       ? (
+        <p>No hay datos para mostrar</p>
+      ) : (
+        <div style={containerStyle}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart
               width={400}
@@ -156,8 +159,8 @@ export default function StatisticsCard() {
               <Tooltip content={props => <CustomTooltip {...props} />} />
             </PieChart>
           </ResponsiveContainer>
-        )}
-      </div>
+        </div>
+      )}
     </BasicCard>
   )
 }

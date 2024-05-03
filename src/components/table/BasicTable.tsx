@@ -43,15 +43,17 @@ export interface BasicTableProps {
   rows: any[]
   numRowsPerPage?: number
   keyOrder?: string
+  orderDirection?: Order
 }
 
 export default function BasicTable({
   headCells,
   rows,
   numRowsPerPage = 5,
-  keyOrder = 'id'
+  keyOrder = 'id',
+  orderDirection = 'asc'
 }: BasicTableProps) {
-  const [order, setOrder] = useState<Order>('asc')
+  const [order, setOrder] = useState<Order>(orderDirection)
   const [orderBy, setOrderBy] = useState<string>(keyOrder)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(numRowsPerPage)
@@ -80,7 +82,7 @@ export default function BasicTable({
         .slice()
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage]
+    [order, orderBy, page, rows, rowsPerPage]
   )
 
   return (

@@ -1,3 +1,4 @@
+import { TransactionContext } from '@/contexts/TransactionContext'
 import useFetch from '@/hooks/useFetch'
 import {
   Button,
@@ -9,17 +10,17 @@ import {
   TextField,
   useMediaQuery
 } from '@mui/material'
-import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
+import { CSSProperties, ChangeEvent, use, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
 import { ITransaction } from '@/types/index'
-import { TransactionContext } from '@/contexts/TransactionContext'
 
-export interface AddTransactionModalProps {
+export interface EditTransactionModalProps {
   open: boolean
   handleClose: () => void
+  transaction: ITransaction | null
 }
 
-export default function AddTransactionModal({ open, handleClose }: AddTransactionModalProps) {
+export default function EditTransactionModal({ open, handleClose, transaction }: EditTransactionModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [type, setType] = useState<'income' | 'expense'>('income')
   const [amount, setAmount] = useState<number | null>(0)
@@ -36,7 +37,17 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
 
   const { refreshTransactions } = useContext(TransactionContext)
 
-  const handleAddTransaction = async () => {
+  useEffect(() => {
+    if (transaction) {
+      setType(transaction.amount < 0 ? 'expense' : 'income')
+      setAmount(transaction.amount)
+      setTitle(transaction.title)
+      setCategory(transaction.category)
+      setDate(new Date(transaction.date))
+    }
+  }, [transaction])
+
+  const handleEditTransaction = async () => {
     if (!amount || !title || !category || !date) {
       setErrorAmount(!amount)
       setErrorTitle(!title)
@@ -52,20 +63,20 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
 
     setLoading(true)
 
-    const newTransaction = {
+    const updatedTransaction = {
       title,
       amount,
       category,
-      date: date.toISOString()
+      date: date
     }
 
     try {
-      const response = await fetch('/api/transactions', {
-        method: 'POST',
+      const response = await fetch(`/api/transactions/${transaction?.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newTransaction)
+        body: JSON.stringify(updatedTransaction)
       })
       const data = await response.json()
 
@@ -74,7 +85,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
         handleCloseModal()
       }
     } catch (error) {
-      console.error('Failed to add transaction', error)
+      console.error('Failed to edit transaction', error)
     }
 
     setLoading(false)
@@ -149,7 +160,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
   return (
     <BasicModal open={open} style={modalStyle}>
       <div>
-        <h3 style={titleStyle}>Agregar transacción</h3>
+        <h3 style={titleStyle}>Editar transacción</h3>
         {loadingCategories && <CircularProgress style={circularProgressStyle} />}
         <div style={firstRowStyle}>
           <FormControl style={{ width: isMobile ? '192px' : '110px', margin: '8px' }} size="small" disabled>
@@ -184,7 +195,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
             label="Fecha"
             type="date"
             error={errorDate}
-            value={formatDate(date)}
+            value={formatDate(date as Date)}
             onChange={e => setDate(new Date(e.target.value))}
           />
         </div>
@@ -223,7 +234,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
           )}
         </div>
         <div style={actionsStyle}>
-          <Button variant="contained" color="error" onClick={handleAddTransaction} disabled={loading}>
+          <Button variant="contained" color="error" onClick={handleEditTransaction} disabled={loading}>
             Agregar
           </Button>
           <Button variant="text" color="error" onClick={handleCloseModal} disabled={loading}>

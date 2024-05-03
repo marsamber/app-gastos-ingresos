@@ -25,12 +25,6 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
   const [amount, setAmount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
-  // const { addTransaction } = useTransactions()
-  // const { user } = useAuth()
-  // const { enqueueSnackbar } = useSnackbar()
-  // const classes = useStyles()
-  // const theme = useTheme()
-  // const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   useEffect(() => {
     setType(transactionType || 'expense')
@@ -43,20 +37,7 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
     }
     setError(false)
     setLoading(true)
-    // try {
-    //     await addTransaction({
-    //     amount: parseFloat(amount),
-    //     description,
-    //     date,
-    //     type,
-    //     userId: user.id
-    //     })
-    //     enqueueSnackbar('Transacción agregada', { variant: 'success' })
-    //     handleClose()
-    // } catch (error) {
-    //     enqueueSnackbar('Hubo un error
-    //     al agregar la transacción', { variant: 'error' })
-    // }
+    // add fixed transaction
     setLoading(false)
   }
 

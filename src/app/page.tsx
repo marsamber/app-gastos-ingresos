@@ -10,8 +10,9 @@ import useFetch from '@/hooks/useFetch'
 import { IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
 import { useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
-import { CSSProperties, useEffect, useState } from 'react'
+import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
+import { TransactionContext } from '@/contexts/TransactionContext'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -20,6 +21,8 @@ export default function Home() {
   ])
   const [budget, setBudget] = useState<number>(0)
   const [present, setPresent] = useState<boolean>(true)
+  const [transactions, setTransactions] = useState<ITransaction[] | null>([])
+  const [loadingTransactions, setLoadingTransactions] = useState<boolean>(true)
 
   const isMobile = useMediaQuery('(max-width: 600px)')
 
@@ -28,9 +31,19 @@ export default function Home() {
   }, [])
 
   // DATA
-  const { data: transactions, loading: loadingTransactions } = useFetch<ITransaction[]>(
-    `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
-  )
+  const {refreshKey} = useContext(TransactionContext)
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      setLoadingTransactions(true)
+      const transactions = await fetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`).then(res => res.json())
+      setTransactions(transactions)
+      setLoadingTransactions(false)
+    }
+
+    fetchTransactions()
+  }, [monthsSelected, refreshKey])
+
   const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
     `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`

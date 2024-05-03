@@ -22,12 +22,6 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   const [amount, setAmount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
-  // const { addTransaction } = useTransactions()
-  // const { user } = useAuth()
-  // const { enqueueSnackbar } = useSnackbar()
-  // const classes = useStyles()
-  // const theme = useTheme()
-  // const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   const handleAddCategoryBudget = async () => {
     if (!amount || !category) {
@@ -36,20 +30,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     }
     setError(false)
     setLoading(true)
-    // try {
-    //     await addTransaction({
-    //     amount: parseFloat(amount),
-    //     description,
-    //     date,
-    //     type,
-    //     userId: user.id
-    //     })
-    //     enqueueSnackbar('Transacción agregada', { variant: 'success' })
-    //     handleClose()
-    // } catch (error) {
-    //     enqueueSnackbar('Hubo un error
-    //     al agregar la transacción', { variant: 'error' })
-    // }
+    // add category budget
     setLoading(false)
   }
 

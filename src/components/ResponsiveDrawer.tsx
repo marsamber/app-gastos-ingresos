@@ -16,8 +16,9 @@ import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, use, useCallback, useEffect, useState } from 'react'
 import AddTransactionModal from './modal/AddTransactionModal'
+import { TransactionContext } from '@/contexts/TransactionContext'
 
 const drawerWidth = 240
 
@@ -30,6 +31,11 @@ export default function ResponsiveDrawer({
   const [isClosing, setIsClosing] = useState(false)
   const pathname = usePathname()
   const [addTransaction, setAddTransaction] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const refreshTransactions = useCallback(() => {
+    setRefreshKey((prev) => prev + 1)
+  }, [])
 
   const handleDrawerClose = () => {
     setIsClosing(true)
@@ -51,7 +57,7 @@ export default function ResponsiveDrawer({
       window.location.href = '/login'
       return
     }
-    if (localStorage.getItem('token') && localStorage.getItem('token') !== 'my-password'){
+    if (localStorage.getItem('token') && localStorage.getItem('token') !== 'my-password') {
       window.location.href = '/login'
       return
     }
@@ -126,91 +132,97 @@ export default function ResponsiveDrawer({
 
   const isLogin = pathname === '/login'
 
-  return isLogin ? children : (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar
-        color="inherit"
-        position="fixed"
-        sx={{
-          display: { xs: 'block', sm: 'block', md: 'none' },
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` }
-        }}
-      >
-        <Toolbar>
-          <IconButton
+  return (
+    <TransactionContext.Provider value={{ refreshKey, refreshTransactions }}>
+      {isLogin ? (
+        children
+      ) : (
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <AppBar
             color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
+            position="fixed"
+            sx={{
+              display: { xs: 'block', sm: 'block', md: 'none' },
+              width: { md: `calc(100% - ${drawerWidth}px)` },
+              ml: { md: `${drawerWidth}px` }
+            }}
           >
-            <MenuIcon style={{ color: 'black' }} />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" color="black">
-            {pathname === '/'
-              ? 'Inicio'
-              : pathname === '/transactions'
-                ? 'Transacciones'
-                : pathname === '/budget'
-                  ? 'Presupuesto'
-                  : pathname === '/settings'
-                    ? 'Configuración'
-                    : '404'}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }} aria-label="mailbox folders">
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          onClose={handleDrawerClose}
-          ModalProps={{
-            keepMounted: true
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
-          }}
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-      </Box>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)`, backgroundColor: '#F7F9FB' } }}
-      >
-        <Toolbar
-          sx={{
-            display: { xs: 'block', sm: 'block', md: 'none' }
-          }}
-        />
-        {children}
-      </Box>
-      <Fab
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px'
-        }}
-        color="error"
-        onClick={() => setAddTransaction(true)}
-      >
-        <Add />
-      </Fab>
-      <AddTransactionModal open={addTransaction} handleClose={() => setAddTransaction(false)} />
-    </Box>
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ mr: 2, display: { md: 'none' } }}
+              >
+                <MenuIcon style={{ color: 'black' }} />
+              </IconButton>
+              <Typography variant="h6" noWrap component="div" color="black">
+                {pathname === '/'
+                  ? 'Inicio'
+                  : pathname === '/transactions'
+                    ? 'Transacciones'
+                    : pathname === '/budget'
+                      ? 'Presupuesto'
+                      : pathname === '/settings'
+                        ? 'Configuración'
+                        : '404'}
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }} aria-label="mailbox folders">
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onTransitionEnd={handleDrawerTransitionEnd}
+              onClose={handleDrawerClose}
+              ModalProps={{
+                keepMounted: true
+              }}
+              sx={{
+                display: { xs: 'block', sm: 'block', md: 'none' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+              }}
+            >
+              {drawer}
+            </Drawer>
+            <Drawer
+              variant="permanent"
+              sx={{
+                display: { xs: 'none', sm: 'none', md: 'block' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+              }}
+              open
+            >
+              {drawer}
+            </Drawer>
+          </Box>
+          <Box
+            component="main"
+            sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)`, backgroundColor: '#F7F9FB' } }}
+          >
+            <Toolbar
+              sx={{
+                display: { xs: 'block', sm: 'block', md: 'none' }
+              }}
+            />
+            {children}
+          </Box>
+          <Fab
+            style={{
+              position: 'fixed',
+              bottom: '20px',
+              right: '20px'
+            }}
+            color="error"
+            onClick={() => setAddTransaction(true)}
+          >
+            <Add />
+          </Fab>
+          <AddTransactionModal open={addTransaction} handleClose={() => setAddTransaction(false)} />
+        </Box>
+      )}
+    </TransactionContext.Provider>
   )
 }

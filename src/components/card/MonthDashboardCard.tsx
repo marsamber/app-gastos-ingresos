@@ -22,21 +22,22 @@ export default function MonthDashboardCard() {
     monthsSelected[0].split('-')[0] === monthsSelected[1].split('-')[0]
 
   const [data, setData] = useState<ISummaryChart[]>([])
-  
 
   // DATA
   const getWeekData = () => {
     const dataMap = new Map()
-    transactions?.forEach(transaction => {
-      const week = getDateWeekOfMonth(new Date(transaction.date))
-      const weekKey = week.toString()
-      const existingEntry = dataMap.get(weekKey)
-      if (existingEntry) {
-        existingEntry.Gastado -= transaction.amount
-      } else {
-        dataMap.set(weekKey, { name: `Sem. ${weekKey}`, Gastado: -transaction.amount })
-      }
-    })
+    transactions
+      ?.filter(transaction => transaction.category !== 'Ingresos fijos')
+      .forEach(transaction => {
+        const week = getDateWeekOfMonth(new Date(transaction.date))
+        const weekKey = week.toString()
+        const existingEntry = dataMap.get(weekKey)
+        if (existingEntry) {
+          existingEntry.Gastado -= transaction.amount
+        } else {
+          dataMap.set(weekKey, { name: `Sem. ${weekKey}`, Gastado: -transaction.amount })
+        }
+      })
 
     // Ensure all weeks are represented in the data
     for (let i = 1; i <= 5; i++) {
@@ -123,9 +124,11 @@ export default function MonthDashboardCard() {
       ) : (
         <h3 style={titleStyle}>Resumen de los meses seleccionados</h3>
       )}
-      {loadingTransactions && <div style={circularProgressStyle}>
-            <CircularProgress />
-          </div>}
+      {loadingTransactions && (
+        <div style={circularProgressStyle}>
+          <CircularProgress />
+        </div>
+      )}
       {!loadingTransactions && !data.some(item => item.Gastado !== 0) ? (
         <p>No hay datos para mostrar</p>
       ) : (
