@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "npm install --legacy-peer-deps && prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --ignore-path .gitignore \"src/**/*.+(ts|js|tsx)\" --write"
