@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import BasicCard from './BasicCard'
 
 export interface OneTransactionCardProps {
@@ -7,7 +8,7 @@ export interface OneTransactionCardProps {
     category: string
     date: Date
     amount: number,
-    actions: JSX.Element
+    actions: ReactNode
   }
 }
 

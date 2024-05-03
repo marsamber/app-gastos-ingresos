@@ -2,7 +2,7 @@ import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
 import BasicTable from './BasicTable'
 import OneTransactionCard from '../card/OneTransactionCard'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
-import { useContext, useEffect, CSSProperties, useState } from 'react'
+import { useContext, useEffect, CSSProperties, useState, ReactNode } from 'react'
 import { Edit, Delete } from '@mui/icons-material'
 
 interface ITransactionTable {
@@ -11,6 +11,7 @@ interface ITransactionTable {
   category: string
   date: Date
   amount: number
+  actions: ReactNode
 }
 
 interface ExpensesTableProps {
@@ -42,23 +43,19 @@ export default function ExpensesTable({ handleEditTransaction, handleDeleteTrans
             title: transaction.title,
             category: transaction.category,
             date: new Date(transaction.date),
-            amount: transaction.amount
+            amount: transaction.amount,
+            actions: (
+              <div key={transaction.id}>
+                <IconButton onClick={() => handleEditTransaction(transaction.id)}>
+                  <Edit color="error" />
+                </IconButton>
+                <IconButton onClick={() => handleDeleteTransaction(transaction.id)}>
+                  <Delete color="error" />
+                </IconButton>
+              </div>
+            )
           }
         })
-
-      data = data.map(row => ({
-        ...row,
-        actions: (
-          <div key={row.id}>
-            <IconButton onClick={() => handleEditTransaction(row.id)}>
-              <Edit color="error" />
-            </IconButton>
-            <IconButton onClick={() => handleDeleteTransaction(row.id)}>
-              <Delete color="error" />
-            </IconButton>
-          </div>
-        )
-      }))
 
       setRows(data)
     }
