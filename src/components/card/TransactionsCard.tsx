@@ -1,6 +1,6 @@
 import { HomeContext } from '@/contexts/HomeContext'
 import { CircularProgress, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useEffect } from 'react'
+import { CSSProperties, useContext } from 'react'
 import BasicCard from './BasicCard'
 
 export default function TransactionsCard() {

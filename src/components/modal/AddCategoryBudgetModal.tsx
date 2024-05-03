@@ -1,5 +1,3 @@
-import { CSSProperties, useState } from 'react'
-import BasicModal from './BasicModal'
 import {
   Button,
   FormControl,
@@ -9,7 +7,8 @@ import {
   TextField,
   useMediaQuery
 } from '@mui/material'
-import { format } from 'path'
+import { CSSProperties, useState } from 'react'
+import BasicModal from './BasicModal'
 
 export interface AddCategoryBudgetModalProps {
   open: boolean

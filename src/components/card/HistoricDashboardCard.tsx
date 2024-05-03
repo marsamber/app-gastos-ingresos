@@ -1,7 +1,7 @@
 import { HomeContext } from '@/contexts/HomeContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudgetHistoric, ITransaction } from '@/types/index'
-import { convertDate, formatMonthYear, monthNames } from '@/utils/utils'
+import { convertDate, formatMonthYear } from '@/utils/utils'
 import { CircularProgress, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import {

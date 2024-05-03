@@ -46,7 +46,7 @@ export default function CategoriesTable() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {isMobile &&
           dataRows
-            .map(row => <OneCategoryBudgetCard data={row} />)}
+            .map(row => <OneCategoryBudgetCard key={row.id} data={row} />)}
       </div>
     </>
   )

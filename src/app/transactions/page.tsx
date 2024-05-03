@@ -1,12 +1,13 @@
 'use client'
 import AddTransactionModal from '@/components/modal/AddTransactionModal'
+import EditTransactionModal from '@/components/modal/EditTransactionModal'
 import AllTransactionsTable from '@/components/table/AllTransactionsTable'
 import ExpensesTable from '@/components/table/ExpensesTable'
 import IncomesTable from '@/components/table/IncomesTable'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
-import useFetch from '@/hooks/useFetch'
 import { ITransaction } from '@/types/index'
-import { Add, Edit } from '@mui/icons-material'
+import { Add } from '@mui/icons-material'
 import {
   Button,
   FormControl,
@@ -18,10 +19,8 @@ import {
   Tabs,
   useMediaQuery
 } from '@mui/material'
-import { SyntheticEvent, use, useContext, useEffect, useState } from 'react'
+import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
-import EditTransactionModal from '@/components/modal/EditTransactionModal'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)

@@ -21,7 +21,8 @@
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",  // Necesario para Next.js desde React 17
-    "react/prop-types": "off"          // Desactiva las advertencias de PropTypes si usas TypeScript
+    "react/prop-types": "off",          // Desactiva las advertencias de PropTypes si usas TypeScript
+    "react-hooks/exhaustive-deps": "off" // Desactiva las advertencias de dependencias en useEffect
   },
   "settings": {
     "react": {

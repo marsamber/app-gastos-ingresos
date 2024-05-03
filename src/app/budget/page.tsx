@@ -6,7 +6,7 @@ import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContex
 import useFetch from '@/hooks/useFetch'
 import { IBudget, IBudgetHistoric } from '@/types/index'
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tab, Tabs, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, use, useContext, useEffect, useState } from 'react'
+import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
 
 export default function Budget() {

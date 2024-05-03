@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function useFetch<D = any, E = unknown>(url: string, options?: RequestInit) {
+export default function useFetch<D = any, E = unknown>(url: string, options?: globalThis.RequestInit) {
   const [data, setData] = useState<D | null>(null)
   const [error, setError] = useState<E | null>(null)
   const [loading, setLoading] = useState(true)

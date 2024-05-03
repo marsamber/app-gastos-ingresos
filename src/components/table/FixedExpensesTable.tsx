@@ -40,7 +40,7 @@ export default function FixedExpensesTable() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {isMobile &&
           dataRows
-            .map(row => <OneFixedTransactionCard data={row} />)}
+            .map(row => <OneFixedTransactionCard key={row.id} data={row} />)}
       </div>
     </>
   )

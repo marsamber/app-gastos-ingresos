@@ -1,4 +1,6 @@
 'use client'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
+import theme from '@/theme'
 import { Add, Calculate, CreditCard, CurrencyExchange, Home, Logout, Settings } from '@mui/icons-material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { Fab, ThemeProvider } from '@mui/material'
@@ -16,10 +18,8 @@ import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
-import { ReactNode, use, useCallback, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
 import AddTransactionModal from './modal/AddTransactionModal'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
-import theme from '@/theme'
 
 const drawerWidth = 240
 

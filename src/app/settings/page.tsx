@@ -1,10 +1,10 @@
 'use client'
-import { useMediaQuery } from '@mui/material'
-import { CSSProperties, useState } from 'react'
-import '../../styles.css'
-import FixedIncomesCard from '@/components/card/FixedIncomesCard'
-import FixedExpensesCard from '@/components/card/FixedExpensesCard'
 import CategoriesCard from '@/components/card/CategoriesCard'
+import FixedExpensesCard from '@/components/card/FixedExpensesCard'
+import FixedIncomesCard from '@/components/card/FixedIncomesCard'
+import { useMediaQuery } from '@mui/material'
+import { CSSProperties } from 'react'
+import '../../styles.css'
 
 export default function Settings() {
   const isTablet = useMediaQuery('(max-width: 1024px)')

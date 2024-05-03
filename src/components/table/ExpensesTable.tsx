@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
 import BasicTable from './BasicTable'
 import OneTransactionCard from '../card/OneTransactionCard'
@@ -79,7 +80,7 @@ export default function ExpensesTable({ handleEditTransaction, handleDeleteTrans
         {isMobile &&
           !loadingTransactions &&
           transactions &&
-          rows.sort((a, b) => a.date.getDate() - b.date.getDate()).map(row => <OneTransactionCard data={row} />)}
+          rows.sort((a, b) => a.date.getDate() - b.date.getDate()).map(row => <OneTransactionCard key={row.id} data={row} />)}
       </div>
     </>
   )

@@ -1,10 +1,10 @@
-import { CircularProgress, useMediaQuery } from '@mui/material'
-import BasicTable from './BasicTable'
-import OneCategoryCard from '../card/OneCategoryCard'
-import { CSSProperties, useContext, useEffect, useState } from 'react'
 import { HomeContext } from '@/contexts/HomeContext'
+import { CircularProgress, useMediaQuery } from '@mui/material'
+import { CSSProperties, useContext, useEffect, useState } from 'react'
+import OneCategoryCard from '../card/OneCategoryCard'
+import BasicTable from './BasicTable'
 
-interface MonthBudgetTable {
+interface MonthBudgetTableData {
   id: string
   category: string
   spent: number
@@ -15,7 +15,7 @@ interface MonthBudgetTable {
 export default function MonthBudgetTable() {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const { transactions, loadingTransactions, budgets, loadingBudgets } = useContext(HomeContext)
-  const [rows, setRows] = useState<MonthBudgetTable[]>([])
+  const [rows, setRows] = useState<MonthBudgetTableData[]>([])
 
   const headCells = [
     { id: 'category', label: 'Categoría' },
@@ -25,7 +25,7 @@ export default function MonthBudgetTable() {
   ]
 
   useEffect(() => {
-    let data: MonthBudgetTable[] = []
+    let data: MonthBudgetTableData[] = []
 
     if (budgets) {
       budgets
@@ -76,7 +76,7 @@ export default function MonthBudgetTable() {
           transactions &&
           !loadingBudgets &&
           budgets &&
-          rows.sort((a, b) => (a.category > b.category ? 1 : -1)).map(row => <OneCategoryCard data={row} />)}
+          rows.sort((a, b) => (a.category > b.category ? 1 : -1)).map(row => <OneCategoryCard key={row.id} data={row} />)}
       </div>
     </>
   )

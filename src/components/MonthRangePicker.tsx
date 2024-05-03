@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { KeyboardArrowRight } from '@mui/icons-material'
 import { DatePicker } from 'antd'
 import locale from 'antd/es/date-picker/locale/es_ES'
-import 'dayjs/locale/es'
 import dayjs, { Dayjs } from 'dayjs'
+import 'dayjs/locale/es'
 import '../styles.css'
 
 interface MonthRangePickerProps {

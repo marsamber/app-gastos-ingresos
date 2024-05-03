@@ -33,7 +33,7 @@ export default function BudgetCard() {
   // DATA
   const mergeBudgetData = (budgetData: Map<string, IBudgetChart>) => {
     // Safe check and merge both budgets and budget historics if they are not null
-    ;[...(budgets ?? []), ...(budgetHistorics ?? [])].forEach(item => {
+    [...(budgets ?? []), ...(budgetHistorics ?? [])].forEach(item => {
       if (item.amount > 0) {
         const existingEntry = budgetData.get(item.category)
         if (existingEntry) {
@@ -47,7 +47,7 @@ export default function BudgetCard() {
 
   const addTransactionData = (budgetData: Map<string, IBudgetChart>) => {
     // Safe check and aggregate transactions if they are not null
-    ;(transactions ?? [])
+    (transactions ?? [])
       .filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
         const category = budgetData.get(transaction.category)

@@ -1,6 +1,5 @@
-import { ITransaction } from '@/types/index'
-import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 // pages/api/budget_historics/index.js
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

@@ -1,9 +1,10 @@
-import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
-import BasicTable from './BasicTable'
-import OneTransactionCard from '../card/OneTransactionCard'
+/* eslint-disable no-unused-vars */
 import { TransactionsContext } from '@/contexts/TransactionsContext'
-import { useContext, useState, useEffect, CSSProperties, ReactNode } from 'react'
-import { Edit, Delete } from '@mui/icons-material'
+import { Delete, Edit } from '@mui/icons-material'
+import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
+import { CSSProperties, ReactNode, useContext, useEffect, useState } from 'react'
+import OneTransactionCard from '../card/OneTransactionCard'
+import BasicTable from './BasicTable'
 
 interface ITransactionTable {
   id: number
@@ -79,7 +80,7 @@ export default function IncomesTable({ handleEditTransaction, handleDeleteTransa
         {isMobile &&
           !loadingTransactions &&
           transactions &&
-          rows.sort((a, b) => a.date.getDate() - b.date.getDate()).map(row => <OneTransactionCard data={row} />)}
+          rows.sort((a, b) => a.date.getDate() - b.date.getDate()).map(row => <OneTransactionCard key={row.id} data={row} />)}
       </div>
     </>
   )

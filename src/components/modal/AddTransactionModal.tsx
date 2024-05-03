@@ -1,3 +1,4 @@
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
 import {
   Button,
@@ -9,10 +10,8 @@ import {
   TextField,
   useMediaQuery
 } from '@mui/material'
-import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
+import { CSSProperties, ChangeEvent, useContext, useState } from 'react'
 import BasicModal from './BasicModal'
-import { ITransaction } from '@/types/index'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 
 export interface AddTransactionModalProps {
   open: boolean
@@ -67,7 +66,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
         },
         body: JSON.stringify(newTransaction)
       })
-      const data = await response.json()
+      await response.json()
 
       if (response.ok) {
         refreshTransactions()
@@ -113,7 +112,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
     }
     if (/^-?\d*\.?\d*$/.test(newValue)) {
       setAmount(newValue)
-      
+
       const value = parseFloat(newValue)
       if (value < 0) {
         setType('expense')

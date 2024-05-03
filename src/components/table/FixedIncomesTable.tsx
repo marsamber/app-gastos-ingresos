@@ -1,7 +1,7 @@
-import { Button, IconButton, useMediaQuery } from '@mui/material'
-import BasicTable from './BasicTable'
-import OneFixedTransactionCard from '../card/OneFixedTransactionCard'
 import { Delete, Edit } from '@mui/icons-material'
+import { IconButton, useMediaQuery } from '@mui/material'
+import OneFixedTransactionCard from '../card/OneFixedTransactionCard'
+import BasicTable from './BasicTable'
 
 export default function FixedIncomesTable() {
   const isMobile = useMediaQuery('(max-width: 600px)')
@@ -35,7 +35,7 @@ export default function FixedIncomesTable() {
     <>
       {!isMobile && <BasicTable headCells={headCells} rows={dataRows} keyOrder="date" numRowsPerPage={5} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {isMobile && dataRows.map(row => <OneFixedTransactionCard data={row} />)}
+        {isMobile && dataRows.map(row => <OneFixedTransactionCard key={row.id} data={row} />)}
       </div>
     </>
   )

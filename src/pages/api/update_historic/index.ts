@@ -1,6 +1,6 @@
-import { ITransaction } from '@/types/index'
-import { NextApiRequest, NextApiResponse } from 'next'
+/* eslint-disable no-unused-vars */
 import prisma from '@/lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 // pages/api/update_historic/index.js
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

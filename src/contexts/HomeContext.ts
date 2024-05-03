@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { IBudget, IBudgetHistoric, ITransaction } from '@/types/index'; // Asegúrate de que estos tipos estén correctamente definidos en tu proyecto
 import dayjs from 'dayjs';
 import { createContext } from 'react';

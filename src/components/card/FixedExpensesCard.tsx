@@ -1,9 +1,9 @@
-import { CSSProperties, useState } from 'react'
-import BasicCard from './BasicCard'
-import { Button, useMediaQuery } from '@mui/material'
 import { Add } from '@mui/icons-material'
-import FixedExpensesTable from '../table/FixedExpensesTable'
+import { Button } from '@mui/material'
+import { CSSProperties, useState } from 'react'
 import AddFixedTransactionModal from '../modal/AddFixedTransactionModal'
+import FixedExpensesTable from '../table/FixedExpensesTable'
+import BasicCard from './BasicCard'
 
 export default function FixedExpensesCard() {
   const [addFixedExpenseTransaction, setAddFixedExpenseTransaction] = useState(false)

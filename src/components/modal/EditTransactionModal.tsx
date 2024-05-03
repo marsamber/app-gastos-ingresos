@@ -1,5 +1,6 @@
 import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
+import { ITransaction } from '@/types/index'
 import {
   Button,
   CircularProgress,
@@ -10,9 +11,8 @@ import {
   TextField,
   useMediaQuery
 } from '@mui/material'
-import { CSSProperties, ChangeEvent, use, useContext, useEffect, useState } from 'react'
+import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
-import { ITransaction } from '@/types/index'
 
 export interface EditTransactionModalProps {
   open: boolean
@@ -78,7 +78,7 @@ export default function EditTransactionModal({ open, handleClose, transaction }:
         },
         body: JSON.stringify(updatedTransaction)
       })
-      const data = await response.json()
+      await response.json()
 
       if (response.ok) {
         refreshTransactions()

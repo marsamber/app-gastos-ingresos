@@ -1,17 +1,14 @@
-import { CSSProperties, useEffect, useState } from 'react'
-import BasicModal from './BasicModal'
 import {
   Button,
   FormControl,
-  Input,
   InputLabel,
   MenuItem,
   Select,
   TextField,
-  Typography,
   useMediaQuery
 } from '@mui/material'
-import { format } from 'path'
+import { CSSProperties, useEffect, useState } from 'react'
+import BasicModal from './BasicModal'
 
 export interface AddFixedTransactionModalProps {
   open: boolean
