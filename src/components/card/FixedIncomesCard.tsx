@@ -35,7 +35,7 @@ export default function FixedIncomesCard() {
     <BasicCard style={cardStyle}>
       <div style={headerStyle}>
         <h3 style={titleStyle}>Ingresos fijos</h3>
-        <Button variant="contained" color="error" endIcon={<Add />} onClick={() => setAddFixedIncomeTransaction(true)}>
+        <Button variant="contained" color="primary" endIcon={<Add />} onClick={() => setAddFixedIncomeTransaction(true)}>
           Añadir
         </Button>
       </div>

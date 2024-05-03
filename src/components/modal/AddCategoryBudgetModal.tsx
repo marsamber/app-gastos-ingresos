@@ -68,7 +68,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
         <h3 style={titleStyle}>Agregar presupuesto</h3>
         <div style={firstRowStyle}>
           <FormControl style={{ width: isMobile ? '192px' : '200px', margin: '8px' }} size="small">
-            <InputLabel id="category-label" color="error">
+            <InputLabel id="category-label" color="primary">
               Categoría
             </InputLabel>
             <Select
@@ -76,7 +76,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
               value={category}
               label="Categoría"
               onChange={e => setCategory(e.target.value)}
-              color="error"
+              color="primary"
             >
               <MenuItem value='shopping'>Compras</MenuItem>
               <MenuItem value='food'>Comida</MenuItem>
@@ -91,7 +91,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
             size="small"
-            color="error"
+            color="primary"
             label="Cantidad"
             type="number"
             value={amount}
@@ -100,10 +100,10 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
           />
         </div>
         <div style={actionsStyle}>
-          <Button variant="contained" color="error" onClick={handleAddCategoryBudget} disabled={loading}>
+          <Button variant="contained" color="primary" onClick={handleAddCategoryBudget} disabled={loading}>
             Agregar
           </Button>
-          <Button variant="text" color="error" onClick={handleCloseModal} disabled={loading}>
+          <Button variant="text" color="primary" onClick={handleCloseModal} disabled={loading}>
             Cancelar
           </Button>
         </div>

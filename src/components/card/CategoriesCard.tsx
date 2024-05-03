@@ -37,7 +37,7 @@ export default function CategoriesCard() {
     <BasicCard style={cardStyle}>
       <div style={headerStyle}>
         <h3 style={titleStyle}>Presupuesto por categorías</h3>
-        <Button variant="contained" color="error" endIcon={<Add />}
+        <Button variant="contained" color="primary" endIcon={<Add />}
         onClick={() => setAddCategoryBudget(true)}>
           Añadir
         </Button>

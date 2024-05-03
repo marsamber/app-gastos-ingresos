@@ -160,7 +160,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
         {loadingCategories && <CircularProgress style={circularProgressStyle} />}
         <div style={firstRowStyle}>
           <FormControl style={{ width: isMobile ? '192px' : '110px', margin: '8px' }} size="small" disabled>
-            <InputLabel id="type-label" color="error">
+            <InputLabel id="type-label" color="primary">
               Tipo
             </InputLabel>
             <Select
@@ -168,7 +168,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
               value={type}
               label="Tipo"
               onChange={e => setType(e.target.value as 'income' | 'expense')}
-              color="error"
+              color="primary"
             >
               <MenuItem value="income">Ingreso</MenuItem>
               <MenuItem value="expense">Gasto</MenuItem>
@@ -177,7 +177,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
             size="small"
-            color="error"
+            color="primary"
             label="Cantidad"
             type="text"
             value={amount}
@@ -190,7 +190,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
           <TextField
             style={{ width: isMobile ? '192px' : '143px', margin: '8px' }}
             size="small"
-            color="error"
+            color="primary"
             label="Fecha"
             type="date"
             error={errorDate}
@@ -202,7 +202,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
           <TextField
             style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
             size="small"
-            color="error"
+            color="primary"
             label="Título"
             value={title}
             error={errorTitle}
@@ -210,7 +210,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
           />
           {categories && categories.length > 0 ? (
             <FormControl style={{ width: isMobile ? '192px' : '200px', margin: '8px' }} size="small">
-              <InputLabel id="category-label" color="error">
+              <InputLabel id="category-label" color="primary">
                 Categoría
               </InputLabel>
               <Select
@@ -218,7 +218,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
                 value={category}
                 label="Categoría"
                 onChange={e => setCategory(e.target.value)}
-                color="error"
+                color="primary"
                 error={errorCategory}
               >
                 {categories.map(category => (
@@ -233,10 +233,10 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
           )}
         </div>
         <div style={actionsStyle}>
-          <Button variant="contained" color="error" onClick={handleAddTransaction} disabled={loading}>
+          <Button variant="contained" color="primary" onClick={handleAddTransaction} disabled={loading}>
             Agregar
           </Button>
-          <Button variant="text" color="error" onClick={handleCloseModal} disabled={loading}>
+          <Button variant="text" color="primary" onClick={handleCloseModal} disabled={loading}>
             Cancelar
           </Button>
         </div>

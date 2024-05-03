@@ -6,7 +6,7 @@ import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContex
 import useFetch from '@/hooks/useFetch'
 import { IBudget, IBudgetHistoric } from '@/types/index'
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tab, Tabs, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, useContext, useEffect, useState } from 'react'
+import { SyntheticEvent, use, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
 
 export default function Budget() {
@@ -67,6 +67,10 @@ export default function Budget() {
         break
     }
   }
+
+  useEffect(() => {
+    document.title = `Presupuesto`
+  }, [])
 
   // DATA
   useEffect(() => {
@@ -134,7 +138,7 @@ export default function Budget() {
           {isMobile && value === 1 && (
             <div style={buttonsStyle}>
               <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                <InputLabel id="filter-label" color="error">
+                <InputLabel id="filter-label" color="primary">
                   Filtro
                 </InputLabel>
                 <Select
@@ -142,7 +146,7 @@ export default function Budget() {
                   value={filter}
                   label="Filtro"
                   onChange={handleChangeFilter}
-                  color="error"
+                  color="primary"
                 >
                   <MenuItem value="last_month">Mes pasado</MenuItem>
                   <MenuItem value="this_year">Este año</MenuItem>
@@ -157,8 +161,8 @@ export default function Budget() {
               classes={{
                 indicator: 'indicator'
               }}
-              textColor="secondary"
-              indicatorColor="secondary"
+              // textColor="secondary"
+              // indicatorColor="primary"
               value={value}
               onChange={handleChangeTab}
               variant={isMobile ? 'fullWidth' : 'standard'}
@@ -181,7 +185,7 @@ export default function Budget() {
             {!isMobile && value === 1 && (
               <div style={buttonsStyle}>
                 <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                  <InputLabel id="filter-label" color="error">
+                  <InputLabel id="filter-label" color="primary">
                     Filtro
                   </InputLabel>
                   <Select
@@ -189,7 +193,7 @@ export default function Budget() {
                     value={filter}
                     label="Filtro"
                     onChange={handleChangeFilter}
-                    color="error"
+                    color="primary"
                   >
                     <MenuItem value="last_month">Mes pasado</MenuItem>
                     <MenuItem value="this_year">Este año</MenuItem>

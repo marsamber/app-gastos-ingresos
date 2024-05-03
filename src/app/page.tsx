@@ -6,13 +6,14 @@ import MonthDashboardCard from '@/components/card/MonthDashboardCard'
 import StatisticsCard from '@/components/card/StatisticsCard'
 import TransactionsCard from '@/components/card/TransactionsCard'
 import { HomeContext } from '@/contexts/HomeContext'
+import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
 import { useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
+import theme from '@/theme'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -31,12 +32,14 @@ export default function Home() {
   }, [])
 
   // DATA
-  const {refreshKey} = useContext(RefreshTransactionsContext)
+  const { refreshKey } = useContext(RefreshTransactionsContext)
 
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
-      const transactions = await fetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`).then(res => res.json())
+      const transactions = await fetch(
+        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
+      ).then(res => res.json())
       setTransactions(transactions)
       setLoadingTransactions(false)
     }
@@ -100,7 +103,7 @@ export default function Home() {
 
   const budgetStyle: CSSProperties = {
     margin: '10px 0',
-    color: '#af1f0e',
+    color: theme.palette.primary.main,
     textAlign: 'right'
   }
 

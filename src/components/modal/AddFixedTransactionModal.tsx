@@ -75,7 +75,7 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
         <h3 style={titleStyle}>Agregar {transactionType === 'income' ? 'ingreso fijo' : 'gasto fijo'}</h3>
         <div style={firstRowStyle}>
           <FormControl style={{ width: isMobile ? '192px' : '110px', margin: '8px' }} size="small">
-            <InputLabel id="type-label" color="error">
+            <InputLabel id="type-label" color="primary">
               Tipo
             </InputLabel>
             <Select
@@ -84,7 +84,7 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
               label="Tipo"
               disabled={transactionType !== undefined}
               onChange={e => setType(e.target.value)}
-              color="error"
+              color="primary"
             >
               <MenuItem value="income">Ingreso</MenuItem>
               <MenuItem value="expense">Gasto</MenuItem>
@@ -93,7 +93,7 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
             size="small"
-            color="error"
+            color="primary"
             label="Cantidad"
             type="number"
             value={amount}
@@ -102,10 +102,10 @@ export default function AddFixedTransactionModal({ open, handleClose, transactio
           />
         </div>
         <div style={actionsStyle}>
-          <Button variant="contained" color="error" onClick={handleAddTransaction} disabled={loading}>
+          <Button variant="contained" color="primary" onClick={handleAddTransaction} disabled={loading}>
             Agregar
           </Button>
-          <Button variant="text" color="error" onClick={handleCloseModal} disabled={loading}>
+          <Button variant="text" color="primary" onClick={handleCloseModal} disabled={loading}>
             Cancelar
           </Button>
         </div>

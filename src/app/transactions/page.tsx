@@ -140,7 +140,7 @@ export default function Transactions() {
           {isMobile && (
             <div style={buttonsStyle}>
               <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                <InputLabel id="filter-label" color="error">
+                <InputLabel id="filter-label" color="primary">
                   Filtro
                 </InputLabel>
                 <Select
@@ -148,7 +148,7 @@ export default function Transactions() {
                   value={filter}
                   label="Filtro"
                   onChange={handleChangeFilter}
-                  color="error"
+                  color="primary"
                 >
                   <MenuItem value="this_month">Este mes</MenuItem>
                   <MenuItem value="last_month">Mes pasado</MenuItem>
@@ -195,7 +195,7 @@ export default function Transactions() {
             {!isMobile && (
               <div style={buttonsStyle}>
                 <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                  <InputLabel id="filter-label" color="error">
+                  <InputLabel id="filter-label" color="primary">
                     Filtro
                   </InputLabel>
                   <Select
@@ -203,7 +203,7 @@ export default function Transactions() {
                     value={filter}
                     label="Filtro"
                     onChange={handleChangeFilter}
-                    color="error"
+                    color="primary"
                   >
                     <MenuItem value="this_month">Este mes</MenuItem>
                     <MenuItem value="last_month">Mes pasado</MenuItem>
@@ -214,7 +214,7 @@ export default function Transactions() {
                 </FormControl>
                 <Button
                   variant="contained"
-                  color="error"
+                  color="primary"
                   endIcon={<Add />}
                   onClick={() => setAddTransactionTable(true)}
                 >

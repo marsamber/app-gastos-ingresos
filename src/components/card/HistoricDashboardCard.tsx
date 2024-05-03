@@ -34,6 +34,7 @@ export default function HistoricDashboardCard() {
   const { monthsSelected, budgets, loadingBudgets } = useContext(HomeContext)
 
   useEffect(() => {
+    if (!monthsSelected) return
     const calculateMonthsHistoric = () => {
       const date = new Date(monthsSelected[1])
       const isLeapYear = date.getFullYear() % 4 === 0
@@ -43,7 +44,7 @@ export default function HistoricDashboardCard() {
     }
 
     const monthsHistoric = calculateMonthsHistoric()
-    setMonthsHistoric([monthsHistoric, monthsSelected[1]])
+    setMonthsHistoric([monthsHistoric, monthsSelected[1]! ])
   }, [monthsSelected])
 
   const { data: transactions, loading: loadingTransactions } = useFetch<ITransaction[]>(
@@ -58,7 +59,8 @@ export default function HistoricDashboardCard() {
 
     // Initialize with current month from budgets
     if (budgets) {
-      const currentMonthKey = formatMonthYear(monthsSelected[1])
+      if(!monthsSelected) return
+      const currentMonthKey = formatMonthYear(monthsSelected[1]!)
       dataMap.set(currentMonthKey, {
         name: currentMonthKey,
         Gastado: 0,

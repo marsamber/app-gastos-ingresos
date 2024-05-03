@@ -47,10 +47,10 @@ export default function ExpensesTable({ handleEditTransaction, handleDeleteTrans
             actions: (
               <div key={transaction.id}>
                 <IconButton onClick={() => handleEditTransaction(transaction.id)}>
-                  <Edit color="error" />
+                  <Edit color="primary" />
                 </IconButton>
                 <IconButton onClick={() => handleDeleteTransaction(transaction.id)}>
-                  <Delete color="error" />
+                  <Delete color="primary" />
                 </IconButton>
               </div>
             )

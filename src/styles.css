@@ -6,11 +6,11 @@
 
 /* Tabs */
 .tabSelected {
-  color: #d32f2f !important;
+  color: #257CA3 !important;
 }
 
 .indicator{
-  background-color: #d32f2f !important;
+  background-color: #257CA3 !important;
 }
 
 /* Month range picker */
@@ -21,15 +21,15 @@
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner {
-  background-color: #d32f2f !important;
+  background-color: #257CA3 !important;
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
-  background-color: #d32f2f !important;
+  background-color: #257CA3 !important;
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
-  border-color: #b57175 !important;
+  border-color: #4A9ABE !important;
 }
 
 .monthRangePicker
@@ -40,7 +40,7 @@
   > .ant-picker-time-panel-column
   > li.ant-picker-time-panel-cell-selected
   .ant-picker-time-panel-cell-inner {
-  background: #b57175 !important;
+  background: #4A9ABE !important;
 }
 
 .ant-picker-dropdown .ant-picker-cell-in-range .ant-picker-cell-inner {
@@ -48,23 +48,23 @@
 }
 
 .ant-btn-primary {
-  background-color: #b57175 !important;
-  border-color: #b57175 !important;
+  background-color: #4A9ABE !important;
+  border-color: #4A9ABE !important;
 }
 
 .ant-picker-range .ant-picker-active-bar {
-  background-color: #d32f2f !important;
+  background-color: #257CA3 !important;
 }
 
 .ant-picker-dropdown .ant-picker-header-view button:hover,
 .ant-picker-dropdown .ant-picker-header-view button:active {
-  color: #b57175 !important;
+  color: #4A9ABE !important;
 }
 
 .ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-in-range:not(.ant-picker-cell-disabled):before, 
 .ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-range-start:not(.ant-picker-cell-disabled):before, 
 .ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-range-end:not(.ant-picker-cell-disabled):before {
-    background: #b57175;
+    background: #4A9ABE;
 }
 
 @media (max-width: 800px) {

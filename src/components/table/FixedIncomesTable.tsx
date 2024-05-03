@@ -22,10 +22,10 @@ export default function FixedIncomesTable() {
     actions: (
       <div key={row.id}>
         <IconButton>
-          <Edit color='error' />
+          <Edit color="primary" />
         </IconButton>
         <IconButton>
-          <Delete color='error' />
+          <Delete color="primary" />
         </IconButton>
       </div>
     )

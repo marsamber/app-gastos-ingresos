@@ -26,7 +26,11 @@ export default function LoginPage() {
     >
       <Card>
         <CardContent>
-          <TextField type="password" label="Password" onChange={event => setPassword(event.target.value)} />
+          <TextField type="password" label="Password" onChange={event => setPassword(event.target.value)} onKeyDown={event => {
+            if (event.key === 'Enter') {
+              saveToken();
+            }
+          }} />
         </CardContent>
         <CardActions
           style={{

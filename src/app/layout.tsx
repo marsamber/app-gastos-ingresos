@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import React, { ReactNode, useContext } from 'react'
 import ResponsiveDrawer from '@/components/ResponsiveDrawer'
+import theme from '@/theme'
+import { ThemeProvider } from '@mui/material/styles'
 
 const inter = Inter({ subsets: ['latin'] })
 
