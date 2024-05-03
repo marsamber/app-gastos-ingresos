@@ -125,6 +125,7 @@ export default function Budget() {
     <main className="main">
       <HomeContext.Provider
         value={{
+          monthsSelected,
           transactions,
           loadingTransactions,
           budgets: present ? budgets : [],
