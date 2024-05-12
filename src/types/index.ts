@@ -6,6 +6,14 @@ export interface ITransaction {
   category: string
 }
 
+export interface IMonthlyTransaction {
+  id: number
+  title: string
+  amount: number
+  category: string
+  type: 'income' | 'expense'
+}
+
 export interface IBudget {
   id: number
   amount: number

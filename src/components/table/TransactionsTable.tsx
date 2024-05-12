@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
-import BasicTable from './BasicTable'
-import OneTransactionCard from '../card/OneTransactionCard'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
-import { useContext, useEffect, CSSProperties, useState, ReactNode } from 'react'
-import { Edit, Delete } from '@mui/icons-material'
+import { ITransaction } from '@/types/index'
+import { Delete, Edit } from '@mui/icons-material'
+import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
+import { CSSProperties, ReactNode, useContext, useEffect, useState } from 'react'
+import OneTransactionCard from '../card/OneTransactionCard'
+import BasicTable from './BasicTable'
 
 interface ITransactionTable {
   id: number
@@ -15,12 +16,17 @@ interface ITransactionTable {
   actions: ReactNode
 }
 
-interface ExpensesTableProps {
+interface TransactionsTableProps {
   handleEditTransaction: (id: number) => void
   handleDeleteTransaction: (id: number) => void
+  filterFunction: (transaction: ITransactionTable) => boolean
 }
 
-export default function ExpensesTable({ handleEditTransaction, handleDeleteTransaction }: ExpensesTableProps) {
+export default function TransactionsTable({
+  handleEditTransaction,
+  handleDeleteTransaction,
+  filterFunction
+}: TransactionsTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const { transactions, loadingTransactions } = useContext(TransactionsContext)
   const [rows, setRows] = useState<ITransactionTable[]>([])
@@ -36,27 +42,34 @@ export default function ExpensesTable({ handleEditTransaction, handleDeleteTrans
   // DATA
   useEffect(() => {
     if (transactions) {
-      let data = transactions
-        .filter(transaction => transaction.amount < 0)
-        .map(transaction => {
-          return {
+      const data = transactions
+        .filter((transaction: ITransaction) =>
+          filterFunction({
             id: transaction.id,
             title: transaction.title,
             category: transaction.category,
             date: new Date(transaction.date),
             amount: transaction.amount,
-            actions: (
-              <div key={transaction.id}>
-                <IconButton onClick={() => handleEditTransaction(transaction.id)}>
-                  <Edit color="primary" />
-                </IconButton>
-                <IconButton onClick={() => handleDeleteTransaction(transaction.id)}>
-                  <Delete color="primary" />
-                </IconButton>
-              </div>
-            )
-          }
-        })
+            actions: <></>
+          })
+        )
+        .map(transaction => ({
+          id: transaction.id,
+          title: transaction.title,
+          category: transaction.category,
+          date: new Date(transaction.date),
+          amount: transaction.amount,
+          actions: (
+            <div key={transaction.id}>
+              <IconButton onClick={() => handleEditTransaction(transaction.id)}>
+                <Edit color="primary" />
+              </IconButton>
+              <IconButton onClick={() => handleDeleteTransaction(transaction.id)}>
+                <Delete color="primary" />
+              </IconButton>
+            </div>
+          )
+        }))
 
       setRows(data)
     }
@@ -80,7 +93,9 @@ export default function ExpensesTable({ handleEditTransaction, handleDeleteTrans
         {isMobile &&
           !loadingTransactions &&
           transactions &&
-          rows.sort((a, b) => a.date.getDate() - b.date.getDate()).map(row => <OneTransactionCard key={row.id} data={row} />)}
+          rows
+            .sort((a, b) => a.date.getDate() - b.date.getDate())
+            .map(row => <OneTransactionCard key={row.id} data={row} />)}
       </div>
     </>
   )

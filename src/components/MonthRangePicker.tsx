@@ -7,14 +7,15 @@ import 'dayjs/locale/es'
 import '../styles.css'
 
 interface MonthRangePickerProps {
-  monthsSelected: [string, string]
   setMonthsSelected: (dates: [string, string]) => void
 }
 
-export default function MonthRangePicker({ monthsSelected: dates, setMonthsSelected: setDates }: MonthRangePickerProps) {
-
-  const handleOnChangeDates = (dates: [Dayjs, Dayjs]) => {
-    setDates([dates[0].startOf('month').format('YYYY-MM-DD'), dates[1].endOf('month').format('YYYY-MM-DD')])
+export default function MonthRangePicker({ setMonthsSelected }: MonthRangePickerProps) {
+  const handleOnChangeDates = (monthsSelected: [Dayjs, Dayjs]) => {
+    setMonthsSelected([
+      monthsSelected[0].startOf('month').format('YYYY-MM-DD'),
+      monthsSelected[1].endOf('month').format('YYYY-MM-DD')
+    ])
   }
 
   return (
@@ -33,7 +34,7 @@ export default function MonthRangePicker({ monthsSelected: dates, setMonthsSelec
       separator={<KeyboardArrowRight />}
       allowEmpty={[false, false]}
       inputReadOnly
-      onChange={(dates) => handleOnChangeDates(dates as [Dayjs, Dayjs])}
+      onChange={dates => handleOnChangeDates(dates as [Dayjs, Dayjs])}
       style={{
         width: '200px',
         marginBottom: '5px',

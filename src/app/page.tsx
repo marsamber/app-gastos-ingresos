@@ -150,10 +150,7 @@ export default function Home() {
             }}
           >
             <h2 style={titleStyle}>Dashboard</h2>
-            <MonthRangePicker
-              monthsSelected={monthsSelected}
-              setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)}
-            />
+            <MonthRangePicker setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)} />
           </div>
           {loadingTransactions || loadingBudgets || loadingBudgetHistorics ? (
             <p>Cargando...</p>

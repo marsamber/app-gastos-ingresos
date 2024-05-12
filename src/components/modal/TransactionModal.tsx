@@ -1,5 +1,6 @@
 import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
+import { ITransaction } from '@/types/index'
 import {
   Button,
   CircularProgress,
@@ -10,15 +11,16 @@ import {
   TextField,
   useMediaQuery
 } from '@mui/material'
-import { CSSProperties, ChangeEvent, useContext, useState } from 'react'
+import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
 
-export interface AddTransactionModalProps {
+interface TransactionModalProps {
   open: boolean
   handleClose: () => void
+  transaction?: ITransaction | null
 }
 
-export default function AddTransactionModal({ open, handleClose }: AddTransactionModalProps) {
+export default function TransactionModal({ open, handleClose, transaction }: TransactionModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [type, setType] = useState<'income' | 'expense'>('income')
   const [amount, setAmount] = useState<string>('')
@@ -26,32 +28,41 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
   const [category, setCategory] = useState('')
   const [date, setDate] = useState(new Date())
   const [loading, setLoading] = useState(false)
-  const [errorAmount, setErrorAmount] = useState(false)
-  const [errorDate, setErrorDate] = useState(false)
-  const [errorTitle, setErrorTitle] = useState(false)
-  const [errorCategory, setErrorCategory] = useState(false)
+  const [errors, setErrors] = useState({ amount: false, date: false, title: false, category: false })
 
   const { data: categories, loading: loadingCategories } = useFetch<string[]>('/api/categories')
-
   const { refreshTransactions } = useContext(RefreshTransactionsContext)
 
-  const handleAddTransaction = async () => {
+  useEffect(() => {
+    if (transaction) {
+      setType(transaction.amount < 0 ? 'expense' : 'income')
+      setAmount(transaction.amount.toString())
+      setTitle(transaction.title)
+      setCategory(transaction.category)
+      setDate(new Date(transaction.date))
+    } else {
+      setType('income')
+      setAmount('')
+      setTitle('')
+      setCategory('')
+      setDate(new Date())
+    }
+  }, [transaction, open])
+
+  const handleSaveTransaction = async () => {
     if (!amount || !title || !category || !date) {
-      setErrorAmount(!amount || amount === '-')
-      setErrorTitle(!title)
-      setErrorCategory(!category)
-      setErrorDate(!date || date.toString() === 'Invalid Date')
+      setErrors({
+        amount: !amount,
+        title: !title,
+        category: !category,
+        date: date.toString() === 'Invalid Date'
+      })
       return
     }
 
-    setErrorAmount(false)
-    setErrorTitle(false)
-    setErrorCategory(false)
-    setErrorDate(false)
-
     setLoading(true)
 
-    const newTransaction = {
+    const transactionData = {
       title,
       amount: parseFloat(amount),
       category,
@@ -59,31 +70,32 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
     }
 
     try {
-      const response = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newTransaction)
+      const response = await fetch(transaction ? `/api/transactions/${transaction.id}` : '/api/transactions', {
+        method: transaction ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transactionData)
       })
-      await response.json()
-
       if (response.ok) {
         refreshTransactions()
-        handleCloseModal()
+        handleClose()
       }
     } catch (error) {
-      console.error('Failed to add transaction', error)
+      console.error('Failed to save transaction', error)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
+  const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = e.target.value
+    if (/^-?\d*\.?\d*$/.test(value)) {
+      setAmount(value)
+      setType(parseFloat(value) < 0 ? 'expense' : 'income')
+    }
+  }
+  
   const handleCloseModal = () => {
-    setErrorAmount(false)
-    setErrorTitle(false)
-    setErrorCategory(false)
-    setErrorDate(false)
+    setErrors({ amount: false, date: false, title: false, category: false })
 
     setAmount('')
     setTitle('')
@@ -103,23 +115,6 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
     if (day.length < 2) day = '0' + day
 
     return [year, month, day].join('-')
-  }
-
-  const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const newValue = e.target.value
-    if (newValue === '' || newValue === '-') {
-      setAmount(newValue)
-    }
-    if (/^-?\d*\.?\d*$/.test(newValue)) {
-      setAmount(newValue)
-
-      const value = parseFloat(newValue)
-      if (value < 0) {
-        setType('expense')
-      } else {
-        setType('income')
-      }
-    }
   }
 
   // STYLES
@@ -151,11 +146,10 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
     alignItems: 'center',
     height: '100%'
   }
-
   return (
-    <BasicModal open={open} style={modalStyle}>
+    <BasicModal open={open} style={modalStyle} handleClose={handleCloseModal}>
       <div>
-        <h3 style={titleStyle}>Agregar transacción</h3>
+        <h3 style={titleStyle}>Editar transacción</h3>
         {loadingCategories && <CircularProgress style={circularProgressStyle} />}
         <div style={firstRowStyle}>
           <FormControl style={{ width: isMobile ? '192px' : '110px', margin: '8px' }} size="small" disabled>
@@ -180,7 +174,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
             label="Cantidad"
             type="text"
             value={amount}
-            error={errorAmount}
+            error={errors.amount}
             onChange={e => handleChangeAmount(e)}
             inputProps={{
               pattern: '^-?\\d*\\.?\\d*$'
@@ -192,8 +186,8 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
             color="primary"
             label="Fecha"
             type="date"
-            error={errorDate}
-            value={formatDate(date)}
+            error={errors.date}
+            value={formatDate(date as Date)}
             onChange={e => setDate(new Date(e.target.value))}
           />
         </div>
@@ -204,7 +198,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
             color="primary"
             label="Título"
             value={title}
-            error={errorTitle}
+            error={errors.title}
             onChange={e => setTitle(e.target.value)}
           />
           {categories && categories.length > 0 ? (
@@ -218,7 +212,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
                 label="Categoría"
                 onChange={e => setCategory(e.target.value)}
                 color="primary"
-                error={errorCategory}
+                error={errors.category}
               >
                 {categories.map(category => (
                   <MenuItem key={category} value={category}>
@@ -232,7 +226,7 @@ export default function AddTransactionModal({ open, handleClose }: AddTransactio
           )}
         </div>
         <div style={actionsStyle}>
-          <Button variant="contained" color="primary" onClick={handleAddTransaction} disabled={loading}>
+          <Button variant="contained" color="primary" onClick={handleSaveTransaction} disabled={loading}>
             Agregar
           </Button>
           <Button variant="text" color="primary" onClick={handleCloseModal} disabled={loading}>

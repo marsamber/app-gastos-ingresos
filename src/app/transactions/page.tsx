@@ -1,9 +1,5 @@
 'use client'
-import AddTransactionModal from '@/components/modal/AddTransactionModal'
-import EditTransactionModal from '@/components/modal/EditTransactionModal'
-import AllTransactionsTable from '@/components/table/AllTransactionsTable'
-import ExpensesTable from '@/components/table/ExpensesTable'
-import IncomesTable from '@/components/table/IncomesTable'
+import TransactionsTable from '@/components/table/TransactionsTable'
 import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
 import { ITransaction } from '@/types/index'
@@ -21,6 +17,7 @@ import {
 } from '@mui/material'
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
+import TransactionModal from '@/components/modal/TransactionModal'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
@@ -224,27 +221,32 @@ export default function Transactions() {
           </div>
           <div>
             {value === 0 && (
-              <AllTransactionsTable
-                handleEditTransaction={handleEditTransaction}
-                handleDeleteTransaction={handleDeleteTransaction}
-              />
+             <TransactionsTable
+             handleEditTransaction={handleEditTransaction}
+             handleDeleteTransaction={handleDeleteTransaction}
+             filterFunction={() => true}
+           />
             )}
             {value === 1 && (
-              <ExpensesTable
-                handleEditTransaction={handleEditTransaction}
-                handleDeleteTransaction={handleDeleteTransaction}
-              />
+              <TransactionsTable
+              handleEditTransaction={handleEditTransaction}
+              handleDeleteTransaction={handleDeleteTransaction}
+              filterFunction={(transaction) => transaction.amount < 0} 
+            />
             )}
             {value === 2 && (
-              <IncomesTable
-                handleEditTransaction={handleEditTransaction}
-                handleDeleteTransaction={handleDeleteTransaction}
-              />
+              <TransactionsTable
+              handleEditTransaction={handleEditTransaction}
+              handleDeleteTransaction={handleDeleteTransaction}
+              filterFunction={(transaction) => transaction.amount > 0}
+            />
             )}
           </div>
         </div>
-        <AddTransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
-        <EditTransactionModal open={editTransaction} handleClose={() => setEditTransaction(false)} transaction={transaction} />
+        <TransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
+        <TransactionModal open={editTransaction} handleClose={() => setEditTransaction(false)} transaction={transaction} />
+        {/* <AddTransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
+        <EditTransactionModal open={editTransaction} handleClose={() => setEditTransaction(false)} transaction={transaction} /> */}
       </TransactionsContext.Provider>
     </main>
   )

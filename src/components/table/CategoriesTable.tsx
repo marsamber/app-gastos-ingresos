@@ -1,52 +1,67 @@
-import { IconButton, useMediaQuery } from '@mui/material'
-import BasicTable from './BasicTable'
-import OneCategoryBudgetCard from '../card/OneCategoryBudgetCard'
+/* eslint-disable no-unused-vars */
+import { SettingsContext } from '@/contexts/SettingsContext'
 import { Delete, Edit } from '@mui/icons-material'
+import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
+import { CSSProperties, useContext, useEffect, useState } from 'react'
+import OneCategoryBudgetCard from '../card/OneCategoryBudgetCard'
+import BasicTable from './BasicTable'
 
-export default function CategoriesTable() {
+interface CategoriesTableProps {
+  handleEditCategoryBudget: (id: number) => void
+  handleDeleteCategoryBudget: (id: number) => void
+}
+
+export default function CategoriesTable({ handleEditCategoryBudget, handleDeleteCategoryBudget }: CategoriesTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
+  const { budgets, loadingBudgets } = useContext(SettingsContext)
+  const [rows, setRows] = useState<any[]>([])
 
   const headCells = [
     { id: 'category', label: 'Categoría' },
-    { id: 'budget', label: 'Presupuesto' }
+    { id: 'budget', label: 'Presupuesto' },
+    { id: 'actions', label: 'Acciones' }
   ]
 
-  const rows = [
-    { id: 0, category: 'Comida', budget: 300 },
-    { id: 1, category: 'Ocio', budget: 100 },
-    { id: 2, category: 'Transporte', budget: 50 },
-    { id: 3, category: 'Ropa', budget: 50 },
-    { id: 4, category: 'Salud', budget: 50 },
-    { id: 5, category: 'Hogar', budget: 50 },
-    { id: 6, category: 'Educación', budget: 50 },
-    { id: 7, category: 'Regalos', budget: 50 },
-    { id: 8, category: 'Viajes', budget: 50 },
-    { id: 9, category: 'Ahorro', budget: 50 },
-    { id: 10, category: 'Otros', budget: 50 }
-  ]
+  // DATA
+  useEffect(() => {
+    if (!budgets) return
+    const rows = budgets.map(budget => ({
+      id: budget.id,
+      category: budget.category,
+      budget: budget.amount,
+      actions: (
+        <div key={budget.id}>
+          <IconButton onClick={() => handleEditCategoryBudget(budget.id)} >
+            <Edit color="primary"/>
+          </IconButton>
+          <IconButton onClick={() => handleDeleteCategoryBudget(budget.id)}>
+            <Delete color="primary"/>
+          </IconButton>
+        </div>
+      )
+    }))
 
-  headCells.push({ id: 'actions', label: 'Acciones' })
-  const dataRows = rows.map(row => ({
-    ...row,
-    actions: (
-      <div key={row.id}>
-        <IconButton>
-          <Edit color="primary" />
-        </IconButton>
-        <IconButton>
-          <Delete color="primary" />
-        </IconButton>
-      </div>
-    )
-  }))
+    rows.sort((a, b) => a.category.localeCompare(b.category))
+
+    setRows(rows)
+  }, [budgets])
+
+  // STYLES
+  const circularProgressStyle: CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%'
+  }
 
   return (
     <>
-      {!isMobile && <BasicTable headCells={headCells} rows={dataRows} keyOrder="date" numRowsPerPage={15} />}
+      {loadingBudgets && <CircularProgress style={circularProgressStyle} />}
+      {!isMobile && !loadingBudgets && budgets && (
+        <BasicTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={15} />
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {isMobile &&
-          dataRows
-            .map(row => <OneCategoryBudgetCard key={row.id} data={row} />)}
+        {isMobile && !loadingBudgets && budgets && rows.map(row => <OneCategoryBudgetCard key={row.id} data={row} />)}
       </div>
     </>
   )

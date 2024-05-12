@@ -1,14 +1,16 @@
-import { Modal, SxProps, Theme } from '@mui/material'
+import { IconButton, Modal, SxProps, Theme } from '@mui/material'
 import { CSSProperties, ReactElement } from 'react'
 import '../../styles.css'
+import { Close } from '@mui/icons-material'
 
 export interface BasicModalProps {
   open: boolean
-  style: CSSProperties
+  style?: CSSProperties
+  handleClose: () => void
   children: ReactElement
 }
 
-export default function BasicModal({ open, style, children }: BasicModalProps) {
+export default function BasicModal({ open, style, handleClose, children }: BasicModalProps) {
   const defaultStyle: SxProps<Theme> = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -21,8 +23,16 @@ export default function BasicModal({ open, style, children }: BasicModalProps) {
   return (
     <Modal sx={{...defaultStyle, ...style }} classes={{
       backdrop: 'backdrop'
-    }} open={open}>
+    }} open={open} >
+      <div>
+        <IconButton
+          style={{ position: 'absolute', top: '10px', right: '10px' }}
+          onClick={handleClose}
+        >
+          <Close />
+        </IconButton>
       {children}
+      </div>
     </Modal>
   )
 }

@@ -1,6 +1,5 @@
 'use client'
-import HistoricBudgetTable from '@/components/table/HistoricBudgetTable'
-import MonthBudgetTable from '@/components/table/MonthBudgetTable'
+import BudgetTable from '@/components/table/BudgetTable'
 import { HomeContext } from '@/contexts/HomeContext'
 import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
@@ -206,8 +205,8 @@ export default function Budget() {
             )}
           </div>
           <div>
-            {value === 0 && <MonthBudgetTable />}
-            {value === 1 && <HistoricBudgetTable />}
+            {value === 0 && <BudgetTable includeHistorics={false} />}
+            {value === 1 && <BudgetTable includeHistorics />}
           </div>
         </div>
       </HomeContext.Provider>

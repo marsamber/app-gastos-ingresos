@@ -49,6 +49,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       break
 
+    // case delete by category
+    case 'DELETE':
+      try {
+        const { category } = req.body
+
+        // Use Prisma's deleteMany to delete budgets historic by category
+        await prisma.budgetHistoric.deleteMany({
+          where: {
+            category
+          }
+        })
+
+        res.status(204).end()
+      } catch (error) {
+        console.error('Failed to delete budgets:', error)
+        res.status(400).json({ error: 'Failed to delete budgets' })
+      }
+      break
+
     default:
       res.setHeader('Allow', ['GET', 'POST'])
       res.status(405).end(`Method ${method} Not Allowed`)

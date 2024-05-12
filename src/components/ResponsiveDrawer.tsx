@@ -19,7 +19,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import AddTransactionModal from './modal/AddTransactionModal'
+import TransactionModal from './modal/TransactionModal'
 
 const drawerWidth = 240
 
@@ -242,7 +242,7 @@ export default function ResponsiveDrawer({
             >
               <Add />
             </Fab>
-            <AddTransactionModal open={addTransaction} handleClose={() => setAddTransaction(false)} />
+            <TransactionModal open={addTransaction} handleClose={() => setAddTransaction(false)} />
           </Box>
         )}
       </RefreshTransactionsContext.Provider>
