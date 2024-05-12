@@ -61,6 +61,23 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
       return
     }
 
+    if (!categoriesOptions.some(c => c.title === category.title)) {
+      // add new category
+      try {
+        await fetch('/api/categories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            category: category.title
+          })
+        })
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     setLoading(true)
     const budgetData = {
       category: category.title,
