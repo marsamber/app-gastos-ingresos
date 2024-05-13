@@ -1,9 +1,9 @@
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
-import useFetch from '@/hooks/useFetch'
+import { TransactionsContext } from '@/contexts/TransactionsContext'
 import { ITransaction } from '@/types/index'
-import { Autocomplete, Button, CircularProgress, TextField, useMediaQuery } from '@mui/material'
-import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
+import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
+import { CSSProperties, ChangeEvent, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
+import { RefreshContext } from '@/contexts/RefreshContext'
 
 interface TransactionModalProps {
   open: boolean
@@ -12,6 +12,8 @@ interface TransactionModalProps {
 }
 
 export default function TransactionModal({ open, handleClose, transaction }: TransactionModalProps) {
+  const inputRef = useRef<HTMLInputElement>()
+
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [type, setType] = useState<'income' | 'expense'>('income')
   const [amount, setAmount] = useState<string>('')
@@ -20,11 +22,44 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   const [date, setDate] = useState(new Date())
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({ amount: false, date: false, title: false, category: false })
+  const [categories, setCategories] = useState<string[] | null>(null)
 
-  const { data: categories, loading: loadingCategories } = useFetch<string[]>('/api/categories')
-  const { refreshTransactions } = useContext(RefreshTransactionsContext)
+  const { addTransaction, editTransaction } = useContext(TransactionsContext)
+  const { refreshTransactions, refreshKeyCategories } = useContext(RefreshContext)
 
-  const categoriesOptions = categories?.map(category => ({ value: category, label: category })) || []
+  const categoriesOptions = useMemo(
+    () =>
+      categories
+        ?.map(category => ({ value: category, label: category }))
+        .sort((a, b) => a.label.localeCompare(b.label)) || [],
+    [categories]
+  )
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await fetch('/api/categories')      
+      if (response.ok) {
+        const categories = await response.json()
+        setCategories(categories)
+      }
+    }
+
+    fetchCategories()
+  }, [refreshKeyCategories])
+
+  useEffect(() => {
+    if (open) {
+      const timeout = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 200)
+
+      return () => {
+        clearTimeout(timeout)
+      }
+    }
+  }, [open])
 
   useEffect(() => {
     if (transaction) {
@@ -69,6 +104,14 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
         body: JSON.stringify(transactionData)
       })
       if (response.ok) {
+        if (transaction) {
+          const updatedTransaction = await response.json()
+          editTransaction(updatedTransaction)
+        } else {
+          const newTransaction: ITransaction[] = await response.json()
+          addTransaction(newTransaction[0])
+        }
+
         refreshTransactions()
         handleClose()
       }
@@ -117,7 +160,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
   const modalStyle: CSSProperties = {
     width: isMobile ? '80%' : '500px',
-    height: isMobile ? '480px' : '300px'
+    height: isMobile ? '500px' : '300px'
   }
 
   const firstRowStyle: CSSProperties = {
@@ -133,17 +176,37 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
     margin: '20px 8px 0px 8px'
   }
 
-  const circularProgressStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%'
-  }
   return (
     <BasicModal open={open} style={modalStyle} handleClose={handleCloseModal}>
-      <div>
+      <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' } : {}}>
         <h3 style={titleStyle}>{transaction ? 'Editar transacción' : 'Agregar transacción'}</h3>
-        {loadingCategories && <CircularProgress style={circularProgressStyle} />}
+        <div style={firstRowStyle}>
+          <TextField
+            style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
+            size="small"
+            color="primary"
+            label="Título"
+            value={title}
+            error={errors.title}
+            onChange={e => setTitle(e.target.value)}
+            inputRef={inputRef}
+          />
+          {categories && categories.length > 0 ? (
+            <Autocomplete
+              style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
+              size="small"
+              options={categoriesOptions}
+              getOptionLabel={option => option.label}
+              value={categoriesOptions.find(opt => opt.value === category)}
+              onChange={(event, newValue) => setCategory(newValue.value)}
+              isOptionEqualToValue={(option, value) => option.value === value.value}
+              renderInput={params => <TextField {...params} label="Categoría" error={errors.category} />}
+              disableClearable
+            />
+          ) : (
+            <div>Cargando categorías...</div>
+          )}
+        </div>
         <div style={firstRowStyle}>
           <TextField
             style={{ width: isMobile ? '192px' : '110px', margin: '8px' }}
@@ -177,32 +240,6 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             value={formatDate(date as Date)}
             onChange={e => setDate(new Date(e.target.value))}
           />
-        </div>
-        <div style={firstRowStyle}>
-          <TextField
-            style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
-            size="small"
-            color="primary"
-            label="Título"
-            value={title}
-            error={errors.title}
-            onChange={e => setTitle(e.target.value)}
-          />
-          {categories && categories.length > 0 ? (
-            <Autocomplete
-              style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
-              size="small"
-              options={categoriesOptions}
-              getOptionLabel={option => option.label}
-              value={categoriesOptions.find(opt => opt.value === category)}
-              onChange={(event, newValue) => setCategory(newValue.value)}
-              isOptionEqualToValue={(option, value) => option.value === value.value}
-              renderInput={params => <TextField {...params} label="Categoría" error={errors.category} />}
-              disableClearable
-            />
-          ) : (
-            <div>Cargando categorías...</div>
-          )}
         </div>
         <div style={actionsStyle}>
           <Button variant="contained" color="primary" onClick={handleSaveTransaction} disabled={loading}>

@@ -1,5 +1,5 @@
 'use client'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
+import { RefreshContext } from '@/contexts/RefreshContext'
 import theme from '@/theme'
 import { Add, Calculate, CreditCard, CurrencyExchange, Home, Logout, Settings } from '@mui/icons-material'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -32,10 +32,16 @@ export default function ResponsiveDrawer({
   const [isClosing, setIsClosing] = useState(false)
   const pathname = usePathname()
   const [addTransaction, setAddTransaction] = useState(false)
-  const [refreshKey, setRefreshKey] = useState(0)
+
+  const [refreshKeyTransactions, setRefreshKeyTransactions] = useState(0)
+  const [refreshKeyCategories, setRefreshKeyCategories] = useState(0)
 
   const refreshTransactions = useCallback(() => {
-    setRefreshKey(prev => prev + 1)
+    setRefreshKeyTransactions(prev => prev + 1)
+  }, [])
+
+  const refreshCategories = useCallback(() => {
+    setRefreshKeyCategories(prev => prev + 1)
   }, [])
 
   const handleDrawerClose = () => {
@@ -132,7 +138,7 @@ export default function ResponsiveDrawer({
           <ListItemButton
             style={{
               backgroundColor: 'inherit',
-              color:'gray'
+              color: 'gray'
             }}
             href="/login"
             onClick={() => localStorage.removeItem('token')}
@@ -151,7 +157,9 @@ export default function ResponsiveDrawer({
 
   return (
     <ThemeProvider theme={theme}>
-      <RefreshTransactionsContext.Provider value={{ refreshKey, refreshTransactions }}>
+      <RefreshContext.Provider
+        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories }}
+      >
         {isLogin ? (
           children
         ) : (
@@ -231,21 +239,23 @@ export default function ResponsiveDrawer({
               />
               {children}
             </Box>
-            <Fab
-              style={{
-                position: 'fixed',
-                bottom: '20px',
-                right: '20px'
-              }}
-              color="primary"
-              onClick={() => setAddTransaction(true)}
-            >
-              <Add />
-            </Fab>
+            {pathname !== '/transactions' && (
+              <Fab
+                style={{
+                  position: 'fixed',
+                  bottom: '20px',
+                  right: '20px'
+                }}
+                color="primary"
+                onClick={() => setAddTransaction(true)}
+              >
+                <Add />
+              </Fab>
+            )}
             <TransactionModal open={addTransaction} handleClose={() => setAddTransaction(false)} />
           </Box>
         )}
-      </RefreshTransactionsContext.Provider>
+      </RefreshContext.Provider>
     </ThemeProvider>
   )
 }

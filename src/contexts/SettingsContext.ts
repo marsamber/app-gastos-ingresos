@@ -1,4 +1,5 @@
-import { IBudget, IMonthlyTransaction } from '@/types/index'
+/* eslint-disable no-unused-vars */
+import { IBudget, IBudgetHistoric, IMonthlyTransaction } from '@/types/index'
 import { createContext } from 'react'
 
 interface SettingsContextType {
@@ -9,6 +10,15 @@ interface SettingsContextType {
   loadingBudgets: boolean
   budgets: IBudget[]
   monthSelected: string
+
+  addMonthlyTransaction: (monthlyTransaction: IMonthlyTransaction) => void
+  editMonthlyTransaction: (monthlyTransaction: IMonthlyTransaction) => void
+
+  addBudget: (budget: IBudget | IBudgetHistoric) => void
+  editBudget: (budget: IBudget | IBudgetHistoric) => void
+  deleteBudget: (id: number) => void
+
+  deleteCategory: (category: string) => void
 }
 
 const defaultValue: SettingsContextType = {
@@ -18,7 +28,16 @@ const defaultValue: SettingsContextType = {
   categories: [],
   loadingBudgets: true,
   budgets: [],
-  monthSelected: ''
+  monthSelected: '',
+
+  addMonthlyTransaction: () => {},
+  editMonthlyTransaction: () => {},
+
+  addBudget: () => {},
+  editBudget: () => {},
+  deleteBudget: () => {},
+
+  deleteCategory: () => {}
 }
 
 export const SettingsContext = createContext<SettingsContextType>(defaultValue)

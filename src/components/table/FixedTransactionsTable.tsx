@@ -50,30 +50,35 @@ export default function FixedTransactionsTable({
       )
     }))
 
-    mappedRows.sort((a, b) => a.title.localeCompare(b.title))
+    mappedRows.sort((a, b) => b.title.localeCompare(a.title))
 
     setRows(mappedRows)
   }, [monthlyTransactions, isIncome])
 
+  // STYLES
   const circularProgressStyle: CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%'
+    height: '100%',
+    width: '100%'
   }
 
   return (
     <>
-      {loadingMonthlyTransactions && <CircularProgress style={circularProgressStyle} />}
-      {!isMobile && !loadingMonthlyTransactions && monthlyTransactions && (
-        <BasicTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={5} />
+      {loadingMonthlyTransactions ? (
+        <div style={circularProgressStyle}>
+          <CircularProgress />
+        </div>
+      ) : isMobile ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {rows.map(row => (
+            <OneFixedTransactionCard key={row.id} data={row} />
+          ))}
+        </div>
+      ) : (
+        <BasicTable headCells={headCells} rows={rows} keyOrder="title" numRowsPerPage={5} />
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {isMobile &&
-          !loadingMonthlyTransactions &&
-          monthlyTransactions &&
-          rows.map(row => <OneFixedTransactionCard key={row.id} data={row} />)}
-      </div>
     </>
   )
 }

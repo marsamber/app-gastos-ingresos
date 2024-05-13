@@ -101,7 +101,8 @@ export default function MonthDashboardCard() {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%'
+    height: '100%',
+    width: '100%'
   }
 
   const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
@@ -124,15 +125,14 @@ export default function MonthDashboardCard() {
       ) : (
         <h3 style={titleStyle}>Resumen de los meses seleccionados</h3>
       )}
-      {loadingTransactions && (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      )}
-      {!loadingTransactions && !data.some(item => item.Gastado !== 0) ? (
-        <p>No hay datos para mostrar</p>
-      ) : (
-        <div style={containerStyle}>
+      <div style={containerStyle}>
+        {loadingTransactions ? (
+          <div style={circularProgressStyle}>
+            <CircularProgress />
+          </div>
+        ) : !data.some(item => item.Gastado !== 0) ? (
+          <p>No hay datos para mostrar</p>
+        ) : (
           <ResponsiveContainer>
             <BarChart
               width={500}
@@ -153,8 +153,8 @@ export default function MonthDashboardCard() {
               <Bar dataKey="Gastado" barSize={50} fill="#FF6384" />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-      )}
+        )}
+      </div>
     </BasicCard>
   )
 }

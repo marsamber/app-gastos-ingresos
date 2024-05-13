@@ -1,4 +1,4 @@
-import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
+import { RefreshContext } from '@/contexts/RefreshContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudget, ITransaction } from '@/types/index'
@@ -18,8 +18,8 @@ export default function DeleteCategoryBudgetModal({
   categoryBudget
 }: DeleteCategoryBudgetModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { refreshBudgets, refreshCategories, refreshMonthlyTransactions } = useContext(RefreshSettingsContext)
-  const { monthlyTransactions, categories } = useContext(SettingsContext)
+  const { refreshCategories  } = useContext(RefreshContext)
+  const { monthlyTransactions, categories, deleteBudget, deleteCategory } = useContext(SettingsContext)
 
   const [loading, setLoading] = useState(false)
 
@@ -34,7 +34,7 @@ export default function DeleteCategoryBudgetModal({
       })
 
       if (response.ok) {
-        refreshBudgets()
+        deleteBudget(categoryBudget?.id!)
         console.log('Budget deleted')
         handleClose()
       }
@@ -160,16 +160,16 @@ export default function DeleteCategoryBudgetModal({
     }
   }
 
-  const deleteCategory = async () => {
+  const deleteCategoryBudget = async () => {
     if (!categoryBudget) return
 
     try {
       const response = await fetch(`/api/categories/${categoryBudget.category}`, { method: 'DELETE' })
 
       if (response.ok) {
-        refreshBudgets()
+        deleteBudget(categoryBudget.id!)
+        deleteCategory(categoryBudget.category)
         refreshCategories()
-        refreshMonthlyTransactions()
         handleClose()
         console.log('Category deleted')
       }
@@ -181,17 +181,33 @@ export default function DeleteCategoryBudgetModal({
   const handleDeleteCategory = async () => {
     setLoading(true)
 
-    await createCategory()
-    await updateTransactions()
-    await updateMonthlyTransactions()
-    await deleteBudgets()
-    await deleteBudgetHistorics()
-    await deleteCategory()
-
-    setLoading(false)
-
-    handleClose()
-  }
+    try {
+      // Create the category if it doesn't exist
+      await createCategory();
+  
+      // Update transactions only if createCategory succeeds
+      await updateTransactions();
+  
+      // Update monthly transactions only if updateTransactions succeeds
+      await updateMonthlyTransactions();
+  
+      // Delete budgets only if updateMonthlyTransactions succeeds
+      await deleteBudgets();
+  
+      // Delete budget historics only if deleteBudgets succeeds
+      await deleteBudgetHistorics();
+  
+      // Delete the category budget only if deleteBudgetHistorics succeeds
+      await deleteCategoryBudget();
+  
+    } catch (error) {
+      console.error('An error occurred:', error);
+      // Optionally, handle any specific cleanup or recovery from the error here
+    } finally {
+      setLoading(false);
+      handleClose(); // Assuming you want to close regardless of success or failure
+    }
+  };
 
   // STYLES
   const titleStyle = {

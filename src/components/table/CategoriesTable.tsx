@@ -11,7 +11,10 @@ interface CategoriesTableProps {
   handleDeleteCategoryBudget: (id: number) => void
 }
 
-export default function CategoriesTable({ handleEditCategoryBudget, handleDeleteCategoryBudget }: CategoriesTableProps) {
+export default function CategoriesTable({
+  handleEditCategoryBudget,
+  handleDeleteCategoryBudget
+}: CategoriesTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const { budgets, loadingBudgets } = useContext(SettingsContext)
   const [rows, setRows] = useState<any[]>([])
@@ -31,11 +34,11 @@ export default function CategoriesTable({ handleEditCategoryBudget, handleDelete
       budget: budget.amount,
       actions: (
         <div key={budget.id}>
-          <IconButton onClick={() => handleEditCategoryBudget(budget.id)} >
-            <Edit color="primary"/>
+          <IconButton onClick={() => handleEditCategoryBudget(budget.id)}>
+            <Edit color="primary" />
           </IconButton>
           <IconButton onClick={() => handleDeleteCategoryBudget(budget.id)}>
-            <Delete color="primary"/>
+            <Delete color="primary" />
           </IconButton>
         </div>
       )
@@ -56,13 +59,19 @@ export default function CategoriesTable({ handleEditCategoryBudget, handleDelete
 
   return (
     <>
-      {loadingBudgets && <CircularProgress style={circularProgressStyle} />}
-      {!isMobile && !loadingBudgets && budgets && (
-        <BasicTable headCells={headCells} rows={rows} keyOrder="date" numRowsPerPage={15} />
+      {loadingBudgets ? (
+        <div style={circularProgressStyle}>
+          <CircularProgress />
+        </div>
+      ) : isMobile ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {rows.map(row => (
+            <OneCategoryBudgetCard key={row.id} data={row} />
+          ))}{' '}
+        </div>
+      ) : (
+        <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="asc" numRowsPerPage={15} />
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {isMobile && !loadingBudgets && budgets && rows.map(row => <OneCategoryBudgetCard key={row.id} data={row} />)}
-      </div>
     </>
   )
 }

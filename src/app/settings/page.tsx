@@ -4,56 +4,48 @@ import FixedTransactionsCard from '@/components/card/FixedTransactionsCard'
 import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import theme from '@/theme'
-import { IBudget, IMonthlyTransaction } from '@/types/index'
-import { useMediaQuery } from '@mui/material'
+import { IBudget, IBudgetHistoric, IMonthlyTransaction } from '@/types/index'
+import { Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
-import { CSSProperties, useCallback, useEffect, useState } from 'react'
+import { CSSProperties, useCallback, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
+import { Info } from '@mui/icons-material'
+import { RefreshContext } from '@/contexts/RefreshContext'
+import useFetch from '@/hooks/useFetch'
 
 export default function Settings() {
+  const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1400px)')
   const [monthSelected, setMonthSelected] = useState<string>(dayjs().startOf('month').format('YYYY-MM-DD'))
   const [present, setPresent] = useState<boolean>(true)
-  const [loadingMonthlyTransactions, setLoadingMonthlyTransactions] = useState(true)
-  const [monthlyTransactions, setMonthlyTransactions] = useState<IMonthlyTransaction[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
   const [categories, setCategories] = useState<string[]>([])
   const [loadingBudgets, setLoadingBudgets] = useState(true)
   const [budgets, setBudgets] = useState<IBudget[]>([])
+  const [monthlyTransactions, setMonthlyTransactions] = useState<IMonthlyTransaction[]>([])
   const [restingBudget, setRestingBudget] = useState<number>(0)
 
-  const [refreshKeyMonthlyTransactions, setRefreshKeyMonthlyTransactions] = useState(0)
-  const [refreshKeyCategories, setRefreshKeyCategories] = useState(0)
-  const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
+  const { refreshKeyCategories, refreshCategories } = useContext(RefreshContext)
 
-  const refreshMonthlyTransactions = useCallback(() => {
-    setRefreshKeyMonthlyTransactions(prev => prev + 1)
-  }, [])
-
-  const refreshCategories = useCallback(() => {
-    setRefreshKeyCategories(prev => prev + 1)
-  }, [])
+  const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)  
 
   const refreshBudgets = useCallback(() => {
     setRefreshKeyBudgets(prev => prev + 1)
   }, [])
 
   // Refresh data
+  const {data, loading: loadingMonthlyTransactions} = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions')
   useEffect(() => {
-    const fetchMonthlyTransactions = async () => {
-      setLoadingMonthlyTransactions(true)
-      const monthlyTransactions = await fetch(`/api/monthly_transactions`).then(res => res.json())
-      setMonthlyTransactions(monthlyTransactions)
-      setLoadingMonthlyTransactions(false)
+    if (data) {
+      setMonthlyTransactions(data)
     }
-
-    fetchMonthlyTransactions()
-  }, [refreshKeyMonthlyTransactions])
+  }, [data])
 
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true)
-      const categories = await fetch(`/api/categories`).then(res => res.json())
+      let categories: string[] = await fetch(`/api/categories`).then(res => res.json())
+      categories = categories.sort((a: string, b: string) => a.localeCompare(b))
       setCategories(categories)
       setLoadingCategories(false)
     }
@@ -81,6 +73,7 @@ export default function Settings() {
     document.title = 'Configuración - Mis Finanzas'
   }, [])
 
+  // Check if the month selected is the current month
   useEffect(() => {
     const currentDate = new Date().toISOString().substring(0, 7)
     const dateSelected = monthSelected.substring(0, 7)
@@ -107,6 +100,7 @@ export default function Settings() {
     }
   }, [loadingCategories, categories, isFirstLoad])
 
+  // Create fixed income category if it doesn't exist
   useEffect(() => {
     if (!isCreating) return
 
@@ -140,7 +134,7 @@ export default function Settings() {
       method: 'DELETE'
     })
       .then(() => {
-        refreshMonthlyTransactions()
+        setMonthlyTransactions(prev => prev.filter(transaction => transaction.id !== id))
       })
       .catch(error => {
         console.error('Failed to delete transaction', error)
@@ -160,8 +154,50 @@ export default function Settings() {
     setRestingBudget(-(totalBudget - totalSpent))
   }, [loadingBudgets, budgets, loadingCategories, categories, loadingMonthlyTransactions, monthlyTransactions])
 
+  const addMonthlyTransaction = (transaction: IMonthlyTransaction) => {
+    setMonthlyTransactions(prev => {
+      const updatedTransactions = [...prev, transaction]
+      return updatedTransactions.sort((a, b) => b.title.localeCompare(a.title))
+    })
+  }
+
+  const editMonthlyTransaction = (transaction: IMonthlyTransaction) => {
+    setMonthlyTransactions(prev => {
+      const updatedTransactions = prev.map(t => (t.id === transaction.id ? transaction : t))
+      return updatedTransactions.sort((a, b) => b.title.localeCompare(a.title))
+    })
+  }
+
+  const addBudget = (budget: IBudget | IBudgetHistoric) => {
+    setBudgets(prev => {
+      const updatedBudgets = [...prev, budget]
+      return updatedBudgets.sort((a, b) => b.category.localeCompare(a.category))
+    })
+  }
+
+  const editBudget = (budget: IBudget | IBudgetHistoric) => {
+    setBudgets(prev => {
+      const updatedBudgets = prev.map(b => (b.id === budget.id ? budget : b))
+      return updatedBudgets.sort((a, b) => b.category.localeCompare(a.category))
+    })
+  }
+
+  const deleteBudget = (id: number) => {
+    setBudgets(prev => prev.filter(budget => budget.id !== id))
+  }
+
+  const deleteCategory = (category: string) => {
+    const transactionsToUpdate = monthlyTransactions.map(transaction => {
+      if (transaction.category === category) {
+        return { ...transaction, category: 'Sin categoría' }
+      }
+      return transaction
+    })
+    setMonthlyTransactions(transactionsToUpdate.sort((a, b) => b.title.localeCompare(a.title)))
+  }
+
   // STYLES
-  const titleStyle = {
+  const titleStyle: CSSProperties = {
     margin: '10px 0',
     color: 'black'
   }
@@ -182,11 +218,14 @@ export default function Settings() {
     width: isTablet ? '100%' : '50%',
     height: '100%'
   }
-  
+
   const budgetStyle: CSSProperties = {
     margin: '10px 0',
     color: theme.palette.primary.main,
-    textAlign: 'right'
+    textAlign: 'right',
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '5px'
   }
 
   return (
@@ -194,11 +233,7 @@ export default function Settings() {
       <RefreshSettingsContext.Provider
         value={{
           refreshBudgets,
-          refreshCategories,
-          refreshMonthlyTransactions,
           refreshKeyBudgets,
-          refreshKeyCategories,
-          refreshKeyMonthlyTransactions
         }}
       >
         <SettingsContext.Provider
@@ -209,7 +244,14 @@ export default function Settings() {
             categories,
             loadingMonthlyTransactions,
             monthlyTransactions,
-            monthSelected
+            monthSelected,
+            // Functions to add and edit transactions and budgets
+            addMonthlyTransaction,
+            editMonthlyTransaction,
+            addBudget,
+            editBudget,
+            deleteBudget,
+            deleteCategory
           }}
         >
           <div
@@ -220,13 +262,33 @@ export default function Settings() {
               width: '100%'
             }}
           >
-            <h2 style={titleStyle}>Configuración</h2>
-            {present && <h3 style={budgetStyle}>Presupuesto sin asignar: {restingBudget} €</h3>}
+            {!isMobile && <h2 style={titleStyle}>Configuración</h2>}
+            {present && isMobile ? (
+              <h4 style={budgetStyle}>
+                Presupuesto sin asignar: {restingBudget} €
+                <Tooltip title="Cantidad del presupuesto no asignada a categorías específicas, después de considerar los ingresos fijos y los presupuestos ya asignados a otras categorías.">
+                  <Info />
+                </Tooltip>
+              </h4>
+            ) : present && !isMobile ? (
+              <h3 style={budgetStyle}>
+                Presupuesto sin asignar: {restingBudget} €
+                <Tooltip title="Cantidad del presupuesto no asignada a categorías específicas, después de considerar los ingresos fijos y los presupuestos ya asignados a otras categorías.">
+                  <Info />
+                </Tooltip>
+              </h3>
+            ) : null}
           </div>
           <div style={containerStyle}>
             <div style={columnStyle}>
-              <FixedTransactionsCard handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction} transactionType='income' />
-              <FixedTransactionsCard handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction} transactionType='expense' />
+              <FixedTransactionsCard
+                handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
+                transactionType="income"
+              />
+              <FixedTransactionsCard
+                handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
+                transactionType="expense"
+              />
             </div>
             <div style={columnStyle}>
               <CategoriesCard setMonthSelected={setMonthSelected} />

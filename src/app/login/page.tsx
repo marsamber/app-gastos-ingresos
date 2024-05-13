@@ -17,20 +17,33 @@ export default function LoginPage() {
 
   return (
     <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh'
-      }}
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      width: '100vw',
+      backgroundColor: '#F7F9FB'    
+    }}
     >
-      <Card>
+      <Card style = {{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        borderRadius: '10px',
+      }}>
         <CardContent>
-          <TextField type="password" label="Password" onChange={event => setPassword(event.target.value)} onKeyDown={event => {
-            if (event.key === 'Enter') {
-              saveToken();
-            }
-          }} />
+          <TextField
+            type="password"
+            label="Clave"
+            onChange={event => setPassword(event.target.value)}
+            onKeyDown={event => {
+              if (event.key === 'Enter') {
+                saveToken()
+              }
+            }}
+          />
         </CardContent>
         <CardActions
           style={{

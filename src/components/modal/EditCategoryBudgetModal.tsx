@@ -1,8 +1,8 @@
 import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import { IBudget } from '@/types/index'
-import { Button, CircularProgress, TextField, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useEffect, useState } from 'react'
+import { Button, TextField, useMediaQuery } from '@mui/material'
+import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
 
 export interface EditCategoryBudgetModalProps {
@@ -12,6 +12,8 @@ export interface EditCategoryBudgetModalProps {
 }
 
 export default function EditCategoryBudgetModal({ open, handleClose, categoryBudget }: EditCategoryBudgetModalProps) {
+  const inputRef = useRef<HTMLInputElement>()
+
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState<string>('')
@@ -20,8 +22,22 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
   const [errorAmount, setErrorAmount] = useState(false)
   const [present, setPresent] = useState(false)
 
-  const { loadingCategories, categories, monthSelected } = useContext(SettingsContext)
-  const { refreshBudgets, refreshCategories } = useContext(RefreshSettingsContext)
+  const { categories, monthSelected, editBudget } = useContext(SettingsContext)
+  const { refreshBudgets } = useContext(RefreshSettingsContext)
+
+  useEffect(() => {
+    if (open) {
+      const timeout = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 200)
+
+      return () => {
+        clearTimeout(timeout)
+      }
+    }
+  }, [open])
 
   useEffect(() => {
     if (categoryBudget) {
@@ -65,11 +81,10 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
           body: JSON.stringify(newCategoryBudget)
         })
       }
-      await response.json()
+      const updatedBudget = await response.json()
 
       if (response.ok) {
-        refreshBudgets()
-        refreshCategories()
+        editBudget(updatedBudget)
         handleCloseModal()
       }
     } catch (error) {
@@ -131,20 +146,12 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     margin: '20px 8px 0px 8px'
   }
 
-  const circularProgressStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%'
-  }
-
   return (
     <BasicModal open={open} style={modalStyle} handleClose={handleCloseModal}>
       <div>
         <h3 style={titleStyle}>Editar presupuesto</h3>
-        {loadingCategories && <CircularProgress style={circularProgressStyle} />}
         <div style={rowStyle}>
-          {categories && categories.length > 0 && !loadingCategories && (
+          {categories && categories.length > 0 && (
             <TextField
               style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
               size="small"
@@ -167,6 +174,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
             value={amount}
             error={errorAmount}
             onChange={e => handleChangeAmount(e.target.value)}
+            inputRef={inputRef}
           />
         </div>
         <div style={actionsStyle}>

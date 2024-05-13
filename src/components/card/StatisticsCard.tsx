@@ -34,19 +34,19 @@ export default function StatisticsCard() {
   const addTransactionData = (statisticsData: Map<string, IStatisticsChart>) => {
     // Safe check and aggregate transactions if they are not null
     (transactions ?? [])
-    .filter(transaction => transaction.category !== 'Ingresos fijos')
-    .forEach(transaction => {
-      const category = statisticsData.get(transaction.category)
-      if (category) {
-        category.value -= transaction.amount
-      } else {
-        // If there's a transaction without a corresponding budget/budget historic, create a new category entry
-        statisticsData.set(transaction.category, {
-          name: transaction.category,
-          value: -transaction.amount
-        })
-      }
-    })
+      .filter(transaction => transaction.category !== 'Ingresos fijos')
+      .forEach(transaction => {
+        const category = statisticsData.get(transaction.category)
+        if (category) {
+          category.value -= transaction.amount
+        } else {
+          // If there's a transaction without a corresponding budget/budget historic, create a new category entry
+          statisticsData.set(transaction.category, {
+            name: transaction.category,
+            value: -transaction.amount
+          })
+        }
+      })
   }
 
   useEffect(() => {
@@ -81,7 +81,8 @@ export default function StatisticsCard() {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%'
+    height: '100%',
+    width: '100%'
   }
 
   const COLORS = [
@@ -123,16 +124,14 @@ export default function StatisticsCard() {
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Estadísticas por categoría</h3>
-      {(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      )}
-      {(!(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && !data.some(item => item.value !== 0))
-       ? (
-        <p>No hay datos para mostrar</p>
-      ) : (
-        <div style={containerStyle}>
+      <div style={containerStyle}>
+        {loadingTransactions || loadingBudgets || loadingBudgetHistorics ? (
+          <div style={circularProgressStyle}>
+            <CircularProgress />
+          </div>
+        ) : data.length === 0 ? (
+          <p>No hay datos para mostrar</p>
+        ) : (
           <ResponsiveContainer width="100%" height="100%">
             <PieChart
               width={400}
@@ -159,8 +158,8 @@ export default function StatisticsCard() {
               <Tooltip content={props => <CustomTooltip {...props} />} />
             </PieChart>
           </ResponsiveContainer>
-        </div>
-      )}
+        )}
+      </div>
     </BasicCard>
   )
 }

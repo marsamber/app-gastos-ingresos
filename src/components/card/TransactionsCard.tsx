@@ -30,19 +30,19 @@ export default function TransactionsCard() {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%'
+    height: '100%',
+    width: '100%'
   }
 
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Transacciones recientes</h3>
-      {loadingTransactions && (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      )}
       <div style={containerStyle}>
-        {!loadingTransactions && transactions && transactions.length == 0 ? (
+        {loadingTransactions ? (
+          <div style={circularProgressStyle}>
+            <CircularProgress />
+          </div>
+        ) : transactions && transactions.length == 0 ? (
           <p>No hay datos para mostrar</p>
         ) : (
           transactions &&

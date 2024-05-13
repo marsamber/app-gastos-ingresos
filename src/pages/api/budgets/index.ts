@@ -22,18 +22,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Verify if the request body is an array or a single object
         const budgetsInput = Array.isArray(req.body) ? req.body : [req.body]
 
-        // Map incoming budget details to the format expected by the Prisma createMany
-        const budgetData = budgetsInput.map(budget => ({
-          amount: budget.amount,
-          category: budget.category
-        }))
+        // Use a loop to create each budget and collect them
+        const createdBudgets = []
+        for (const budget of budgetsInput) {
+          const newBudget = await prisma.budget.create({
+            data: {
+              amount: budget.amount,
+              category: budget.category
+            }
+          })
+          createdBudgets.push(newBudget)
+        }
 
-        // Use Prisma's createMany to insert multiple budgets
-        const newBudgets = await prisma.budget.createMany({
-          data: budgetData
-        })
-
-        res.status(201).json(newBudgets)
+        // Respond with the array of created budgets
+        res.status(201).json(createdBudgets)
       } catch (error) {
         console.error('Failed to create newBudget:', error)
         res.status(400).json({ error: 'Failed to create newBudget' })

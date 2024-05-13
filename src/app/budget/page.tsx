@@ -1,7 +1,7 @@
 'use client'
 import BudgetTable from '@/components/table/BudgetTable'
 import { HomeContext } from '@/contexts/HomeContext'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
+import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudget, IBudgetHistoric } from '@/types/index'
 import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
@@ -19,7 +19,7 @@ export default function Budget() {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [loadingTransactions, setLoadingTransactions] = useState(false)
   const [transactions, setTransactions] = useState([])
-  const { refreshKey } = useContext(RefreshTransactionsContext)
+  const { refreshKeyTransactions } = useContext(RefreshContext)
 
   const filterOptions = [
     { label: 'Mes pasado', value: 'last_month' },
@@ -84,7 +84,7 @@ export default function Budget() {
     }
 
     fetchTransactions()
-  }, [monthsSelected, refreshKey])
+  }, [monthsSelected, refreshKeyTransactions])
 
   const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
@@ -93,7 +93,7 @@ export default function Budget() {
 
   useEffect(() => {
     const currentDate = new Date().toISOString().split('T')[0]
-    if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
+    if (new Date(monthsSelected[1]) >= new Date(currentDate) || monthsSelected[1] === '') {
       setPresent(true)
     } else {
       setPresent(false)
@@ -134,18 +134,18 @@ export default function Budget() {
           loadingBudgetHistorics
         }}
       >
-        <h2 style={titleStyle}>Presupuesto</h2>
+        {!isMobile && <h2 style={titleStyle}>Presupuesto</h2>}
         <div>
           {isMobile && value === 1 && (
             <div style={buttonsStyle}>
               <Autocomplete
-                sx={{ m: 1, width: 150}}
+                sx={{ m: 1, width: 150 }}
                 size="small"
                 options={filterOptions}
                 value={filterOptions.find(option => option.value === filter)}
                 onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
                 getOptionLabel={option => option.label}
-                renderInput={params => <TextField {...params} label="Filtro" color="primary"  />}
+                renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
                 disableClearable
               />
             </div>
@@ -155,8 +155,6 @@ export default function Budget() {
               classes={{
                 indicator: 'indicator'
               }}
-              // textColor="secondary"
-              // indicatorColor="primary"
               value={value}
               onChange={handleChangeTab}
               variant={isMobile ? 'fullWidth' : 'standard'}
@@ -179,15 +177,15 @@ export default function Budget() {
             {!isMobile && value === 1 && (
               <div style={buttonsStyle}>
                 <Autocomplete
-                sx={{ m: 1, width: 150}}
-                size="small"
-                options={filterOptions}
-                value={filterOptions.find(option => option.value === filter)}
-                onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
-                getOptionLabel={option => option.label}
-                renderInput={params => <TextField {...params} label="Filtro" color="primary"  />}
-                disableClearable
-              />
+                  sx={{ m: 1, width: 150 }}
+                  size="small"
+                  options={filterOptions}
+                  value={filterOptions.find(option => option.value === filter)}
+                  onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                  getOptionLabel={option => option.label}
+                  renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
+                  disableClearable
+                />
               </div>
             )}
           </div>

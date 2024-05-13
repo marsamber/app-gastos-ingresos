@@ -1,9 +1,10 @@
 import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import theme from '@/theme'
-import { Autocomplete, Button, CircularProgress, TextField, createFilterOptions, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useEffect, useMemo, useState } from 'react'
+import { Autocomplete, Button, TextField, createFilterOptions, useMediaQuery } from '@mui/material'
+import { CSSProperties, ChangeEvent, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
+import { RefreshContext } from '@/contexts/RefreshContext'
 
 export interface AddCategoryBudgetModalProps {
   open: boolean
@@ -18,19 +19,37 @@ interface CategoryType {
 const filter = createFilterOptions<CategoryType>()
 
 export default function AddCategoryBudgetModal({ open, handleClose }: AddCategoryBudgetModalProps) {
+  const inputRef = useRef<HTMLInputElement>()
+
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [category, setCategory] = useState<CategoryType>({ title: '' })
   const [amount, setAmount] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState({ category: false, amount: false, message: '' })
 
-  const { loadingCategories, categories, budgets, monthSelected } = useContext(SettingsContext)
-  const { refreshCategories, refreshBudgets } = useContext(RefreshSettingsContext)
+  const { categories, budgets, monthSelected, addBudget } = useContext(SettingsContext)
+  const { refreshBudgets } = useContext(RefreshSettingsContext)
   const currentDate = useMemo(() => new Date().toISOString().substring(0, 7), [])
   const present = useMemo(() => monthSelected.substring(0, 7) === currentDate, [monthSelected, currentDate])
 
+  const { refreshCategories } = useContext(RefreshContext)
+
   useEffect(() => {
-    refreshBudgets() // Ensure budgets are updated when month changes
+    if (open) {
+      const timeout = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 200)
+
+      return () => {
+        clearTimeout(timeout)
+      }
+    }
+  }, [open])
+
+  useEffect(() => {
+    refreshBudgets()
   }, [monthSelected])
 
   const categoriesOptions = useMemo(() => {
@@ -92,8 +111,9 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     })
 
     if (response.ok) {
+      const newBudget = await response.json()
       refreshCategories()
-      refreshBudgets()
+      addBudget(newBudget[0])
       handleCloseModal()
     } else {
       setError({ ...error, message: 'Error al guardar el presupuesto.' })
@@ -107,6 +127,13 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     setCategory({ title: '' })
     setAmount('')
     handleClose()
+  }
+
+  const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = e.target.value
+    if (/^-?\d*\.?\d*$/.test(value)) {
+      setAmount(value)
+    }
   }
 
   // STYLES
@@ -132,68 +159,63 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     margin: '20px 8px 0px 8px'
   }
 
-  const circularProgressStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%'
-  }
-
   return (
     <BasicModal style={modalStyle} open={open} handleClose={handleCloseModal}>
       <div>
         <h3 style={titleStyle}>Agregar presupuesto</h3>
-        {loadingCategories && <CircularProgress style={circularProgressStyle} />}
         <div style={rowStyle}>
-          {!loadingCategories && (
-            <Autocomplete
-              style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
-              size="small"
-              value={category}
-              onChange={(event, newValue) => {
-                if (typeof newValue === 'string') {
-                  // Direct string input from freeSolo
-                  setCategory({ title: newValue })
-                } else if (newValue && newValue.inputValue) {
-                  // Input from user input not yet existing in options
-                  setCategory({ title: newValue.inputValue })
-                } else {
-                  // Selection from existing options
-                  setCategory(newValue ?? { title: '' })
-                }
-              }}
-              filterOptions={(options, params) => {
-                const filtered = filter(options, params)
-                const { inputValue } = params
-                const isExisting = options.some(option => inputValue === option.title)
-                if (inputValue !== '' && !isExisting) {
-                  // Suggest creating a new value
-                  filtered.push({
-                    inputValue,
-                    title: `Añade "${inputValue}"`
-                  })
-                }
-                return filtered
-              }}
-              selectOnFocus
-              handleHomeEndKeys
-              id="free-solo-with-text-demo"
-              options={categoriesOptions}
-              getOptionLabel={option => (typeof option === 'string' ? option : option.inputValue || option.title)}
-              renderOption={(props, option) => <li {...props}>{option.title}</li>}
-              sx={{ width: 300 }}
-              renderInput={params => <TextField {...params} error={error.category} label="Categoría" />}
-              disableClearable
-            />
-          )}
+          <Autocomplete
+            style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
+            size="small"
+            value={category}
+            onChange={(event, newValue) => {
+              if (typeof newValue === 'string') {
+                // Direct string input from freeSolo
+                setCategory({ title: newValue })
+              } else if (newValue && newValue.inputValue) {
+                // Input from user input not yet existing in options
+                setCategory({ title: newValue.inputValue })
+              } else {
+                // Selection from existing options
+                setCategory(newValue ?? { title: '' })
+              }
+            }}
+            filterOptions={(options, params) => {
+              const filtered = filter(options, params)
+              const { inputValue } = params
+              const isExisting = options.some(option => inputValue === option.title)
+              if (inputValue !== '' && !isExisting) {
+                // Suggest creating a new value
+                filtered.push({
+                  inputValue,
+                  title: `Añade "${inputValue}"`
+                })
+              }
+              return filtered
+            }}
+            selectOnFocus
+            handleHomeEndKeys
+            id="free-solo-with-text-demo"
+            options={categoriesOptions}
+            getOptionLabel={option => (typeof option === 'string' ? option : option.inputValue || option.title)}
+            renderOption={(props, option) => <li {...props}>{option.title}</li>}
+            sx={{ width: 300 }}
+            renderInput={params => (
+              <TextField {...params} error={error.category} label="Categoría" inputRef={inputRef} />
+            )}
+            disableClearable
+          />
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
             size="small"
             value={amount}
-            onChange={e => setAmount(e.target.value)}
+            onChange={handleChangeAmount}
             label="Cantidad"
             type="text"
             error={error.amount}
+            inputProps={{
+              pattern: '^-?\\d*\\.?\\d*$'
+            }}
           />
         </div>
         <div style={{ textAlign: 'center', color: theme.palette.error.main, fontSize: '14px' }}>{error.message}</div>

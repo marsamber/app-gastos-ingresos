@@ -1,14 +1,7 @@
-import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import { IMonthlyTransaction } from '@/types/index'
-import {
-  Autocomplete,
-  Button,
-  CircularProgress,
-  TextField,
-  useMediaQuery
-} from '@mui/material'
-import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
+import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
+import { CSSProperties, ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
 
 interface FixedTransactionModalProps {
@@ -24,6 +17,8 @@ export default function FixedTransactionModal({
   transactionType,
   monthlyTransaction = null
 }: FixedTransactionModalProps) {
+  const inputRef = useRef<HTMLInputElement>()
+
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [amount, setAmount] = useState('')
   const [title, setTitle] = useState('')
@@ -31,10 +26,25 @@ export default function FixedTransactionModal({
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({ amount: false, title: false, category: false })
 
-  const { categories, loadingCategories } = useContext(SettingsContext)
-  const { refreshMonthlyTransactions } = useContext(RefreshSettingsContext)
-  
-  const categoriesOptions = categories.map(category => ({ value: category, label: category }))
+  const { categories, addMonthlyTransaction, editMonthlyTransaction } = useContext(SettingsContext)
+
+  const categoriesOptions = categories
+    .filter(category => (transactionType === 'expense' ? category !== 'Ingresos fijos' : true))
+    .map(category => ({ value: category, label: category }))
+
+  useEffect(() => {
+    if (open) {
+      const timeout = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 200)
+
+      return () => {
+        clearTimeout(timeout)
+      }
+    }
+  }, [open])
 
   useEffect(() => {
     if (monthlyTransaction) {
@@ -67,9 +77,9 @@ export default function FixedTransactionModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transactionData)
       })
-      await response.json()
+      const monthlyTrans = await response.json()
       if (response.ok) {
-        refreshMonthlyTransactions()
+        monthlyTransaction ? editMonthlyTransaction(monthlyTrans) : addMonthlyTransaction(monthlyTrans)
         handleClose()
       }
     } catch (error) {
@@ -112,89 +122,73 @@ export default function FixedTransactionModal({
     margin: '20px 8px 0px 8px'
   }
 
-  const circularProgressStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%'
-  }
-
   return (
     <BasicModal open={open} handleClose={handleClose} style={modalStyle}>
-      <div>
+      <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' } : {}}>
         <h3 style={titleStyle}>{monthlyTransaction ? 'Editar transacción' : 'Agregar transacción'}</h3>
-        {loadingCategories ? (
-          <CircularProgress style={circularProgressStyle} />
-        ) : (
-          <>
-            <div style={rowStyle}>
+        <div style={rowStyle}>
+          <TextField
+            style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
+            size="small"
+            color="primary"
+            label="Título"
+            value={title}
+            error={errors.title}
+            onChange={e => setTitle(e.target.value)}
+            inputRef={inputRef}
+          />
+          <Autocomplete
+            style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
+            size="small"
+            options={categoriesOptions}
+            getOptionLabel={option => option.label}
+            value={categoriesOptions.find(opt => opt.value === category)}
+            onChange={(event, newValue) => setCategory(newValue.value)}
+            isOptionEqualToValue={(option, value) => option.value === value.value}
+            renderInput={params => (
               <TextField
-                style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
-                disabled
-                size="small"
-                color="primary"
-                label="Tipo"
-                type="text"
-                value={transactionType === 'income' ? 'Ingreso' : 'Gasto'}
+                {...params}
+                label="Categoría"
+                error={errors.category}
+                disabled={transactionType === 'income'}
               />
-              <TextField
-                style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
-                size="small"
-                color="primary"
-                label="Cantidad"
-                type="text"
-                value={amount}
-                error={errors.amount}
-                onChange={e => handleChangeAmount(e)}
-                inputProps={{
-                  pattern: transactionType === 'income' ? '^\\d*\\.?\\d*$' : '^-\\d*\\.?\\d*$'
-                }}
-              />
-            </div>
-            <div style={rowStyle}>
-              <TextField
-                style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
-                size="small"
-                color="primary"
-                label="Título"
-                value={title}
-                error={errors.title}
-                onChange={e => setTitle(e.target.value)}
-              />
-              {categories && categories.length > 0 ? (
-                <Autocomplete
-                  style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
-                  size="small"
-                  options={categoriesOptions}
-                  getOptionLabel={option => option.label}
-                  value={categoriesOptions.find(opt => opt.value === category)} 
-                  onChange={(event, newValue) => setCategory(newValue.value)}
-                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      label="Categoría"
-                      error={errors.category}
-                      disabled={transactionType === 'income'} 
-                    />
-                  )}
-                  disableClearable
-                  disabled={transactionType === 'income'} 
-                />
-              ) : (
-                <div>Cargando categorías...</div>
-              )}
-            </div>
-            <div style={actionsStyle}>
-              <Button variant="contained" color="primary" onClick={handleSaveTransaction} disabled={loading}>
-                {monthlyTransaction ? 'Actualizar' : 'Agregar'}
-              </Button>
-              <Button variant="text" color="primary" onClick={handleClose} disabled={loading}>
-                Cancelar
-              </Button>
-            </div>
-          </>
-        )}
+            )}
+            disableClearable
+            disabled={transactionType === 'income'}
+          />
+        </div>
+        <div style={rowStyle}>
+          <TextField
+            style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
+            disabled
+            size="small"
+            color="primary"
+            label="Tipo"
+            type="text"
+            value={transactionType === 'income' ? 'Ingreso' : 'Gasto'}
+          />
+          <TextField
+            style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
+            size="small"
+            color="primary"
+            label="Cantidad"
+            type="text"
+            value={amount}
+            error={errors.amount}
+            onChange={e => handleChangeAmount(e)}
+            inputProps={{
+              pattern: transactionType === 'income' ? '^\\d*\\.?\\d*$' : '^-\\d*\\.?\\d*$'
+            }}
+          />
+        </div>
+        <div style={actionsStyle}>
+          <Button variant="contained" color="primary" onClick={handleSaveTransaction} disabled={loading}>
+            {monthlyTransaction ? 'Actualizar' : 'Agregar'}
+          </Button>
+          <Button variant="text" color="primary" onClick={handleClose} disabled={loading}>
+            Cancelar
+          </Button>
+        </div>
       </div>
     </BasicModal>
   )

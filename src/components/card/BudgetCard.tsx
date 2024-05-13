@@ -96,7 +96,8 @@ export default function BudgetCard() {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%'
+    height: '100%',
+    width: '100%'
   }
 
   const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
@@ -119,13 +120,12 @@ export default function BudgetCard() {
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Presupuesto</h3>
-      {(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      )}
       <div style={containerStyle}>
-        {!(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && data.length === 0 ? (
+        {loadingTransactions || loadingBudgets || loadingBudgetHistorics ? (
+          <div style={circularProgressStyle}>
+            <CircularProgress />
+          </div>
+        ) : data.length === 0 ? (
           <p>No hay datos para mostrar</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

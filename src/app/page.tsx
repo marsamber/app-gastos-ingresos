@@ -6,14 +6,15 @@ import MonthDashboardCard from '@/components/card/MonthDashboardCard'
 import StatisticsCard from '@/components/card/StatisticsCard'
 import TransactionsCard from '@/components/card/TransactionsCard'
 import { HomeContext } from '@/contexts/HomeContext'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
+import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
+import theme from '@/theme'
 import { IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
-import { useMediaQuery } from '@mui/material'
+import { Info } from '@mui/icons-material'
+import { Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
-import theme from '@/theme'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -32,7 +33,7 @@ export default function Home() {
   }, [])
 
   // DATA
-  const { refreshKey } = useContext(RefreshTransactionsContext)
+  const { refreshKeyTransactions } = useContext(RefreshContext)
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -45,7 +46,7 @@ export default function Home() {
     }
 
     fetchTransactions()
-  }, [monthsSelected, refreshKey])
+  }, [monthsSelected, refreshKeyTransactions])
 
   const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
@@ -90,13 +91,15 @@ export default function Home() {
   }, [transactions])
 
   // STYLES
-  const headerStyle = {
+  const headerStyle: CSSProperties = {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: isMobile ? 'unset' : 'space-between',
+    flexDirection: isMobile ? 'column-reverse' : 'row',
     alignItems: 'center',
     width: '100%'
   }
-  const titleStyle = {
+
+  const titleStyle: CSSProperties = {
     margin: '10px 0',
     color: 'black'
   }
@@ -104,7 +107,10 @@ export default function Home() {
   const budgetStyle: CSSProperties = {
     margin: '10px 0',
     color: theme.palette.primary.main,
-    textAlign: 'right'
+    textAlign: 'right',
+    display: 'flex',
+    alignItems: isMobile ? 'center' : 'flex-start',
+    gap: '5px'
   }
 
   const containerStyle: CSSProperties = {
@@ -149,13 +155,23 @@ export default function Home() {
               gap: isMobile ? 0 : '10px'
             }}
           >
-            <h2 style={titleStyle}>Dashboard</h2>
+            {!isMobile && <h2 style={titleStyle}>Dashboard</h2>}
             <MonthRangePicker setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)} />
           </div>
-          {loadingTransactions || loadingBudgets || loadingBudgetHistorics ? (
-            <p>Cargando...</p>
+          {isMobile ? (
+            <h4 style={budgetStyle}>
+              Presupuesto restante: {budget} €
+              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. No incluye los ingresos fijos.">
+                <Info />
+              </Tooltip>
+            </h4>
           ) : (
-            budgets && transactions && budgetHistorics && <h3 style={budgetStyle}>Presupuesto restante: {budget} €</h3>
+            <h3 style={budgetStyle}>
+              Presupuesto restante: {budget} €
+              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. No incluye los ingresos fijos.">
+                <Info />
+              </Tooltip>
+            </h3>
           )}
         </div>
         <div style={containerStyle}>

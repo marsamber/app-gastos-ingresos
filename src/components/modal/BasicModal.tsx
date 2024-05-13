@@ -12,26 +12,28 @@ export interface BasicModalProps {
 
 export default function BasicModal({ open, style, handleClose, children }: BasicModalProps) {
   const defaultStyle: SxProps<Theme> = {
-    position: 'absolute' as 'absolute',
+    position: 'fixed',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     boxShadow: 24,
-    p: 4
+    p: 4,
+    zIndex: 1000
   }
 
   return (
-    <Modal sx={{...defaultStyle, ...style }} classes={{
-      backdrop: 'backdrop'
-    }} open={open} >
+    <Modal
+      sx={{ ...defaultStyle, ...style }}
+      classes={{
+        backdrop: 'backdrop'
+      }}
+      open={open}
+    >
       <div>
-        <IconButton
-          style={{ position: 'absolute', top: '10px', right: '10px' }}
-          onClick={handleClose}
-        >
+        <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={handleClose}>
           <Close />
         </IconButton>
-      {children}
+        {children}
       </div>
     </Modal>
   )

@@ -71,6 +71,8 @@ export default function TransactionsTable({
           )
         }))
 
+      data.sort((a, b) => b.date.getDate() - a.date.getDate())
+
       setRows(data)
     }
   }, [transactions])
@@ -80,23 +82,26 @@ export default function TransactionsTable({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%'
+    height: '100%',
+    width: '100%'
   }
 
   return (
     <>
-      {loadingTransactions && <CircularProgress style={circularProgressStyle} />}
-      {!isMobile && !loadingTransactions && transactions && (
+      {loadingTransactions ? (
+        <div style={circularProgressStyle}>
+          <CircularProgress />
+        </div>
+      ) : isMobile ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {rows
+            .map(row => (
+              <OneTransactionCard key={row.id} data={row} />
+            ))}
+        </div>
+      ) : (
         <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="desc" numRowsPerPage={10} />
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {isMobile &&
-          !loadingTransactions &&
-          transactions &&
-          rows
-            .sort((a, b) => a.date.getDate() - b.date.getDate())
-            .map(row => <OneTransactionCard key={row.id} data={row} />)}
-      </div>
     </>
   )
 }

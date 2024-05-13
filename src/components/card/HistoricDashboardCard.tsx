@@ -142,13 +142,11 @@ export default function HistoricDashboardCard() {
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Gastos mensuales</h3>
-      {(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && (
+      <div style={containerStyle}>
+      {(loadingTransactions || loadingBudgets || loadingBudgetHistorics) ? (
         <div style={circularProgressStyle}>
           <CircularProgress />
-        </div>
-      )}
-      <div style={containerStyle}>
-        {!(loadingTransactions || loadingBudgets || loadingBudgetHistorics) && data.length === 0 ? (
+        </div> ) : data.length === 0 ? (
           <p>No hay datos para mostrar</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

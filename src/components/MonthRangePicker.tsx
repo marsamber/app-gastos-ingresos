@@ -5,12 +5,15 @@ import locale from 'antd/es/date-picker/locale/es_ES'
 import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/es'
 import '../styles.css'
+import { useMediaQuery } from '@mui/material'
 
 interface MonthRangePickerProps {
   setMonthsSelected: (dates: [string, string]) => void
 }
 
 export default function MonthRangePicker({ setMonthsSelected }: MonthRangePickerProps) {
+  const isMobile = useMediaQuery('(max-width: 600px)')
+
   const handleOnChangeDates = (monthsSelected: [Dayjs, Dayjs]) => {
     setMonthsSelected([
       monthsSelected[0].startOf('month').format('YYYY-MM-DD'),
@@ -36,7 +39,7 @@ export default function MonthRangePicker({ setMonthsSelected }: MonthRangePicker
       inputReadOnly
       onChange={dates => handleOnChangeDates(dates as [Dayjs, Dayjs])}
       style={{
-        width: '200px',
+        width: isMobile ? '170px':'200px',
         marginBottom: '5px',
         paddingBottom: 0,
         paddingLeft: 0,

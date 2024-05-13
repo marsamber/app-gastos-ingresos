@@ -31,20 +31,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Verify if the request body is an array or a single object
         const transactionsInput = Array.isArray(req.body) ? req.body : [req.body]
 
-        // Map incoming transaction details to the format expected by the Prisma createMany
-        const transactionData = transactionsInput.map(transaction => ({
-          title: transaction.title,
-          amount: transaction.amount,
-          date: transaction.date,
-          category: transaction.category,
-          type: transaction.amount < 0 ? 'EXPENSE' : 'INCOME'
-        }))
+        // Use a loop to create each transaction and collect them
+        const createdTransactions = []
+        for (const transaction of transactionsInput) {
+          const newTransaction = await prisma.transaction.create({
+            data: {
+              title: transaction.title,
+              amount: transaction.amount,
+              date: transaction.date,
+              category: transaction.category,
+              type: transaction.amount < 0 ? 'EXPENSE' : 'INCOME'
+            }
+          })
+          createdTransactions.push(newTransaction)
+        }
 
-        // Use Prisma's createMany to insert multiple transactions
-        const newTransactions = await prisma.transaction.createMany({
-          data: transactionData
-        })
-        res.status(201).json(newTransactions)
+        // Respond with the array of created transactions
+        res.status(201).json(createdTransactions)
       } catch (error) {
         console.error('Failed to create transaction:', error)
         res.status(400).json({ error: 'Failed to create transaction' })

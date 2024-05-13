@@ -1,13 +1,13 @@
 'use client'
 import TransactionsTable from '@/components/table/TransactionsTable'
-import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
 import { ITransaction } from '@/types/index'
 import { Add } from '@mui/icons-material'
 import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, useContext, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useState } from 'react'
 import '../../styles.css'
 import TransactionModal from '@/components/modal/TransactionModal'
+import useFetch from '@/hooks/useFetch'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
@@ -18,10 +18,8 @@ export default function Transactions() {
   ])
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [addTransactionTable, setAddTransactionTable] = useState(false)
-  const { refreshKey, refreshTransactions } = useContext(RefreshTransactionsContext)
   const [transactions, setTransactions] = useState<ITransaction[] | null>([])
-  const [loadingTransactions, setLoadingTransactions] = useState(true)
-  const [editTransaction, setEditTransaction] = useState(false)
+  const [openEditTransaction, setOpenEditTransaction] = useState(false)
   const [transaction, setTransaction] = useState<ITransaction | null>(null)
 
   const filterOptions = [
@@ -32,18 +30,34 @@ export default function Transactions() {
     { label: 'Todo', value: 'all' }
   ]
 
+  const {data, loading: loadingTransactions} = useFetch<ITransaction[]>(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`)
+  
   useEffect(() => {
-    const fetchTransactions = async () => {
-      setLoadingTransactions(true)
-      const transactions = await fetch(
-        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
-      ).then(res => res.json())
-      setTransactions(transactions)
-      setLoadingTransactions(false)
-    }
+    setTransactions(data)
+  }, [data])
 
-    fetchTransactions()
-  }, [monthsSelected, refreshKey])
+  const addTransaction = (newTransaction: ITransaction) => {
+    console.log(newTransaction)
+    setTransactions(prev => {
+      const updatedTransactions = [...prev!, newTransaction];
+      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return updatedTransactions;
+    });
+  };
+  
+  const editTransaction = (updatedTransaction: ITransaction) => {
+    setTransactions(prev => {
+      const updatedTransactions = prev!.map(transaction => transaction.id === updatedTransaction.id ? updatedTransaction : transaction);
+      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return updatedTransactions;
+    });
+  };
+  
+  const deleteTransaction = (transactionId: number) => {
+    setTransactions(prev =>
+      prev!.filter(transaction => transaction.id !== transactionId)
+    );
+  };
 
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
@@ -86,7 +100,7 @@ export default function Transactions() {
     const transaction = transactions?.find(transaction => transaction.id === id)
     if (transaction) {
       setTransaction(transaction)
-      setEditTransaction(true)
+      setOpenEditTransaction(true)
     }
   }
 
@@ -95,7 +109,8 @@ export default function Transactions() {
       method: 'DELETE'
     })
     if (response.ok) {
-      refreshTransactions()
+      deleteTransaction(id)
+      // refreshTransactions()
     }
   }
 
@@ -128,19 +143,19 @@ export default function Transactions() {
 
   return (
     <main className="main">
-      <TransactionsContext.Provider value={{ transactions, loadingTransactions }}>
-        <h2 style={titleStyle}>Transacciones</h2>
+      <TransactionsContext.Provider value={{ transactions, loadingTransactions, addTransaction, editTransaction }}>
+        {!isMobile && <h2 style={titleStyle}>Transacciones</h2>}
         <div>
           {isMobile && (
             <div style={buttonsStyle}>
               <Autocomplete
-                sx={{ m: 1, width: 150}}
+                sx={{ m: 1, width: 150 }}
                 size="small"
                 options={filterOptions}
                 value={filterOptions.find(option => option.value === filter)}
                 onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
                 getOptionLabel={option => option.label}
-                renderInput={params => <TextField {...params} label="Filtro" color="primary"  />}
+                renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
                 disableClearable
               />
             </div>
@@ -203,21 +218,21 @@ export default function Transactions() {
           </div>
           <div>
             {value === 0 && (
-              <TransactionsTable
+              <TransactionsTable key={0}
                 handleEditTransaction={handleEditTransaction}
                 handleDeleteTransaction={handleDeleteTransaction}
                 filterFunction={() => true}
               />
             )}
             {value === 1 && (
-              <TransactionsTable
+              <TransactionsTable key={1}
                 handleEditTransaction={handleEditTransaction}
                 handleDeleteTransaction={handleDeleteTransaction}
                 filterFunction={transaction => transaction.amount < 0}
               />
             )}
             {value === 2 && (
-              <TransactionsTable
+              <TransactionsTable key={2}
                 handleEditTransaction={handleEditTransaction}
                 handleDeleteTransaction={handleDeleteTransaction}
                 filterFunction={transaction => transaction.amount > 0}
@@ -227,12 +242,10 @@ export default function Transactions() {
         </div>
         <TransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
         <TransactionModal
-          open={editTransaction}
-          handleClose={() => setEditTransaction(false)}
+          open={openEditTransaction}
+          handleClose={() => setOpenEditTransaction(false)}
           transaction={transaction}
         />
-        {/* <AddTransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
-        <EditTransactionModal open={editTransaction} handleClose={() => setEditTransaction(false)} transaction={transaction} /> */}
       </TransactionsContext.Provider>
     </main>
   )
