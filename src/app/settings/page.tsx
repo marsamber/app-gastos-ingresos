@@ -3,6 +3,7 @@ import CategoriesCard from '@/components/card/CategoriesCard'
 import FixedTransactionsCard from '@/components/card/FixedTransactionsCard'
 import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
+import theme from '@/theme'
 import { IBudget, IMonthlyTransaction } from '@/types/index'
 import { useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
@@ -19,6 +20,7 @@ export default function Settings() {
   const [categories, setCategories] = useState<string[]>([])
   const [loadingBudgets, setLoadingBudgets] = useState(true)
   const [budgets, setBudgets] = useState<IBudget[]>([])
+  const [restingBudget, setRestingBudget] = useState<number>(0)
 
   const [refreshKeyMonthlyTransactions, setRefreshKeyMonthlyTransactions] = useState(0)
   const [refreshKeyCategories, setRefreshKeyCategories] = useState(0)
@@ -145,6 +147,19 @@ export default function Settings() {
       })
   }
 
+  useEffect(() => {
+    if (loadingBudgets || loadingCategories || loadingMonthlyTransactions) return
+
+    const totalBudget = budgets
+      .filter(budget => budget.category !== 'Ingresos fijos')
+      .reduce((acc, budget) => acc + budget.amount, 0)
+    const totalSpent = monthlyTransactions
+      .filter(transaction => transaction.category === 'Ingresos fijos')
+      .reduce((acc, transaction) => acc + transaction.amount, 0)
+
+    setRestingBudget(-(totalBudget - totalSpent))
+  }, [loadingBudgets, budgets, loadingCategories, categories, loadingMonthlyTransactions, monthlyTransactions])
+
   // STYLES
   const titleStyle = {
     margin: '10px 0',
@@ -166,6 +181,12 @@ export default function Settings() {
     gap: '10px',
     width: isTablet ? '100%' : '50%',
     height: '100%'
+  }
+  
+  const budgetStyle: CSSProperties = {
+    margin: '10px 0',
+    color: theme.palette.primary.main,
+    textAlign: 'right'
   }
 
   return (
@@ -200,6 +221,7 @@ export default function Settings() {
             }}
           >
             <h2 style={titleStyle}>Configuración</h2>
+            {present && <h3 style={budgetStyle}>Presupuesto sin asignar: {restingBudget} €</h3>}
           </div>
           <div style={containerStyle}>
             <div style={columnStyle}>
