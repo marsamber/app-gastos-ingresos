@@ -1,18 +1,9 @@
-import {
-  Button,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  useMediaQuery
-} from '@mui/material'
+import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
+import { SettingsContext } from '@/contexts/SettingsContext'
+import { IBudget } from '@/types/index'
+import { Button, CircularProgress, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
-import { SettingsContext } from '@/contexts/SettingsContext'
-import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
-import { IBudget } from '@/types/index'
 
 export interface EditCategoryBudgetModalProps {
   open: boolean
@@ -154,21 +145,15 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
         {loadingCategories && <CircularProgress style={circularProgressStyle} />}
         <div style={rowStyle}>
           {categories && categories.length > 0 && !loadingCategories && (
-            <FormControl style={{ width: isMobile ? '192px' : '200px', margin: '8px' }} size="small" disabled>
-              <InputLabel id="category-label" color="primary">
-                Categoría
-              </InputLabel>
-              <Select
-                labelId="category-label"
-                value={category}
-                label="Categoría"
-                onChange={e => setCategory(e.target.value)}
-                color="primary"
-                error={errorCategory}
-              >
-                <MenuItem value={categoryBudget?.category}>{categoryBudget?.category}</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
+              size="small"
+              value={category}
+              label="Categoría"
+              color="primary"
+              error={errorCategory}
+              disabled
+            />
           )}
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}

@@ -4,17 +4,7 @@ import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContex
 import { TransactionsContext } from '@/contexts/TransactionsContext'
 import { ITransaction } from '@/types/index'
 import { Add } from '@mui/icons-material'
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Tab,
-  Tabs,
-  useMediaQuery
-} from '@mui/material'
+import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
 import TransactionModal from '@/components/modal/TransactionModal'
@@ -34,6 +24,14 @@ export default function Transactions() {
   const [editTransaction, setEditTransaction] = useState(false)
   const [transaction, setTransaction] = useState<ITransaction | null>(null)
 
+  const filterOptions = [
+    { label: 'Este mes', value: 'this_month' },
+    { label: 'Mes pasado', value: 'last_month' },
+    { label: 'Este año', value: 'this_year' },
+    { label: 'Año pasado', value: 'last_year' },
+    { label: 'Todo', value: 'all' }
+  ]
+
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
@@ -51,9 +49,9 @@ export default function Transactions() {
     setValue(newValue)
   }
 
-  const handleChangeFilter = (event: SelectChangeEvent<string>) => {
-    setFilter(event.target.value as string)
-    switch (event.target.value) {
+  const handleChangeFilter = (newValue: { label: string; value: string }) => {
+    setFilter(newValue.value)
+    switch (newValue.value) {
       case 'this_month':
         setMonthsSelected([
           new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
@@ -135,24 +133,16 @@ export default function Transactions() {
         <div>
           {isMobile && (
             <div style={buttonsStyle}>
-              <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                <InputLabel id="filter-label" color="primary">
-                  Filtro
-                </InputLabel>
-                <Select
-                  labelId="filter-label"
-                  value={filter}
-                  label="Filtro"
-                  onChange={handleChangeFilter}
-                  color="primary"
-                >
-                  <MenuItem value="this_month">Este mes</MenuItem>
-                  <MenuItem value="last_month">Mes pasado</MenuItem>
-                  <MenuItem value="this_year">Este año</MenuItem>
-                  <MenuItem value="last_year">Año pasado</MenuItem>
-                  <MenuItem value="all">Todo</MenuItem>
-                </Select>
-              </FormControl>
+              <Autocomplete
+                sx={{ m: 1, width: 150}}
+                size="small"
+                options={filterOptions}
+                value={filterOptions.find(option => option.value === filter)}
+                onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                getOptionLabel={option => option.label}
+                renderInput={params => <TextField {...params} label="Filtro" color="primary"  />}
+                disableClearable
+              />
             </div>
           )}
           <div style={tabsStyle}>
@@ -190,24 +180,16 @@ export default function Transactions() {
             </Tabs>
             {!isMobile && (
               <div style={buttonsStyle}>
-                <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                  <InputLabel id="filter-label" color="primary">
-                    Filtro
-                  </InputLabel>
-                  <Select
-                    labelId="filter-label"
-                    value={filter}
-                    label="Filtro"
-                    onChange={handleChangeFilter}
-                    color="primary"
-                  >
-                    <MenuItem value="this_month">Este mes</MenuItem>
-                    <MenuItem value="last_month">Mes pasado</MenuItem>
-                    <MenuItem value="this_year">Este año</MenuItem>
-                    <MenuItem value="last_year">Año pasado</MenuItem>
-                    <MenuItem value="all">Todo</MenuItem>
-                  </Select>
-                </FormControl>
+                <Autocomplete
+                  sx={{ m: 1, width: 150 }}
+                  size="small"
+                  options={filterOptions}
+                  value={filterOptions.find(option => option.value === filter)}
+                  onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                  getOptionLabel={option => option.label}
+                  renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
+                  disableClearable
+                />
                 <Button
                   variant="contained"
                   color="primary"
@@ -221,30 +203,34 @@ export default function Transactions() {
           </div>
           <div>
             {value === 0 && (
-             <TransactionsTable
-             handleEditTransaction={handleEditTransaction}
-             handleDeleteTransaction={handleDeleteTransaction}
-             filterFunction={() => true}
-           />
+              <TransactionsTable
+                handleEditTransaction={handleEditTransaction}
+                handleDeleteTransaction={handleDeleteTransaction}
+                filterFunction={() => true}
+              />
             )}
             {value === 1 && (
               <TransactionsTable
-              handleEditTransaction={handleEditTransaction}
-              handleDeleteTransaction={handleDeleteTransaction}
-              filterFunction={(transaction) => transaction.amount < 0} 
-            />
+                handleEditTransaction={handleEditTransaction}
+                handleDeleteTransaction={handleDeleteTransaction}
+                filterFunction={transaction => transaction.amount < 0}
+              />
             )}
             {value === 2 && (
               <TransactionsTable
-              handleEditTransaction={handleEditTransaction}
-              handleDeleteTransaction={handleDeleteTransaction}
-              filterFunction={(transaction) => transaction.amount > 0}
-            />
+                handleEditTransaction={handleEditTransaction}
+                handleDeleteTransaction={handleDeleteTransaction}
+                filterFunction={transaction => transaction.amount > 0}
+              />
             )}
           </div>
         </div>
         <TransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
-        <TransactionModal open={editTransaction} handleClose={() => setEditTransaction(false)} transaction={transaction} />
+        <TransactionModal
+          open={editTransaction}
+          handleClose={() => setEditTransaction(false)}
+          transaction={transaction}
+        />
         {/* <AddTransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
         <EditTransactionModal open={editTransaction} handleClose={() => setEditTransaction(false)} transaction={transaction} /> */}
       </TransactionsContext.Provider>

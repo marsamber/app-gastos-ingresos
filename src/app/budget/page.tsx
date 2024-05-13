@@ -4,7 +4,7 @@ import { HomeContext } from '@/contexts/HomeContext'
 import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudget, IBudgetHistoric } from '@/types/index'
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tab, Tabs, useMediaQuery } from '@mui/material'
+import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
 
@@ -21,6 +21,13 @@ export default function Budget() {
   const [transactions, setTransactions] = useState([])
   const { refreshKey } = useContext(RefreshTransactionsContext)
 
+  const filterOptions = [
+    { label: 'Mes pasado', value: 'last_month' },
+    { label: 'Este año', value: 'this_year' },
+    { label: 'Año pasado', value: 'last_year' },
+    { label: 'Todo', value: 'all' }
+  ]
+
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
     if (newValue === 1) {
@@ -34,15 +41,9 @@ export default function Budget() {
     }
   }
 
-  const handleChangeFilter = (event: SelectChangeEvent<string>) => {
-    setFilter(event.target.value as string)
-    switch (event.target.value) {
-      case 'this_month':
-        setMonthsSelected([
-          new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]
-        ])
-        break
+  const handleChangeFilter = (newValue: { label: string; value: string }) => {
+    setFilter(newValue.value)
+    switch (newValue.value) {
       case 'last_month':
         setMonthsSelected([
           new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().split('T')[0],
@@ -137,23 +138,16 @@ export default function Budget() {
         <div>
           {isMobile && value === 1 && (
             <div style={buttonsStyle}>
-              <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                <InputLabel id="filter-label" color="primary">
-                  Filtro
-                </InputLabel>
-                <Select
-                  labelId="filter-label"
-                  value={filter}
-                  label="Filtro"
-                  onChange={handleChangeFilter}
-                  color="primary"
-                >
-                  <MenuItem value="last_month">Mes pasado</MenuItem>
-                  <MenuItem value="this_year">Este año</MenuItem>
-                  <MenuItem value="last_year">Año pasado</MenuItem>
-                  <MenuItem value="all">Todo</MenuItem>
-                </Select>
-              </FormControl>
+              <Autocomplete
+                sx={{ m: 1, width: 150}}
+                size="small"
+                options={filterOptions}
+                value={filterOptions.find(option => option.value === filter)}
+                onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                getOptionLabel={option => option.label}
+                renderInput={params => <TextField {...params} label="Filtro" color="primary"  />}
+                disableClearable
+              />
             </div>
           )}
           <div style={tabsStyle}>
@@ -184,23 +178,16 @@ export default function Budget() {
             </Tabs>
             {!isMobile && value === 1 && (
               <div style={buttonsStyle}>
-                <FormControl sx={{ m: 1, minWidth: 135 }} size="small">
-                  <InputLabel id="filter-label" color="primary">
-                    Filtro
-                  </InputLabel>
-                  <Select
-                    labelId="filter-label"
-                    value={filter}
-                    label="Filtro"
-                    onChange={handleChangeFilter}
-                    color="primary"
-                  >
-                    <MenuItem value="last_month">Mes pasado</MenuItem>
-                    <MenuItem value="this_year">Este año</MenuItem>
-                    <MenuItem value="last_year">Año pasado</MenuItem>
-                    <MenuItem value="all">Todo</MenuItem>
-                  </Select>
-                </FormControl>
+                <Autocomplete
+                sx={{ m: 1, width: 150}}
+                size="small"
+                options={filterOptions}
+                value={filterOptions.find(option => option.value === filter)}
+                onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                getOptionLabel={option => option.label}
+                renderInput={params => <TextField {...params} label="Filtro" color="primary"  />}
+                disableClearable
+              />
               </div>
             )}
           </div>

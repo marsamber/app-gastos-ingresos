@@ -1,16 +1,7 @@
 import { RefreshTransactionsContext } from '@/contexts/RefreshTransactionsContext'
 import useFetch from '@/hooks/useFetch'
 import { ITransaction } from '@/types/index'
-import {
-  Button,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  useMediaQuery
-} from '@mui/material'
+import { Autocomplete, Button, CircularProgress, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
 
@@ -32,6 +23,8 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
   const { data: categories, loading: loadingCategories } = useFetch<string[]>('/api/categories')
   const { refreshTransactions } = useContext(RefreshTransactionsContext)
+
+  const categoriesOptions = categories?.map(category => ({ value: category, label: category })) || []
 
   useEffect(() => {
     if (transaction) {
@@ -93,7 +86,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
       setType(parseFloat(value) < 0 ? 'expense' : 'income')
     }
   }
-  
+
   const handleCloseModal = () => {
     setErrors({ amount: false, date: false, title: false, category: false })
 
@@ -149,24 +142,18 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   return (
     <BasicModal open={open} style={modalStyle} handleClose={handleCloseModal}>
       <div>
-        <h3 style={titleStyle}>Editar transacción</h3>
+        <h3 style={titleStyle}>{transaction ? 'Editar transacción' : 'Agregar transacción'}</h3>
         {loadingCategories && <CircularProgress style={circularProgressStyle} />}
         <div style={firstRowStyle}>
-          <FormControl style={{ width: isMobile ? '192px' : '110px', margin: '8px' }} size="small" disabled>
-            <InputLabel id="type-label" color="primary">
-              Tipo
-            </InputLabel>
-            <Select
-              labelId="type-label"
-              value={type}
-              label="Tipo"
-              onChange={e => setType(e.target.value as 'income' | 'expense')}
-              color="primary"
-            >
-              <MenuItem value="income">Ingreso</MenuItem>
-              <MenuItem value="expense">Gasto</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            style={{ width: isMobile ? '192px' : '110px', margin: '8px' }}
+            disabled
+            size="small"
+            color="primary"
+            label="Tipo"
+            type="text"
+            value={type === 'income' ? 'Ingreso' : 'Gasto'}
+          />
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
             size="small"
@@ -202,32 +189,24 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             onChange={e => setTitle(e.target.value)}
           />
           {categories && categories.length > 0 ? (
-            <FormControl style={{ width: isMobile ? '192px' : '200px', margin: '8px' }} size="small">
-              <InputLabel id="category-label" color="primary">
-                Categoría
-              </InputLabel>
-              <Select
-                labelId="category-label"
-                value={category}
-                label="Categoría"
-                onChange={e => setCategory(e.target.value)}
-                color="primary"
-                error={errors.category}
-              >
-                {categories.map(category => (
-                  <MenuItem key={category} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
+              size="small"
+              options={categoriesOptions}
+              getOptionLabel={option => option.label}
+              value={categoriesOptions.find(opt => opt.value === category)}
+              onChange={(event, newValue) => setCategory(newValue.value)}
+              isOptionEqualToValue={(option, value) => option.value === value.value}
+              renderInput={params => <TextField {...params} label="Categoría" error={errors.category} />}
+              disableClearable
+            />
           ) : (
             <div>Cargando categorías...</div>
           )}
         </div>
         <div style={actionsStyle}>
           <Button variant="contained" color="primary" onClick={handleSaveTransaction} disabled={loading}>
-            Agregar
+            {transaction ? 'Editar' : 'Agregar'}
           </Button>
           <Button variant="text" color="primary" onClick={handleCloseModal} disabled={loading}>
             Cancelar

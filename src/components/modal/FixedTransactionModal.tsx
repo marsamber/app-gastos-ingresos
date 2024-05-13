@@ -1,7 +1,13 @@
 import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import { IMonthlyTransaction } from '@/types/index'
-import { Button, CircularProgress, FormControl, InputLabel, MenuItem, Select, TextField, useMediaQuery } from '@mui/material'
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  TextField,
+  useMediaQuery
+} from '@mui/material'
 import { CSSProperties, ChangeEvent, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
 
@@ -27,6 +33,8 @@ export default function FixedTransactionModal({
 
   const { categories, loadingCategories } = useContext(SettingsContext)
   const { refreshMonthlyTransactions } = useContext(RefreshSettingsContext)
+  
+  const categoriesOptions = categories.map(category => ({ value: category, label: category }))
 
   useEffect(() => {
     if (monthlyTransaction) {
@@ -110,6 +118,7 @@ export default function FixedTransactionModal({
     alignItems: 'center',
     height: '100%'
   }
+
   return (
     <BasicModal open={open} handleClose={handleClose} style={modalStyle}>
       <div>
@@ -119,15 +128,15 @@ export default function FixedTransactionModal({
         ) : (
           <>
             <div style={rowStyle}>
-              <FormControl style={{ width: isMobile ? '192px' : '194px', margin: '8px' }} size="small" disabled>
-                <InputLabel id="type-label" color="primary">
-                  Tipo
-                </InputLabel>
-                <Select labelId="type-label" value={transactionType} label="Tipo" color="primary">
-                  <MenuItem value="income">Ingreso</MenuItem>
-                  <MenuItem value="expense">Gasto</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                style={{ width: isMobile ? '192px' : '194px', margin: '8px' }}
+                disabled
+                size="small"
+                color="primary"
+                label="Tipo"
+                type="text"
+                value={transactionType === 'income' ? 'Ingreso' : 'Gasto'}
+              />
               <TextField
                 style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
                 size="small"
@@ -153,29 +162,25 @@ export default function FixedTransactionModal({
                 onChange={e => setTitle(e.target.value)}
               />
               {categories && categories.length > 0 ? (
-                <FormControl
+                <Autocomplete
                   style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
                   size="small"
-                  disabled={transactionType === 'income'}
-                >
-                  <InputLabel id="category-label" color="primary">
-                    Categoría
-                  </InputLabel>
-                  <Select
-                    labelId="category-label"
-                    value={category}
-                    label="Categoría"
-                    onChange={e => setCategory(e.target.value)}
-                    color="primary"
-                    error={errors.category}
-                  >
-                    {categories.map(category => (
-                      <MenuItem key={category} value={category}>
-                        {category}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                  options={categoriesOptions}
+                  getOptionLabel={option => option.label}
+                  value={categoriesOptions.find(opt => opt.value === category)} 
+                  onChange={(event, newValue) => setCategory(newValue.value)}
+                  isOptionEqualToValue={(option, value) => option.value === value.value}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="Categoría"
+                      error={errors.category}
+                      disabled={transactionType === 'income'} 
+                    />
+                  )}
+                  disableClearable
+                  disabled={transactionType === 'income'} 
+                />
               ) : (
                 <div>Cargando categorías...</div>
               )}
