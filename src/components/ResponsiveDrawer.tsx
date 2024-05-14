@@ -155,7 +155,11 @@ export default function ResponsiveDrawer({
 
   const isLogin = pathname === '/login'
 
-  const [apiKey, setApiKey] = useState(localStorage.getItem('apiKey') || '');
+  const [apiKey, setApiKey] = useState('');
+
+  useEffect(() => {
+    setApiKey(localStorage.getItem('apiKey') || '');
+  }, []);
 
   const updateApiKey = (newKey: string) => {
     localStorage.setItem('apiKey', newKey); // Actualiza localStorage
