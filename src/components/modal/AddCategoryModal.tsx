@@ -4,6 +4,7 @@ import theme from '@/theme'
 import { Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
+import customFetch from '@/utils/fetchWrapper'
 
 export interface AddCategoryModalProps {
   open: boolean
@@ -20,7 +21,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
 
   const { categories, addCategory } = useContext(SettingsContext)
 
-  const { refreshCategories, apiKey } = useContext(RefreshContext)
+  const { refreshCategories } = useContext(RefreshContext)
 
   useEffect(() => {
     if (open) {
@@ -56,20 +57,17 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
     setLoading(true)
     // add new category
     try {
-      const response = await fetch('/api/categories', {
+      const response = await customFetch('/api/categories', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey || ''
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           category: category
         })
       })
 
-      if (response.status === 401) {
-        return
-      }
+      
 
       if (response.ok) {
         const newCategory = await response.json()

@@ -141,7 +141,9 @@ export default function ResponsiveDrawer({
               color: 'gray'
             }}
             href="/login"
-            onClick={() => localStorage.removeItem('apiKey')}
+            onClick={() => {
+              localStorage.removeItem('apiKey')
+            }}
           >
             <ListItemIcon>
               <Logout style={{ color: 'gray' }} />
@@ -155,21 +157,10 @@ export default function ResponsiveDrawer({
 
   const isLogin = pathname === '/login'
 
-  const [apiKey, setApiKey] = useState('');
-
-  useEffect(() => {
-    setApiKey(localStorage.getItem('apiKey') || '');
-  }, []);
-
-  const updateApiKey = (newKey: string) => {
-    localStorage.setItem('apiKey', newKey); // Actualiza localStorage
-    setApiKey(newKey); // Actualiza el estado en React
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <RefreshContext.Provider
-        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories, apiKey, updateApiKey }}
+        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories }}
       >
         {isLogin ? (
           children

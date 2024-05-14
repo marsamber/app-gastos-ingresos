@@ -5,6 +5,7 @@ import { ITransaction } from '@/types/index'
 import { Button, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useState } from 'react'
 import BasicModal from './BasicModal'
+import customFetch from '@/utils/fetchWrapper'
 
 export interface DeleteCategoryModalProps {
   open: boolean
@@ -14,27 +15,22 @@ export interface DeleteCategoryModalProps {
 
 export default function DeleteCategoryModal({ open, handleClose, category }: DeleteCategoryModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { refreshCategories, apiKey } = useContext(RefreshContext)
+  const { refreshCategories } = useContext(RefreshContext)
   const { monthlyTransactions, categories, budgets, deleteBudget, deleteCategory } = useContext(SettingsContext)
 
   const [loading, setLoading] = useState(false)
 
-  const { data: transactions } = useFetch<ITransaction[]>('/api/transactions', {
-    headers: {
-      'x-api-key': apiKey || ''
-    }
-  })
+  const { data: transactions } = useFetch<ITransaction[]>('/api/transactions')
 
   const createCategory = async () => {
     const existingCategory = categories.find(category => category === 'Sin categoría')
 
     if (!existingCategory) {
       try {
-        await fetch('/api/categories', {
+        await customFetch('/api/categories', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey || ''
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             category: 'Sin categoría'
@@ -54,21 +50,16 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
     try {
       const transactionsToUpdate = transactions.filter(transaction => transaction.category === category)
       for (const transaction of transactionsToUpdate) {
-        const response = await fetch(`/api/transactions/${transaction.id}`, {
+        const response = await customFetch(`/api/transactions/${transaction.id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey || ''
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             ...transaction,
             category: 'Sin categoría'
           })
         })
-
-        if (response.status === 401) {
-          return
-        }
 
         if (response.ok) {
           console.log('Transaction updated')
@@ -87,21 +78,16 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
     try {
       const transactionsToUpdate = monthlyTransactions.filter(transaction => transaction.category === category)
       for (const transaction of transactionsToUpdate) {
-        const response = await fetch(`/api/monthly_transactions/${transaction.id}`, {
+        const response = await customFetch(`/api/monthly_transactions/${transaction.id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey || ''
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             ...transaction,
             category: 'Sin categoría'
           })
         })
-
-        if (response.status === 401) {
-          return
-        }
 
         if (response.ok) {
           console.log('Monthly Transaction updated')
@@ -118,11 +104,10 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
     if (!category) return
 
     try {
-      await fetch(`/api/budgets`, {
+      await customFetch(`/api/budgets`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey || ''
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ category: category })
       })
@@ -136,11 +121,10 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
     if (!category) return
 
     try {
-      await fetch(`/api/budget_historics`, {
+      await customFetch(`/api/budget_historics`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey || ''
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ category: category })
       })
@@ -154,16 +138,11 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
     if (!category) return
 
     try {
-      const response = await fetch(`/api/categories/${category}`, {
-        method: 'DELETE',
-        headers: {
-          'x-api-key': apiKey || ''
-        }
+      const response = await customFetch(`/api/categories/${category}`, {
+        method: 'DELETE'
       })
 
-      if (response.status === 401) {
-        return
-      }
+      
 
       if (response.ok) {
         const budgetsId = budgets.filter(budget => budget.category === category).map(budget => budget.id)

@@ -4,7 +4,7 @@ import { IBudget } from '@/types/index'
 import { Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
-import { RefreshContext } from '@/contexts/RefreshContext'
+import customFetch from '@/utils/fetchWrapper'
 
 export interface EditCategoryBudgetModalProps {
   open: boolean
@@ -25,7 +25,6 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
 
   const { categories, monthSelected, editBudget } = useContext(SettingsContext)
   const { refreshBudgets } = useContext(RefreshSettingsContext)
-  const { apiKey } = useContext(RefreshContext)
 
   useEffect(() => {
     if (open) {
@@ -67,29 +66,25 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     try {
       let response
       if (present) {
-        response = await fetch(`/api/budgets/${categoryBudget?.id}`, {
+        response = await customFetch(`/api/budgets/${categoryBudget?.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': apiKey || ''
           },
           body: JSON.stringify(newCategoryBudget)
         })
       } else {
-        response = await fetch(`/api/budget_historics/${categoryBudget?.id}`, {
+        response = await customFetch(`/api/budget_historics/${categoryBudget?.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': apiKey || ''
           },
           body: JSON.stringify(newCategoryBudget)
         })
       }
       const updatedBudget = await response.json()
 
-      if (response.status === 401) {
-        return
-      }
+      
 
       if (response.ok) {
         editBudget(updatedBudget)

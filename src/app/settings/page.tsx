@@ -13,6 +13,7 @@ import { Info } from '@mui/icons-material'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
 import CategoriesCard from '@/components/card/CategoriesCard'
+import customFetch from '@/utils/fetchWrapper'
 
 export default function Settings() {
   const isMobile = useMediaQuery('(max-width: 600px)')
@@ -27,7 +28,7 @@ export default function Settings() {
   const [restingBudget, setRestingBudget] = useState<number>(0)
   const [value, setValue] = useState(0)
 
-  const { refreshKeyCategories, refreshCategories, apiKey } = useContext(RefreshContext)
+  const { refreshKeyCategories, refreshCategories } = useContext(RefreshContext)
 
   const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
 
@@ -36,11 +37,7 @@ export default function Settings() {
   }, [])
 
   // Refresh data
-  const { data, loading: loadingMonthlyTransactions } = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions', {
-    headers: {
-      'x-api-key': apiKey || ''
-    }
-  })
+  const { data, loading: loadingMonthlyTransactions } = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions')
   useEffect(() => {
     if (data) {
       setMonthlyTransactions(data)
@@ -50,14 +47,8 @@ export default function Settings() {
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true)
-      const response = await fetch(`/api/categories`, {
-        headers: {
-          'x-api-key': apiKey || ''
-        }
-      })
-      if (response.status === 401) {
-        return
-      }
+      const response = await customFetch(`/api/categories`)
+      
       let categories = await response.json()
       categories = categories.sort((a: string, b: string) => a.localeCompare(b))
       setCategories(categories)
@@ -65,38 +56,27 @@ export default function Settings() {
     }
 
     fetchCategories()
-  }, [refreshKeyCategories, apiKey])
+  }, [refreshKeyCategories])
 
   useEffect(() => {
     const fetchBudgets = async () => {
       setLoadingBudgets(true)
       let response
       if (present) {
-        response = await fetch(`/api/budgets`, {
-          headers: {
-            'x-api-key': apiKey || ''
-          }
-        })
+        response = await customFetch(`/api/budgets`)
       } else {
-        response = await fetch(
-          `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}`,
-          {
-            headers: {
-              'x-api-key': apiKey || ''
-            }
-          }
+        response = await customFetch(
+          `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}`
         )
       }
-      if (response.status === 401) {
-        return
-      }
+      
       const budgets = await response.json()
       setBudgets(budgets)
       setLoadingBudgets(false)
     }
 
     fetchBudgets()
-  }, [refreshKeyBudgets, apiKey])
+  }, [refreshKeyBudgets])
 
   useEffect(() => {
     document.title = 'Configuración - Mis Finanzas'
@@ -133,15 +113,15 @@ export default function Settings() {
   useEffect(() => {
     if (!isCreating) return
 
-    fetch('/api/categories', {
+    customFetch('/api/categories', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || ''},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ category: 'Ingresos fijos' })
     })
       .then(() => {
-        return fetch('/api/budgets', {
+        return customFetch('/api/budgets', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || ''},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ category: 'Ingresos fijos', amount: 0 })
         })
       })
@@ -159,9 +139,8 @@ export default function Settings() {
 
   // Handle delete monthly transaction
   const handleDeleteMonthlyTransaction = (id: number) => {
-    fetch(`/api/monthly_transactions/${id}`, {
-      method: 'DELETE',
-      headers: { 'x-api-key': apiKey || '' }
+    customFetch(`/api/monthly_transactions/${id}`, {
+      method: 'DELETE'
     })
       .then(() => {
         setMonthlyTransactions(prev => prev.filter(transaction => transaction.id !== id))

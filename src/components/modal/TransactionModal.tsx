@@ -1,9 +1,10 @@
+import { RefreshContext } from '@/contexts/RefreshContext'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
 import { ITransaction } from '@/types/index'
 import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, ChangeEvent, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
-import { RefreshContext } from '@/contexts/RefreshContext'
+import customFetch from '@/utils/fetchWrapper'
 
 interface TransactionModalProps {
   open: boolean
@@ -25,7 +26,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   const [categories, setCategories] = useState<string[] | null>(null)
 
   const { addTransaction, editTransaction } = useContext(TransactionsContext)
-  const { refreshTransactions, refreshKeyCategories, apiKey } = useContext(RefreshContext)
+  const { refreshTransactions, refreshKeyCategories } = useContext(RefreshContext)
 
   const categoriesOptions = useMemo(
     () =>
@@ -38,14 +39,8 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await fetch('/api/categories', {
-        headers: {
-          'x-api-key': apiKey || ''
-        }
-      })
-      if (response.status === 401) {
-        return
-      }
+      const response = await customFetch('/api/categories', )
+      
 
       if (response.ok) {
         const categories = await response.json()
@@ -54,7 +49,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
     }
 
     fetchCategories()
-  }, [refreshKeyCategories, apiKey])
+  }, [refreshKeyCategories])
 
   useEffect(() => {
     if (open) {
@@ -107,15 +102,13 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
     }
 
     try {
-      const response = await fetch(transaction ? `/api/transactions/${transaction.id}` : '/api/transactions', {
+      const response = await customFetch(transaction ? `/api/transactions/${transaction.id}` : '/api/transactions', {
         method: transaction ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || '' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transactionData)
       })
 
-      if (response.status === 401) {
-        return
-      }
+      
 
       if (response.ok) {
         if (transaction) {

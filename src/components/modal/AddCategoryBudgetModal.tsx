@@ -5,6 +5,7 @@ import { Autocomplete, Button, TextField, createFilterOptions, useMediaQuery } f
 import { CSSProperties, ChangeEvent, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
 import { RefreshContext } from '@/contexts/RefreshContext'
+import customFetch from '@/utils/fetchWrapper'
 
 export interface AddCategoryBudgetModalProps {
   open: boolean
@@ -32,7 +33,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   const currentDate = useMemo(() => new Date().toISOString().substring(0, 7), [])
   const present = useMemo(() => monthSelected.substring(0, 7) === currentDate, [monthSelected, currentDate])
 
-  const { refreshCategories, apiKey } = useContext(RefreshContext)
+  const { refreshCategories } = useContext(RefreshContext)
 
   useEffect(() => {
     if (open) {
@@ -83,11 +84,10 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     if (!categoriesOptions.some(c => c.title === category.title)) {
       // add new category
       try {
-        await fetch('/api/categories', {
+        await customFetch('/api/categories', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey || ''
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             category: category.title
@@ -105,15 +105,13 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
       date: present ? undefined : new Date(monthSelected).toISOString()
     }
 
-    const response = await fetch(present ? '/api/budgets' : '/api/budget_historics', {
+    const response = await customFetch(present ? '/api/budgets' : '/api/budget_historics', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || '' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(budgetData)
     })
 
-    if (response.status === 401) {
-      return
-    }
+    
 
     if (response.ok) {
       const newBudget = await response.json()

@@ -18,7 +18,6 @@ import {
 } from 'recharts'
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import BasicCard from './BasicCard'
-import { RefreshContext } from '@/contexts/RefreshContext'
 
 interface IHistoricChart {
   name: string
@@ -33,7 +32,6 @@ export default function HistoricDashboardCard() {
   const [data, setData] = useState<IHistoricChart[]>([])
 
   const { monthsSelected, budgets, loadingBudgets } = useContext(HomeContext)
-  const { apiKey } = useContext(RefreshContext)
 
   useEffect(() => {
     const calculateMonthsHistoric = () => {
@@ -49,20 +47,10 @@ export default function HistoricDashboardCard() {
   }, [monthsSelected])
 
   const { data: transactions, loading: loadingTransactions } = useFetch<ITransaction[]>(
-    `/api/transactions?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`,
-    {
-      headers: {
-        'x-api-key': apiKey || ''
-      }
-    }
+    `/api/transactions?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`
   )
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
-    `/api/budget_historics?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`,
-    {
-      headers: {
-        'x-api-key': apiKey || ''
-      }
-    }
+    `/api/budget_historics?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`
   )
 
   useEffect(() => {

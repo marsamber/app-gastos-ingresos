@@ -15,6 +15,7 @@ import { Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
+import customFetch from '@/utils/fetchWrapper'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -33,39 +34,24 @@ export default function Home() {
   }, [])
 
   // DATA
-  const { refreshKeyTransactions, apiKey } = useContext(RefreshContext)
+  const { refreshKeyTransactions } = useContext(RefreshContext)
 
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
-      const response = await fetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`, {
-        headers: {
-          'x-api-key': apiKey || ''
-        }
-      })
-      if (response.status === 401) {
-        return
-      }
+      const response = await customFetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`)
+      
       const transactions = await response.json()
       setTransactions(transactions)
       setLoadingTransactions(false)
     }
 
     fetchTransactions()
-  }, [monthsSelected, refreshKeyTransactions, apiKey])
+  }, [monthsSelected, refreshKeyTransactions])
 
-  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets', {
-    headers: {
-      'x-api-key': apiKey || ''
-    }
-  })
+  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
-    `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`,
-    {
-      headers: {
-        'x-api-key': apiKey || ''
-      }
-    }
+    `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
   )
 
   useEffect(() => {

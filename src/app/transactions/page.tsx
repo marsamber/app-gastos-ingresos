@@ -1,14 +1,14 @@
 'use client'
+import TransactionModal from '@/components/modal/TransactionModal'
 import TransactionsTable from '@/components/table/TransactionsTable'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
+import useFetch from '@/hooks/useFetch'
 import { ITransaction } from '@/types/index'
 import { Add } from '@mui/icons-material'
 import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, useContext, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useState } from 'react'
 import '../../styles.css'
-import TransactionModal from '@/components/modal/TransactionModal'
-import useFetch from '@/hooks/useFetch'
-import { RefreshContext } from '@/contexts/RefreshContext'
+import customFetch from '@/utils/fetchWrapper'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
@@ -22,7 +22,6 @@ export default function Transactions() {
   const [transactions, setTransactions] = useState<ITransaction[] | null>([])
   const [openEditTransaction, setOpenEditTransaction] = useState(false)
   const [transaction, setTransaction] = useState<ITransaction | null>(null)
-  const { apiKey } = useContext(RefreshContext)
 
   const filterOptions = [
     { label: 'Este mes', value: 'this_month' },
@@ -33,12 +32,7 @@ export default function Transactions() {
   ]
 
   const { data, loading: loadingTransactions } = useFetch<ITransaction[]>(
-    `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`,
-    {
-      headers: {
-        'x-api-key': apiKey || ''
-      }
-    }
+    `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
   )
 
   useEffect(() => {
@@ -114,15 +108,10 @@ export default function Transactions() {
   }
 
   const handleDeleteTransaction = async (id: number) => {
-    const response = await fetch(`/api/transactions/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'x-api-key': apiKey || ''
-      }
+    const response = await customFetch(`/api/transactions/${id}`, {
+      method: 'DELETE'
     })
-    if (response.status === 401) {
-      return
-    }
+    
     if (response.ok) {
       deleteTransaction(id)
     }

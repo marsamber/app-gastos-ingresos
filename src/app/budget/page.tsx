@@ -7,6 +7,7 @@ import { IBudget, IBudgetHistoric } from '@/types/index'
 import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
+import customFetch from '@/utils/fetchWrapper'
 
 export default function Budget() {
   const [value, setValue] = useState(0)
@@ -19,7 +20,7 @@ export default function Budget() {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [loadingTransactions, setLoadingTransactions] = useState(false)
   const [transactions, setTransactions] = useState([])
-  const { refreshKeyTransactions, apiKey } = useContext(RefreshContext)
+  const { refreshKeyTransactions } = useContext(RefreshContext)
 
   const filterOptions = [
     { label: 'Mes pasado', value: 'last_month' },
@@ -76,34 +77,19 @@ export default function Budget() {
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
-      const response = await fetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`, {
-        headers: {
-          'x-api-key': apiKey || ''
-        }
-      })
-      if (response.status === 401) {
-        return
-      }
+      const response = await customFetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`)
+      
       const transactions = await response.json()
       setTransactions(transactions)
       setLoadingTransactions(false)
     }
 
     fetchTransactions()
-  }, [monthsSelected, refreshKeyTransactions, apiKey])
+  }, [monthsSelected, refreshKeyTransactions])
 
-  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets', {
-    headers: {
-      'x-api-key': apiKey || ''
-    }
-  })
+  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
-    `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`,
-    {
-      headers: {
-        'x-api-key': apiKey || ''
-      }
-    }
+    `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
   )
 
   useEffect(() => {

@@ -1,13 +1,11 @@
 'use client'
-import { RefreshContext } from '@/contexts/RefreshContext'
 import { Button, Card, CardActions, CardContent, TextField } from '@mui/material'
 import { useRouter } from 'next/navigation'
-import { FormEvent, useContext, useState } from 'react'
+import { FormEvent, useState } from 'react'
 
 export default function LoginPage() {
   const router = useRouter()
   const [password, setPassword] = useState('' as string)
-  const { updateApiKey } = useContext(RefreshContext)
 
   const saveToken = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -23,7 +21,7 @@ export default function LoginPage() {
     const { success } = await response.json()
 
     if (success) {
-      updateApiKey(password)
+      localStorage.setItem('apiKey', password)
       router.push('/')
     } else {
       setPassword('')
