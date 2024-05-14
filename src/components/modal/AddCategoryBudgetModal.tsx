@@ -112,7 +112,6 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     })
 
     if (response.status === 401) {
-      localStorage.removeItem('apiKey')
       return
     }
 

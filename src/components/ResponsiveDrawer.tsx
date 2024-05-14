@@ -18,7 +18,7 @@ import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
-import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import TransactionModal from './modal/TransactionModal'
 
 const drawerWidth = 240
@@ -155,16 +155,12 @@ export default function ResponsiveDrawer({
 
   const isLogin = pathname === '/login'
 
-  const [apiKey, setApiKey] = useState('');
-
-  useEffect(() => {
-    setApiKey(localStorage.getItem('apiKey') || '');
-  }, []);
+  const apiKey = useMemo(() => localStorage.getItem('apiKey'), [localStorage.getItem('apiKey')])
 
   return (
     <ThemeProvider theme={theme}>
       <RefreshContext.Provider
-        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories, apiKey}}
+        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories, apiKey: apiKey ?? '' }}
       >
         {isLogin ? (
           children

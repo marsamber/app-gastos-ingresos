@@ -44,7 +44,6 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
         }
       })
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
 
@@ -55,7 +54,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
     }
 
     fetchCategories()
-  }, [refreshKeyCategories])
+  }, [refreshKeyCategories, apiKey])
 
   useEffect(() => {
     if (open) {
@@ -115,7 +114,6 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
       })
 
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
 

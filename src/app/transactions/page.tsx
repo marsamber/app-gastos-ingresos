@@ -121,16 +121,12 @@ export default function Transactions() {
       }
     })
     if (response.status === 401) {
-      localStorage.removeItem('apiKey')
       return
     }
     if (response.ok) {
       deleteTransaction(id)
-      // refreshTransactions()
     }
   }
-
-  // const {data: transactions, loading: loadingTransactions} = useFetch<ITransaction[]>(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`)
 
   useEffect(() => {
     document.title = `Transacciones`

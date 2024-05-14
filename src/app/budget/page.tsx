@@ -82,7 +82,6 @@ export default function Budget() {
         }
       })
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
       const transactions = await response.json()
@@ -91,7 +90,7 @@ export default function Budget() {
     }
 
     fetchTransactions()
-  }, [monthsSelected, refreshKeyTransactions])
+  }, [monthsSelected, refreshKeyTransactions, apiKey])
 
   const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets', {
     headers: {

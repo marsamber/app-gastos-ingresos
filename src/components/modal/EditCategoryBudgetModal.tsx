@@ -88,7 +88,6 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
       const updatedBudget = await response.json()
 
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
 

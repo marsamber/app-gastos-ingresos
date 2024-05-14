@@ -56,7 +56,6 @@ export default function Settings() {
         }
       })
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
       let categories = await response.json()
@@ -66,7 +65,7 @@ export default function Settings() {
     }
 
     fetchCategories()
-  }, [refreshKeyCategories])
+  }, [refreshKeyCategories, apiKey])
 
   useEffect(() => {
     const fetchBudgets = async () => {
@@ -89,7 +88,6 @@ export default function Settings() {
         )
       }
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
       const budgets = await response.json()
@@ -98,7 +96,7 @@ export default function Settings() {
     }
 
     fetchBudgets()
-  }, [refreshKeyBudgets])
+  }, [refreshKeyBudgets, apiKey])
 
   useEffect(() => {
     document.title = 'Configuración - Mis Finanzas'

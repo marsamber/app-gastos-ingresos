@@ -67,7 +67,6 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
         })
 
         if (response.status === 401) {
-          localStorage.removeItem('apiKey')
           return
         }
 
@@ -101,7 +100,6 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
         })
 
         if (response.status === 401) {
-          localStorage.removeItem('apiKey')
           return
         }
 
@@ -164,7 +162,6 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
       })
 
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
 

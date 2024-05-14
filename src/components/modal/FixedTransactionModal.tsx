@@ -82,7 +82,6 @@ export default function FixedTransactionModal({
       })
 
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
 

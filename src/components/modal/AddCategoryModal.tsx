@@ -68,7 +68,6 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
       })
 
       if (response.status === 401) {
-        localStorage.removeItem('apiKey')
         return
       }
 
