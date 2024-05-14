@@ -155,10 +155,16 @@ export default function ResponsiveDrawer({
 
   const isLogin = pathname === '/login'
 
+  const [apiKey, setApiKey] = useState('');
+
+  useEffect(() => {
+    setApiKey(localStorage.getItem('apiKey') || '');
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <RefreshContext.Provider
-        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories, apiKey: localStorage.getItem('apiKey') || ''}}
+        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories, apiKey}}
       >
         {isLogin ? (
           children
