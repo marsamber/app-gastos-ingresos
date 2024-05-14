@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { createContext } from 'react'
 
 interface RefreshContextType {
@@ -8,6 +9,7 @@ interface RefreshContextType {
   refreshCategories: () => void
 
   apiKey: string
+  updateApiKey: (apiKey: string) => void
 }
 
 const defaultValue: RefreshContextType = {
@@ -17,7 +19,8 @@ const defaultValue: RefreshContextType = {
   refreshKeyCategories: 0,
   refreshCategories: () => {},
 
-  apiKey: ''
+  apiKey: '',
+  updateApiKey: () => {}
 }
 
 export const RefreshContext = createContext<RefreshContextType>(defaultValue)
