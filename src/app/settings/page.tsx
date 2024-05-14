@@ -7,7 +7,7 @@ import theme from '@/theme'
 import { IBudget, IBudgetHistoric, IMonthlyTransaction } from '@/types/index'
 import { Tab, Tabs, Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
-import { CSSProperties, useCallback, useContext, useEffect, useState } from 'react'
+import { CSSProperties, SyntheticEvent, useCallback, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
 import { Info } from '@mui/icons-material'
 import { RefreshContext } from '@/contexts/RefreshContext'
@@ -206,6 +206,13 @@ export default function Settings() {
     setMonthlyTransactions(transactionsToUpdate.sort((a, b) => b.title.localeCompare(a.title)))
   }
 
+  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+    setValue(newValue)
+    if (newValue === 1) {
+      setMonthSelected(dayjs().startOf('month').format('YYYY-MM-DD'))
+    }
+  }
+
   // STYLES
   const titleStyle: CSSProperties = {
     margin: '10px 0',
@@ -306,7 +313,7 @@ export default function Settings() {
               textColor="secondary"
               indicatorColor="secondary"
               value={value}
-              onChange={(event, newValue) => setValue(newValue)}
+              onChange={handleChangeTab}
               variant={isMobile ? 'fullWidth' : 'standard'}
             >
               <Tab
