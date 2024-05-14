@@ -2,60 +2,70 @@
 import { TextField } from '@mui/material'
 import { Button, Card, CardContent, CardActions } from '@mui/material'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
 
 export default function LoginPage() {
   const router = useRouter()
   const [password, setPassword] = useState('' as string)
 
-  const saveToken = () => {
-    if (password === 'my-password') {
-      localStorage.setItem('token', password)
+  const saveToken = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    const { success } = await response.json()
+
+    if (success) {
+      localStorage.setItem('apiKey', password)
       router.push('/')
+    } else {
+      setPassword('')
+      alert('Clave incorrecta')
     }
   }
 
   return (
     <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      width: '100vw',
-      backgroundColor: '#F7F9FB'    
-    }}
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        width: '100vw',
+        backgroundColor: '#F7F9FB'
+      }}
     >
-      <Card style = {{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        borderRadius: '10px',
-      }}>
-        <CardContent>
-          <TextField
-            type="password"
-            label="Clave"
-            onChange={event => setPassword(event.target.value)}
-            onKeyDown={event => {
-              if (event.key === 'Enter') {
-                saveToken()
-              }
+      <Card
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          borderRadius: '10px'
+        }}
+      >
+        <form onSubmit={saveToken}>
+          <CardContent>
+            <TextField type="password" label="Clave" onChange={event => setPassword(event.target.value)} required />
+          </CardContent>
+          <CardActions
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
             }}
-          />
-        </CardContent>
-        <CardActions
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          <Button variant="contained" color="primary" onClick={saveToken}>
-            Inicia sesión
-          </Button>
-        </CardActions>
+          >
+            <Button variant="contained" color="primary" type="submit">
+              Inicia sesión
+            </Button>
+          </CardActions>
+        </form>
       </Card>
     </div>
   )

@@ -18,6 +18,7 @@ import {
 } from 'recharts'
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import BasicCard from './BasicCard'
+import { RefreshContext } from '@/contexts/RefreshContext'
 
 interface IHistoricChart {
   name: string
@@ -32,6 +33,7 @@ export default function HistoricDashboardCard() {
   const [data, setData] = useState<IHistoricChart[]>([])
 
   const { monthsSelected, budgets, loadingBudgets } = useContext(HomeContext)
+  const { apiKey } = useContext(RefreshContext)
 
   useEffect(() => {
     const calculateMonthsHistoric = () => {
@@ -43,14 +45,24 @@ export default function HistoricDashboardCard() {
     }
 
     const monthsHistoric = calculateMonthsHistoric()
-    setMonthsHistoric([monthsHistoric, monthsSelected[1]! ])
+    setMonthsHistoric([monthsHistoric, monthsSelected[1]!])
   }, [monthsSelected])
 
   const { data: transactions, loading: loadingTransactions } = useFetch<ITransaction[]>(
-    `/api/transactions?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`
+    `/api/transactions?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`,
+    {
+      headers: {
+        'x-api-key': apiKey || ''
+      }
+    }
   )
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
-    `/api/budget_historics?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`
+    `/api/budget_historics?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`,
+    {
+      headers: {
+        'x-api-key': apiKey || ''
+      }
+    }
   )
 
   useEffect(() => {
@@ -143,10 +155,11 @@ export default function HistoricDashboardCard() {
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Gastos mensuales</h3>
       <div style={containerStyle}>
-      {(loadingTransactions || loadingBudgets || loadingBudgetHistorics) ? (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div> ) : data.length === 0 ? (
+        {loadingTransactions || loadingBudgets || loadingBudgetHistorics ? (
+          <div style={circularProgressStyle}>
+            <CircularProgress />
+          </div>
+        ) : data.length === 0 ? (
           <p>No hay datos para mostrar</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

@@ -6,6 +6,8 @@ interface RefreshContextType {
 
   refreshKeyCategories: number
   refreshCategories: () => void
+
+  apiKey: string
 }
 
 const defaultValue: RefreshContextType = {
@@ -13,7 +15,9 @@ const defaultValue: RefreshContextType = {
   refreshTransactions: () => {},
 
   refreshKeyCategories: 0,
-  refreshCategories: () => {}
+  refreshCategories: () => {},
+
+  apiKey: ''
 }
 
 export const RefreshContext = createContext<RefreshContextType>(defaultValue)

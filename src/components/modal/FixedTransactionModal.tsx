@@ -3,6 +3,7 @@ import { IMonthlyTransaction } from '@/types/index'
 import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
+import { RefreshContext } from '@/contexts/RefreshContext'
 
 interface FixedTransactionModalProps {
   open: boolean
@@ -27,6 +28,7 @@ export default function FixedTransactionModal({
   const [errors, setErrors] = useState({ amount: false, title: false, category: false })
 
   const { categories, addMonthlyTransaction, editMonthlyTransaction } = useContext(SettingsContext)
+  const { apiKey } = useContext(RefreshContext)
 
   const categoriesOptions = categories
     .filter(category => category !== 'Sin categoría')
@@ -75,9 +77,15 @@ export default function FixedTransactionModal({
         : '/api/monthly_transactions'
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || '' },
         body: JSON.stringify(transactionData)
       })
+
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
+
       const monthlyTrans = await response.json()
       if (response.ok) {
         monthlyTransaction ? editMonthlyTransaction(monthlyTrans) : addMonthlyTransaction(monthlyTrans)

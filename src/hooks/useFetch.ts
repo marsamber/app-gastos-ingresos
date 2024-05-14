@@ -8,6 +8,10 @@ export default function useFetch<D = any, E = unknown>(url: string, options?: gl
   async function refetch() {
     try {
       const response = await fetch(url, options)
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
       const data = await response.json()
       setData(data)
       setLoading(false)

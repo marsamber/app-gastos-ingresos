@@ -4,10 +4,11 @@ import { TransactionsContext } from '@/contexts/TransactionsContext'
 import { ITransaction } from '@/types/index'
 import { Add } from '@mui/icons-material'
 import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
 import TransactionModal from '@/components/modal/TransactionModal'
 import useFetch from '@/hooks/useFetch'
+import { RefreshContext } from '@/contexts/RefreshContext'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
@@ -21,6 +22,7 @@ export default function Transactions() {
   const [transactions, setTransactions] = useState<ITransaction[] | null>([])
   const [openEditTransaction, setOpenEditTransaction] = useState(false)
   const [transaction, setTransaction] = useState<ITransaction | null>(null)
+  const { apiKey } = useContext(RefreshContext)
 
   const filterOptions = [
     { label: 'Este mes', value: 'this_month' },
@@ -30,8 +32,15 @@ export default function Transactions() {
     { label: 'Todo', value: 'all' }
   ]
 
-  const {data, loading: loadingTransactions} = useFetch<ITransaction[]>(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`)
-  
+  const { data, loading: loadingTransactions } = useFetch<ITransaction[]>(
+    `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`,
+    {
+      headers: {
+        'x-api-key': apiKey || ''
+      }
+    }
+  )
+
   useEffect(() => {
     setTransactions(data)
   }, [data])
@@ -39,25 +48,25 @@ export default function Transactions() {
   const addTransaction = (newTransaction: ITransaction) => {
     console.log(newTransaction)
     setTransactions(prev => {
-      const updatedTransactions = [...prev!, newTransaction];
-      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return updatedTransactions;
-    });
-  };
-  
+      const updatedTransactions = [...prev!, newTransaction]
+      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      return updatedTransactions
+    })
+  }
+
   const editTransaction = (updatedTransaction: ITransaction) => {
     setTransactions(prev => {
-      const updatedTransactions = prev!.map(transaction => transaction.id === updatedTransaction.id ? updatedTransaction : transaction);
-      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return updatedTransactions;
-    });
-  };
-  
+      const updatedTransactions = prev!.map(transaction =>
+        transaction.id === updatedTransaction.id ? updatedTransaction : transaction
+      )
+      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      return updatedTransactions
+    })
+  }
+
   const deleteTransaction = (transactionId: number) => {
-    setTransactions(prev =>
-      prev!.filter(transaction => transaction.id !== transactionId)
-    );
-  };
+    setTransactions(prev => prev!.filter(transaction => transaction.id !== transactionId))
+  }
 
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
@@ -106,8 +115,15 @@ export default function Transactions() {
 
   const handleDeleteTransaction = async (id: number) => {
     const response = await fetch(`/api/transactions/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'x-api-key': apiKey || ''
+      }
     })
+    if (response.status === 401) {
+      localStorage.removeItem('apiKey')
+      return
+    }
     if (response.ok) {
       deleteTransaction(id)
       // refreshTransactions()
@@ -218,21 +234,24 @@ export default function Transactions() {
           </div>
           <div>
             {value === 0 && (
-              <TransactionsTable key={0}
+              <TransactionsTable
+                key={0}
                 handleEditTransaction={handleEditTransaction}
                 handleDeleteTransaction={handleDeleteTransaction}
                 filterFunction={() => true}
               />
             )}
             {value === 1 && (
-              <TransactionsTable key={1}
+              <TransactionsTable
+                key={1}
                 handleEditTransaction={handleEditTransaction}
                 handleDeleteTransaction={handleDeleteTransaction}
                 filterFunction={transaction => transaction.amount < 0}
               />
             )}
             {value === 2 && (
-              <TransactionsTable key={2}
+              <TransactionsTable
+                key={2}
                 handleEditTransaction={handleEditTransaction}
                 handleDeleteTransaction={handleDeleteTransaction}
                 filterFunction={transaction => transaction.amount > 0}

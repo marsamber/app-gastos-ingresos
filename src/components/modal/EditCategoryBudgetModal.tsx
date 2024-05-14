@@ -4,6 +4,7 @@ import { IBudget } from '@/types/index'
 import { Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
+import { RefreshContext } from '@/contexts/RefreshContext'
 
 export interface EditCategoryBudgetModalProps {
   open: boolean
@@ -24,6 +25,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
 
   const { categories, monthSelected, editBudget } = useContext(SettingsContext)
   const { refreshBudgets } = useContext(RefreshSettingsContext)
+  const { apiKey } = useContext(RefreshContext)
 
   useEffect(() => {
     if (open) {
@@ -68,7 +70,8 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
         response = await fetch(`/api/budgets/${categoryBudget?.id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey || ''
           },
           body: JSON.stringify(newCategoryBudget)
         })
@@ -76,12 +79,18 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
         response = await fetch(`/api/budget_historics/${categoryBudget?.id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey || ''
           },
           body: JSON.stringify(newCategoryBudget)
         })
       }
       const updatedBudget = await response.json()
+
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
 
       if (response.ok) {
         editBudget(updatedBudget)

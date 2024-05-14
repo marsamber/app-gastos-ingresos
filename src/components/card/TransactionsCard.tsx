@@ -88,7 +88,7 @@ function Transaction({ transaction }: { transaction: { id: number; title: string
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} key={transaction.id}>
       <div style={descriptionStyle}>
         <p style={titleStyle}>{transaction.title}</p>
         <span style={dateStyle}>{transaction.date.toLocaleDateString()}</span>

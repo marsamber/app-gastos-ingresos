@@ -25,7 +25,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   const [categories, setCategories] = useState<string[] | null>(null)
 
   const { addTransaction, editTransaction } = useContext(TransactionsContext)
-  const { refreshTransactions, refreshKeyCategories } = useContext(RefreshContext)
+  const { refreshTransactions, refreshKeyCategories, apiKey } = useContext(RefreshContext)
 
   const categoriesOptions = useMemo(
     () =>
@@ -38,7 +38,16 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await fetch('/api/categories')
+      const response = await fetch('/api/categories', {
+        headers: {
+          'x-api-key': apiKey || ''
+        }
+      })
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
+
       if (response.ok) {
         const categories = await response.json()
         setCategories(categories)
@@ -101,9 +110,15 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
     try {
       const response = await fetch(transaction ? `/api/transactions/${transaction.id}` : '/api/transactions', {
         method: transaction ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || '' },
         body: JSON.stringify(transactionData)
       })
+
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
+
       if (response.ok) {
         if (transaction) {
           const updatedTransaction = await response.json()

@@ -60,13 +60,13 @@ export default function ResponsiveDrawer({
   }
 
   useEffect(() => {
-    if (!localStorage.getItem('token') && pathname !== '/login') {
+    if (!localStorage.getItem('apiKey') && pathname !== '/login') {
       window.location.href = '/login'
       return
     }
-    if (localStorage.getItem('token') && localStorage.getItem('token') !== 'my-password') {
-      window.location.href = '/login'
-      return
+
+    if (localStorage.getItem('apiKey') && pathname === '/login') {
+      window.location.href = '/'
     }
   }, [])
 
@@ -141,7 +141,7 @@ export default function ResponsiveDrawer({
               color: 'gray'
             }}
             href="/login"
-            onClick={() => localStorage.removeItem('token')}
+            onClick={() => localStorage.removeItem('apiKey')}
           >
             <ListItemIcon>
               <Logout style={{ color: 'gray' }} />
@@ -158,7 +158,7 @@ export default function ResponsiveDrawer({
   return (
     <ThemeProvider theme={theme}>
       <RefreshContext.Provider
-        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories }}
+        value={{ refreshKeyTransactions, refreshTransactions, refreshKeyCategories, refreshCategories, apiKey: localStorage.getItem('apiKey') || ''}}
       >
         {isLogin ? (
           children

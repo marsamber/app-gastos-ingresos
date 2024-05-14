@@ -33,14 +33,21 @@ export default function Home() {
   }, [])
 
   // DATA
-  const { refreshKeyTransactions } = useContext(RefreshContext)
+  const { refreshKeyTransactions, apiKey } = useContext(RefreshContext)
 
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
-      const transactions = await fetch(
-        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
-      ).then(res => res.json())
+      const response = await fetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`, {
+        headers: {
+          'x-api-key': apiKey || ''
+        }
+      })
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
+      const transactions = await response.json()
       setTransactions(transactions)
       setLoadingTransactions(false)
     }
@@ -48,9 +55,18 @@ export default function Home() {
     fetchTransactions()
   }, [monthsSelected, refreshKeyTransactions])
 
-  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
+  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets', {
+    headers: {
+      'x-api-key': apiKey || ''
+    }
+  })
   const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
-    `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
+    `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`,
+    {
+      headers: {
+        'x-api-key': apiKey || ''
+      }
+    }
   )
 
   useEffect(() => {

@@ -20,7 +20,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
 
   const { categories, addCategory } = useContext(SettingsContext)
 
-  const { refreshCategories } = useContext(RefreshContext)
+  const { refreshCategories, apiKey } = useContext(RefreshContext)
 
   useEffect(() => {
     if (open) {
@@ -59,12 +59,18 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
       const response = await fetch('/api/categories', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey || ''
         },
         body: JSON.stringify({
           category: category
         })
       })
+
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
 
       if (response.ok) {
         const newCategory = await response.json()
@@ -119,7 +125,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
             error={error.category}
             label="Categoría"
             inputRef={inputRef}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={e => setCategory(e.target.value)}
           />
         </div>
         <div style={{ textAlign: 'center', color: theme.palette.error.main, fontSize: '14px' }}>{error.message}</div>

@@ -32,7 +32,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   const currentDate = useMemo(() => new Date().toISOString().substring(0, 7), [])
   const present = useMemo(() => monthSelected.substring(0, 7) === currentDate, [monthSelected, currentDate])
 
-  const { refreshCategories } = useContext(RefreshContext)
+  const { refreshCategories, apiKey } = useContext(RefreshContext)
 
   useEffect(() => {
     if (open) {
@@ -86,7 +86,8 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
         await fetch('/api/categories', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey || ''
           },
           body: JSON.stringify({
             category: category.title
@@ -106,9 +107,14 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
 
     const response = await fetch(present ? '/api/budgets' : '/api/budget_historics', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || '' },
       body: JSON.stringify(budgetData)
     })
+
+    if (response.status === 401) {
+      localStorage.removeItem('apiKey')
+      return
+    }
 
     if (response.ok) {
       const newBudget = await response.json()

@@ -27,7 +27,7 @@ export default function Settings() {
   const [restingBudget, setRestingBudget] = useState<number>(0)
   const [value, setValue] = useState(0)
 
-  const { refreshKeyCategories, refreshCategories } = useContext(RefreshContext)
+  const { refreshKeyCategories, refreshCategories, apiKey } = useContext(RefreshContext)
 
   const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
 
@@ -36,7 +36,11 @@ export default function Settings() {
   }, [])
 
   // Refresh data
-  const { data, loading: loadingMonthlyTransactions } = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions')
+  const { data, loading: loadingMonthlyTransactions } = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions', {
+    headers: {
+      'x-api-key': apiKey || ''
+    }
+  })
   useEffect(() => {
     if (data) {
       setMonthlyTransactions(data)
@@ -46,7 +50,16 @@ export default function Settings() {
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true)
-      let categories: string[] = await fetch(`/api/categories`).then(res => res.json())
+      const response = await fetch(`/api/categories`, {
+        headers: {
+          'x-api-key': apiKey || ''
+        }
+      })
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
+      let categories = await response.json()
       categories = categories.sort((a: string, b: string) => a.localeCompare(b))
       setCategories(categories)
       setLoadingCategories(false)
@@ -58,12 +71,28 @@ export default function Settings() {
   useEffect(() => {
     const fetchBudgets = async () => {
       setLoadingBudgets(true)
-      let budgets
-      if (present) budgets = await fetch(`/api/budgets`).then(res => res.json())
-      else
-        budgets = await fetch(
-          `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}`
-        ).then(res => res.json())
+      let response
+      if (present) {
+        response = await fetch(`/api/budgets`, {
+          headers: {
+            'x-api-key': apiKey || ''
+          }
+        })
+      } else {
+        response = await fetch(
+          `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}`,
+          {
+            headers: {
+              'x-api-key': apiKey || ''
+            }
+          }
+        )
+      }
+      if (response.status === 401) {
+        localStorage.removeItem('apiKey')
+        return
+      }
+      const budgets = await response.json()
       setBudgets(budgets)
       setLoadingBudgets(false)
     }
@@ -108,13 +137,13 @@ export default function Settings() {
 
     fetch('/api/categories', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || ''},
       body: JSON.stringify({ category: 'Ingresos fijos' })
     })
       .then(() => {
         return fetch('/api/budgets', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey || ''},
           body: JSON.stringify({ category: 'Ingresos fijos', amount: 0 })
         })
       })
@@ -133,7 +162,8 @@ export default function Settings() {
   // Handle delete monthly transaction
   const handleDeleteMonthlyTransaction = (id: number) => {
     fetch(`/api/monthly_transactions/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: { 'x-api-key': apiKey || '' }
     })
       .then(() => {
         setMonthlyTransactions(prev => prev.filter(transaction => transaction.id !== id))
@@ -350,7 +380,9 @@ export default function Settings() {
           )}
           {value === 1 && (
             <div style={containerStyle}>
-              <div style={columnStyle}><CategoriesCard /></div>
+              <div style={columnStyle}>
+                <CategoriesCard />
+              </div>
               <div style={columnStyle}>
                 <CategoriesBudgetCard setMonthSelected={setMonthSelected} />
               </div>
