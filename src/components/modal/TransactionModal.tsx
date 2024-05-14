@@ -30,14 +30,15 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   const categoriesOptions = useMemo(
     () =>
       categories
-        ?.map(category => ({ value: category, label: category }))
+        ?.filter(category => category !== 'Sin categoría')
+        .map(category => ({ value: category, label: category }))
         .sort((a, b) => a.label.localeCompare(b.label)) || [],
     [categories]
   )
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await fetch('/api/categories')      
+      const response = await fetch('/api/categories')
       if (response.ok) {
         const categories = await response.json()
         setCategories(categories)

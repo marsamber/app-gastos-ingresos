@@ -16,8 +16,9 @@ interface SettingsContextType {
 
   addBudget: (budget: IBudget | IBudgetHistoric) => void
   editBudget: (budget: IBudget | IBudgetHistoric) => void
-  deleteBudget: (id: number) => void
+  deleteBudget: (id: number[]) => void
 
+  addCategory: (category: string) => void
   deleteCategory: (category: string) => void
 }
 
@@ -37,6 +38,7 @@ const defaultValue: SettingsContextType = {
   editBudget: () => {},
   deleteBudget: () => {},
 
+  addCategory: () => {},
   deleteCategory: () => {}
 }
 

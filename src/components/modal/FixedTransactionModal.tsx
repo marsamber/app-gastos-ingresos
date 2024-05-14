@@ -29,6 +29,7 @@ export default function FixedTransactionModal({
   const { categories, addMonthlyTransaction, editMonthlyTransaction } = useContext(SettingsContext)
 
   const categoriesOptions = categories
+    .filter(category => category !== 'Sin categoría')
     .filter(category => (transactionType === 'expense' ? category !== 'Ingresos fijos' : true))
     .map(category => ({ value: category, label: category }))
 

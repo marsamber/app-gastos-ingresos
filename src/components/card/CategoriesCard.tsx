@@ -1,46 +1,33 @@
 /* eslint-disable no-unused-vars */
 import { SettingsContext } from '@/contexts/SettingsContext'
-import { IBudget } from '@/types/index'
 import { Add } from '@mui/icons-material'
 import { Button, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useState } from 'react'
-import MonthPicker from '../MonthPicker'
-import AddCategoryBudgetModal from '../modal/AddCategoryBudgetModal'
-import DeleteCategoryBudgetModal from '../modal/DeleteCategoryBudgetModal'
-import EditCategoryBudgetModal from '../modal/EditCategoryBudgetModal'
+import AddCategoryModal from '../modal/AddCategoryModal'
+import DeleteCategoryModal from '../modal/DeleteCategoryModal'
 import CategoriesTable from '../table/CategoriesTable'
 import BasicCard from './BasicCard'
 
-interface CategoriesCardProps {
-  setMonthSelected: (month: string) => void
-}
 
-export default function CategoriesCard({ setMonthSelected }: CategoriesCardProps) {
+export default function CategoriesCard() {
   const isTablet = useMediaQuery('(max-width: 1024px)')
   const isMobile = useMediaQuery('(max-width: 500px)')
-  const [addCategoryBudget, setAddCategoryBudget] = useState(false)
-  const [editCategoryBudget, setEditCategoryBudget] = useState(false)
-  const [deleteCategoryBudget, setDeleteCategoryBudget] = useState(false)
-  const [categoryBudget, setCategoryBudget] = useState<IBudget | null>(null)
+  const [addCategory, setAddCategory] = useState(false)
+  const [deleteCategory, setDeleteCategory] = useState(false)
+  const [category, setCategory] = useState<string | null>(null)
 
-  const { budgets } = useContext(SettingsContext)
+  const { categories } = useContext(SettingsContext)
 
-  const handleEditCategoryBudget = (id: number) => {
-    const categoryBudget = budgets.find(budget => budget.id === id)
-    setCategoryBudget(categoryBudget!)
-    setEditCategoryBudget(true)
-  }
-
-  const handleDeleteCategoryBudget = (id: number) => {
-    const categoryBudget = budgets.find(budget => budget.id === id)
-    setCategoryBudget(categoryBudget!)
-    setDeleteCategoryBudget(true)
+  const handleDeleteCategory = (category: string) => {
+    const categoryToDelete = categories.find(cat => category === cat)
+    setCategory(categoryToDelete!)
+    setDeleteCategory(true)
   }
 
   // STYLES
   const titleStyle = {
     margin: '10px 0',
-    width: isMobile ? '60%' : 'unset',
+    width: isMobile ? '60%' : 'unset'
   }
 
   const cardStyle = {
@@ -65,30 +52,21 @@ export default function CategoriesCard({ setMonthSelected }: CategoriesCardProps
   return (
     <BasicCard style={cardStyle}>
       <div style={headerStyle}>
-        <h3 style={titleStyle}>
-          <span>Presupuesto por categorías - </span>
-          <MonthPicker setMonthSelected={setMonthSelected} />
-        </h3>
-        <Button variant="contained" color="primary" endIcon={<Add />} onClick={() => setAddCategoryBudget(true)}>
+        <h3 style={titleStyle}>Categorías</h3>
+        <Button variant="contained" color="primary" endIcon={<Add />} onClick={() => setAddCategory(true)}>
           Añadir
         </Button>
       </div>
       <div style={containerStyle}>
         <CategoriesTable
-          handleEditCategoryBudget={handleEditCategoryBudget}
-          handleDeleteCategoryBudget={handleDeleteCategoryBudget}
+          handleDeleteCategory={handleDeleteCategory}
         />
       </div>
-      <AddCategoryBudgetModal open={addCategoryBudget} handleClose={() => setAddCategoryBudget(false)} />
-      <EditCategoryBudgetModal
-        open={editCategoryBudget}
-        handleClose={() => setEditCategoryBudget(false)}
-        categoryBudget={categoryBudget}
-      />
-      <DeleteCategoryBudgetModal
-        open={deleteCategoryBudget}
-        handleClose={() => setDeleteCategoryBudget(false)}
-        categoryBudget={categoryBudget}
+      <AddCategoryModal open={addCategory} handleClose={() => setAddCategory(false)} />
+      <DeleteCategoryModal
+        open={deleteCategory}
+        handleClose={() => setDeleteCategory(false)}
+        category={category}
       />
     </BasicCard>
   )

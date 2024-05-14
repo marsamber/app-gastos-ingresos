@@ -1,59 +1,27 @@
+import { ReactNode } from 'react'
 import BasicCard from './BasicCard'
 
 export interface OneCategoryCardProps {
   data: {
-    id: string
+    id: number
     category: string
-    spent: number
-    remaining: number
-    total: number
+    actions: ReactNode
   }
 }
 
 export default function OneCategoryCard({ data }: OneCategoryCardProps) {
   // STYLES
-  const titleStyle = {
-    fontSize: '14px',
-  }
-
-  const dataStyle = {
-    fontSize: '14px',
-    padding: '0 10px'
+  const contentStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 
   return (
     <BasicCard>
-      <b>{data.category}</b>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%'
-        }}
-      >
-        <b style={titleStyle}>Gastado</b>
-        <b style={titleStyle}>Restante</b>
-        <b style={titleStyle}>Total</b>
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%'
-        }}
-      >
-        <p style={dataStyle}>{data.spent} €</p>
-        <p style={dataStyle}>{data.remaining} €</p>
-        <p
-          style={{
-            ...dataStyle,
-            color: data.total > 0 ? 'green' : 'red'
-          }}
-        >
-          {data.total} €
-        </p>
+      <div style={contentStyle}>
+        <b>{data.category}</b>
+        {data.actions}
       </div>
     </BasicCard>
   )

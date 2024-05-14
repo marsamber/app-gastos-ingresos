@@ -1,8 +1,8 @@
 import { CircularProgress, useMediaQuery } from '@mui/material'
 import BasicTable from './BasicTable'
-import OneCategoryCard from '../card/OneCategoryCard'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import { HomeContext } from '@/contexts/HomeContext'
+import OneBudgetCard from '../card/OneBudgetCard'
 
 interface BudgetTableProps {
   includeHistorics?: boolean // Determina si incluir o no datos históricos
@@ -103,7 +103,7 @@ export default function BudgetTable({ includeHistorics = false }: BudgetTablePro
       isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {rows.map(row => (
-            <OneCategoryCard key={row.id} data={row} />
+            <OneBudgetCard key={row.id} data={row} />
           ))}
         </div>
       ) : (

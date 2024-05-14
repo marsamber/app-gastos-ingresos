@@ -1,51 +1,29 @@
 import { RefreshContext } from '@/contexts/RefreshContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import useFetch from '@/hooks/useFetch'
-import { IBudget, ITransaction } from '@/types/index'
+import { ITransaction } from '@/types/index'
 import { Button, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useState } from 'react'
 import BasicModal from './BasicModal'
 
-export interface DeleteCategoryBudgetModalProps {
+export interface DeleteCategoryModalProps {
   open: boolean
   handleClose: () => void
-  categoryBudget: IBudget | null
+  category: string | null
 }
 
-export default function DeleteCategoryBudgetModal({
+export default function DeleteCategoryModal({
   open,
   handleClose,
-  categoryBudget
-}: DeleteCategoryBudgetModalProps) {
+  category
+}: DeleteCategoryModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const { refreshCategories  } = useContext(RefreshContext)
-  const { monthlyTransactions, categories, deleteBudget, deleteCategory } = useContext(SettingsContext)
+  const { monthlyTransactions, categories, budgets, deleteBudget, deleteCategory } = useContext(SettingsContext)
 
   const [loading, setLoading] = useState(false)
 
   const { data: transactions } = useFetch<ITransaction[]>('/api/transactions')
-
-  const handleDeleteBudget = async () => {
-    setLoading(true)
-
-    try {
-      const response = await fetch(`/api/budgets/${categoryBudget?.id}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        deleteBudget([categoryBudget?.id!])
-        console.log('Budget deleted')
-        handleClose()
-      }
-    } catch (error) {
-      console.error(error)
-    }
-
-    setLoading(false)
-
-    handleClose()
-  }
 
   const createCategory = async () => {
     const existingCategory = categories.find(category => category === 'Sin categoría')
@@ -70,10 +48,10 @@ export default function DeleteCategoryBudgetModal({
   }
 
   const updateTransactions = async () => {
-    if (!transactions || !categoryBudget) return
+    if (!transactions || !category) return
 
     try {
-      const transactionsToUpdate = transactions.filter(transaction => transaction.category === categoryBudget.category)
+      const transactionsToUpdate = transactions.filter(transaction => transaction.category === category)
       for (const transaction of transactionsToUpdate) {
         const response = await fetch(`/api/transactions/${transaction.id}`, {
           method: 'PUT',
@@ -98,11 +76,11 @@ export default function DeleteCategoryBudgetModal({
   }
 
   const updateMonthlyTransactions = async () => {
-    if (!monthlyTransactions || !categoryBudget) return
+    if (!monthlyTransactions || !category) return
 
     try {
       const transactionsToUpdate = monthlyTransactions.filter(
-        transaction => transaction.category === categoryBudget.category
+        transaction => transaction.category === category
       )
       for (const transaction of transactionsToUpdate) {
         const response = await fetch(`/api/monthly_transactions/${transaction.id}`, {
@@ -128,7 +106,7 @@ export default function DeleteCategoryBudgetModal({
   }
 
   const deleteBudgets = async () => {
-    if (!categoryBudget) return
+    if (!category) return
 
     try {
       await fetch(`/api/budgets`, {
@@ -136,7 +114,7 @@ export default function DeleteCategoryBudgetModal({
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ category: categoryBudget.category })
+        body: JSON.stringify({ category: category })
       })
       console.log('Budgets deleted')
     } catch (error) {
@@ -145,14 +123,14 @@ export default function DeleteCategoryBudgetModal({
   }
 
   const deleteBudgetHistorics = async () => {
-    if (!categoryBudget) return
+    if (!category) return
 
     try {
       await fetch(`/api/budget_historics`, { method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ category: categoryBudget.category })
+        body: JSON.stringify({ category: category })
        })
       console.log('Budget historics deleted')
     } catch (error) {
@@ -160,15 +138,16 @@ export default function DeleteCategoryBudgetModal({
     }
   }
 
-  const deleteCategoryBudget = async () => {
-    if (!categoryBudget) return
+  const deleteCategorySelected = async () => {
+    if (!category) return
 
     try {
-      const response = await fetch(`/api/categories/${categoryBudget.category}`, { method: 'DELETE' })
+      const response = await fetch(`/api/categories/${category}`, { method: 'DELETE' })
 
       if (response.ok) {
-        deleteBudget([categoryBudget.id!])
-        deleteCategory(categoryBudget.category)
+        const budgetsId = budgets.filter(budget => budget.category === category).map(budget => budget.id)
+        deleteBudget(budgetsId)
+        deleteCategory(category)
         refreshCategories()
         handleClose()
         console.log('Category deleted')
@@ -198,7 +177,7 @@ export default function DeleteCategoryBudgetModal({
       await deleteBudgetHistorics();
   
       // Delete the category budget only if deleteBudgetHistorics succeeds
-      await deleteCategoryBudget();
+      await deleteCategorySelected();
   
     } catch (error) {
       console.error('An error occurred:', error);
@@ -216,28 +195,20 @@ export default function DeleteCategoryBudgetModal({
 
   const modalStyle: CSSProperties = {
     width: isMobile ? '80%' : '600px',
-    height: isMobile ? '550px' : '350px'
+    height: isMobile ? '300px' : '250px'
   }
 
   const actionsStyle = {
     display: 'flex',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    justifyContent: 'center',
     margin: '20px 8px 0px 8px'
   }
 
   return (
     <BasicModal open={open} style={modalStyle} handleClose={handleClose}>
       <div>
-        <h3 style={titleStyle}>Eliminar presupuesto o categoría</h3>
-        <p
-          style={{
-            textAlign: 'justify'
-          }}
-        >
-          Al eliminar el <b>presupuesto</b>, se eliminará únicamente el presupuesto actual y no se incluirá en el mes
-          siguiente.
-        </p>
-        <br />
+        <h3 style={titleStyle}>Eliminar categoría</h3>
         <p
           style={{
             textAlign: 'justify'
@@ -247,17 +218,6 @@ export default function DeleteCategoryBudgetModal({
         </p>
         <div style={actionsStyle}>
           <Button
-            variant="contained"
-            color="warning"
-            onClick={handleDeleteBudget}
-            disabled={loading}
-            style={{
-              fontSize: isMobile ? '12px' : 'auto'
-            }}
-          >
-            Eliminar presupuesto
-          </Button>
-          <Button
             variant="text"
             color="warning"
             onClick={handleDeleteCategory}
@@ -266,7 +226,7 @@ export default function DeleteCategoryBudgetModal({
               fontSize: isMobile ? '12px' : 'auto'
             }}
           >
-            Eliminar categoría &apos;{categoryBudget?.category}&apos;
+            Eliminar categoría &apos;{category}&apos;
           </Button>
         </div>
       </div>

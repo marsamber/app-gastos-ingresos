@@ -77,7 +77,7 @@ export default function FixedTransactionsTable({
           ))}
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} keyOrder="title" numRowsPerPage={5} />
+        <BasicTable headCells={headCells} rows={rows} keyOrder="title" numRowsPerPage={10} />
       )}
     </>
   )

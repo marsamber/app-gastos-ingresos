@@ -1,17 +1,18 @@
 'use client'
-import CategoriesCard from '@/components/card/CategoriesCard'
+import CategoriesBudgetCard from '@/components/card/CategoriesBudgetCard'
 import FixedTransactionsCard from '@/components/card/FixedTransactionsCard'
 import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import theme from '@/theme'
 import { IBudget, IBudgetHistoric, IMonthlyTransaction } from '@/types/index'
-import { Tooltip, useMediaQuery } from '@mui/material'
+import { Tab, Tabs, Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useCallback, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
 import { Info } from '@mui/icons-material'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
+import CategoriesCard from '@/components/card/CategoriesCard'
 
 export default function Settings() {
   const isMobile = useMediaQuery('(max-width: 600px)')
@@ -24,17 +25,18 @@ export default function Settings() {
   const [budgets, setBudgets] = useState<IBudget[]>([])
   const [monthlyTransactions, setMonthlyTransactions] = useState<IMonthlyTransaction[]>([])
   const [restingBudget, setRestingBudget] = useState<number>(0)
+  const [value, setValue] = useState(0)
 
   const { refreshKeyCategories, refreshCategories } = useContext(RefreshContext)
 
-  const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)  
+  const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
 
   const refreshBudgets = useCallback(() => {
     setRefreshKeyBudgets(prev => prev + 1)
   }, [])
 
   // Refresh data
-  const {data, loading: loadingMonthlyTransactions} = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions')
+  const { data, loading: loadingMonthlyTransactions } = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions')
   useEffect(() => {
     if (data) {
       setMonthlyTransactions(data)
@@ -151,7 +153,7 @@ export default function Settings() {
       .filter(transaction => transaction.category === 'Ingresos fijos')
       .reduce((acc, transaction) => acc + transaction.amount, 0)
 
-    setRestingBudget(-(totalBudget - totalSpent))
+    setRestingBudget(-(totalBudget - totalSpent).toFixed(2))
   }, [loadingBudgets, budgets, loadingCategories, categories, loadingMonthlyTransactions, monthlyTransactions])
 
   const addMonthlyTransaction = (transaction: IMonthlyTransaction) => {
@@ -182,8 +184,16 @@ export default function Settings() {
     })
   }
 
-  const deleteBudget = (id: number) => {
-    setBudgets(prev => prev.filter(budget => budget.id !== id))
+  const deleteBudget = (id: number[]) => {
+    setBudgets(prev => prev.filter(budget => !id.includes(budget.id)))
+  }
+
+  const addCategory = (category: string) => {
+    console.log(category)
+    setCategories(prev => {
+      const updatedCategories = [...prev, category]
+      return updatedCategories.sort((a, b) => a.localeCompare(b))
+    })
   }
 
   const deleteCategory = (category: string) => {
@@ -228,12 +238,20 @@ export default function Settings() {
     gap: '5px'
   }
 
+  const tabsStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: '10px'
+  }
+
   return (
     <main className="main">
       <RefreshSettingsContext.Provider
         value={{
           refreshBudgets,
-          refreshKeyBudgets,
+          refreshKeyBudgets
         }}
       >
         <SettingsContext.Provider
@@ -251,6 +269,7 @@ export default function Settings() {
             addBudget,
             editBudget,
             deleteBudget,
+            addCategory,
             deleteCategory
           }}
         >
@@ -279,21 +298,57 @@ export default function Settings() {
               </h3>
             ) : null}
           </div>
-          <div style={containerStyle}>
-            <div style={columnStyle}>
-              <FixedTransactionsCard
-                handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
-                transactionType="income"
+          <div style={tabsStyle}>
+            <Tabs
+              classes={{
+                indicator: 'indicator'
+              }}
+              textColor="secondary"
+              indicatorColor="secondary"
+              value={value}
+              onChange={(event, newValue) => setValue(newValue)}
+              variant={isMobile ? 'fullWidth' : 'standard'}
+            >
+              <Tab
+                classes={{
+                  selected: 'tabSelected'
+                }}
+                label="Transacciones fijas"
+                value={0}
               />
-              <FixedTransactionsCard
-                handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
-                transactionType="expense"
+              <Tab
+                classes={{
+                  selected: 'tabSelected'
+                }}
+                label="Categorías y presupuestos"
+                value={1}
               />
-            </div>
-            <div style={columnStyle}>
-              <CategoriesCard setMonthSelected={setMonthSelected} />
-            </div>
+            </Tabs>
           </div>
+          {value === 0 && (
+            <div style={containerStyle}>
+              <div style={columnStyle}>
+                <FixedTransactionsCard
+                  handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
+                  transactionType="income"
+                />
+              </div>
+              <div style={columnStyle}>
+                <FixedTransactionsCard
+                  handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
+                  transactionType="expense"
+                />
+              </div>
+            </div>
+          )}
+          {value === 1 && (
+            <div style={containerStyle}>
+              <div style={columnStyle}><CategoriesCard /></div>
+              <div style={columnStyle}>
+                <CategoriesBudgetCard setMonthSelected={setMonthSelected} />
+              </div>
+            </div>
+          )}
         </SettingsContext.Provider>
       </RefreshSettingsContext.Provider>
     </main>
