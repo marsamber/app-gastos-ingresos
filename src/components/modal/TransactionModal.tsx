@@ -197,6 +197,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             error={errors.title}
             onChange={e => setTitle(e.target.value)}
             inputRef={inputRef}
+            required
           />
           {categories && categories.length > 0 ? (
             <Autocomplete
@@ -207,7 +208,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
               value={categoriesOptions.find(opt => opt.value === category)}
               onChange={(event, newValue) => setCategory(newValue.value)}
               isOptionEqualToValue={(option, value) => option.value === value.value}
-              renderInput={params => <TextField {...params} label="Categoría" error={errors.category} />}
+              renderInput={params => <TextField {...params} label="Categoría" error={errors.category} required />}
               disableClearable
             />
           ) : (
@@ -223,6 +224,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             label="Tipo"
             type="text"
             value={type === 'income' ? 'Ingreso' : 'Gasto'}
+            required
           />
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
@@ -236,6 +238,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             inputProps={{
               pattern: '^-?\\d*\\.?\\d*$'
             }}
+            required
           />
           <TextField
             style={{ width: isMobile ? '192px' : '143px', margin: '8px' }}
@@ -246,6 +249,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             error={errors.date}
             value={formatDate(date as Date)}
             onChange={e => setDate(new Date(e.target.value))}
+            required
           />
         </div>
         <div style={actionsStyle}>

@@ -163,6 +163,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
               color="primary"
               error={errorCategory}
               disabled
+              required
             />
           )}
           <TextField
@@ -178,6 +179,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
             error={errorAmount}
             onChange={e => handleChangeAmount(e.target.value)}
             inputRef={inputRef}
+            required
           />
         </div>
         <div style={actionsStyle}>

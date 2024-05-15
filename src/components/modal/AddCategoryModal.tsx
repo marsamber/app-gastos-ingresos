@@ -123,6 +123,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
             label="Categoría"
             inputRef={inputRef}
             onChange={e => setCategory(e.target.value)}
+            required
           />
         </div>
         <div style={{ textAlign: 'center', color: theme.palette.error.main, fontSize: '14px' }}>{error.message}</div>

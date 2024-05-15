@@ -14,7 +14,14 @@
 }
 
 /* Month range picker */
-.monthRangePicker .ant-picker-input > input {
+.monthRangePicker .ant-picker-input:first-child > input {
+  cursor: pointer;
+  font-size: 1.5em !important;
+  font-weight: bold !important;
+  padding: 0 0 0 11px !important;
+}
+
+.monthRangePicker:nth-child(2) .ant-picker-input > input {
   cursor: pointer;
   font-size: 1.5em !important;
   font-weight: bold !important;
@@ -23,6 +30,7 @@
 .monthPicker .ant-picker-input > input {
   font-size: 1.27em !important;
   font-weight: bold !important;
+  padding: 0 0 0 11px !important;
 }
 
 .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner {
@@ -79,6 +87,26 @@
 .ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-range-start:not(.ant-picker-cell-disabled):before, 
 .ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-range-end:not(.ant-picker-cell-disabled):before {
     background: #4A9ABE;
+}
+
+.ant-picker.ant-picker-outlined:focus{
+  border-color: #257CA3 !important;
+}
+
+.ant-picker.ant-picker-outlined:focus-within{
+  border-color: #257CA3 !important;
+}
+
+.ant-picker.ant-picker-range.ant-picker-invalid.ant-picker-large.monthRangePicker.ant-picker-outlined:hover{
+  border-color: #4A9ABE !important;
+}
+
+.ant-picker.ant-picker-large.monthPicker.ant-picker-outlined:hover{
+  border-color: #4A9ABE !important;
+}
+
+.ant-picker{
+  background-color: transparent;
 }
 
 @media (max-width: 800px) {

@@ -204,7 +204,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
             renderOption={(props, option) => <li {...props}>{option.title}</li>}
             sx={{ width: 300 }}
             renderInput={params => (
-              <TextField {...params} error={error.category} label="Categoría" inputRef={inputRef} />
+              <TextField {...params} error={error.category} label="Categoría" inputRef={inputRef} required />
             )}
             disableClearable
           />
@@ -219,6 +219,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
             inputProps={{
               pattern: '^-?\\d*\\.?\\d*$'
             }}
+            required
           />
         </div>
         <div style={{ textAlign: 'center', color: theme.palette.error.main, fontSize: '14px' }}>{error.message}</div>

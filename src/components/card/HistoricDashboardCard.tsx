@@ -147,7 +147,7 @@ export default function HistoricDashboardCard() {
           <div style={circularProgressStyle}>
             <CircularProgress />
           </div>
-        ) : data.length === 0 ? (
+        ) : !data.some(item => item.Gastado !== 0 || item.Presupuestado !== 0)  ? (
           <p>No hay datos para mostrar</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

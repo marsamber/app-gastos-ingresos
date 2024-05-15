@@ -24,13 +24,13 @@ export default function MonthPicker({ setMonthSelected }: MonthPickerProps) {
       defaultValue={dayjs().startOf('month')}
       format={'MMM YY'}
       allowClear={false}
-      variant="borderless"
+      // variant="borderless"
       size="large"
       suffixIcon={null}
       inputReadOnly
       onChange={date => handleOnChangeDate(date)}
       style={{
-        width: '90px',
+        width: '86px',
         marginBottom: '5px',
         paddingBottom: 0,
         paddingLeft: 0,

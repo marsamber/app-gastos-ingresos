@@ -170,9 +170,7 @@ export default function DeleteCategoryBudgetModal({
     try {
       const response = await customFetch(`/api/categories/${categoryBudget.category}`, {
         method: 'DELETE'
-      })
-
-      
+      })      
 
       if (response.ok) {
         deleteBudget([categoryBudget.id!])

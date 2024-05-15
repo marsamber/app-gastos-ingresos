@@ -31,7 +31,7 @@ export default function MonthRangePicker({ setMonthsSelected }: MonthRangePicker
       defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
       format={'MMM YY'}
       allowClear={false}
-      variant="borderless"
+      // variant="borderless"
       size="large"
       suffixIcon={null}
       separator={<KeyboardArrowRight />}
@@ -39,7 +39,7 @@ export default function MonthRangePicker({ setMonthsSelected }: MonthRangePicker
       inputReadOnly
       onChange={dates => handleOnChangeDates(dates as [Dayjs, Dayjs])}
       style={{
-        width: isMobile ? '170px':'200px',
+        width: isMobile ? '190px':'220px',
         marginBottom: '5px',
         paddingBottom: 0,
         paddingLeft: 0,

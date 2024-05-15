@@ -140,9 +140,7 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
     try {
       const response = await customFetch(`/api/categories/${category}`, {
         method: 'DELETE'
-      })
-
-      
+      })      
 
       if (response.ok) {
         const budgetsId = budgets.filter(budget => budget.category === category).map(budget => budget.id)

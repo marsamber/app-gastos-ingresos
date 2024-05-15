@@ -141,6 +141,7 @@ export default function FixedTransactionModal({
             error={errors.title}
             onChange={e => setTitle(e.target.value)}
             inputRef={inputRef}
+            required
           />
           <Autocomplete
             style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
@@ -156,6 +157,7 @@ export default function FixedTransactionModal({
                 label="Categoría"
                 error={errors.category}
                 disabled={transactionType === 'income'}
+                required
               />
             )}
             disableClearable
@@ -171,6 +173,7 @@ export default function FixedTransactionModal({
             label="Tipo"
             type="text"
             value={transactionType === 'income' ? 'Ingreso' : 'Gasto'}
+            required
           />
           <TextField
             style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
@@ -184,6 +187,7 @@ export default function FixedTransactionModal({
             inputProps={{
               pattern: transactionType === 'income' ? '^\\d*\\.?\\d*$' : '^-\\d*\\.?\\d*$'
             }}
+            required
           />
         </div>
         <div style={actionsStyle}>
