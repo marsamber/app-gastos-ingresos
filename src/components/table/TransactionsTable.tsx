@@ -25,10 +25,10 @@ interface TransactionsTableProps {
 export default function TransactionsTable({
   handleEditTransaction,
   handleDeleteTransaction,
-  filterFunction
+  filterFunction,
 }: TransactionsTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { transactions, loadingTransactions } = useContext(TransactionsContext)
+  const { transactions } = useContext(TransactionsContext)
   const [rows, setRows] = useState<ITransactionTable[]>([])
 
   const headCells = [
@@ -71,8 +71,6 @@ export default function TransactionsTable({
           )
         }))
 
-      data.sort((a, b) => b.date.getDate() - a.date.getDate())
-
       setRows(data)
     }
   }, [transactions])
@@ -88,11 +86,7 @@ export default function TransactionsTable({
 
   return (
     <>
-      {loadingTransactions ? (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      ) : isMobile ? (
+     {isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {rows
             .map(row => (
@@ -100,7 +94,7 @@ export default function TransactionsTable({
             ))}
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="desc" numRowsPerPage={10} />
+        <BasicTable headCells={headCells} rows={rows} />
       )}
     </>
   )

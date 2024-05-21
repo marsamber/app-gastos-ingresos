@@ -1,6 +1,7 @@
 import { ITransaction } from '@/types/index'
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/prisma'
+import { parseDate, parseIntSafe } from '@/utils/utils'
 
 // pages/api/transactions/index.js
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,16 +11,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'GET':
       try {
         // Retrieve transactions from the database
-        const { startDate, endDate } = req.query
+        const { startDate, endDate, type, page, limit, sortBy, sortOrder } = req.query
+
+        const parsedStartDate = parseDate(startDate as string)
+        const parsedEndDate = parseDate(endDate as string)
+        const parsedPage = parseIntSafe(page as string)
+        const parsedLimit = parseIntSafe(limit as string)
+
+        const whereCondition = {
+          date: {
+            gte: parsedStartDate,
+            lte: parsedEndDate
+          },
+          amount: type === 'expense' ? { lt: 0 } : type === 'income' ? { gt: 0 } : undefined
+        }
+
+        const paginationOptions = {
+          skip: parsedPage ? (parsedPage - 1) * (parsedLimit ?? 0) : undefined,
+          take: parsedLimit,
+          orderBy: sortBy
+            ? {
+                [sortBy as string]: sortOrder === 'asc' ? 'asc' : 'desc'
+              }
+            : undefined
+        }
+
+        const totalItems = await prisma.transaction.count({ where: whereCondition })
         const transactions: ITransaction[] = await prisma.transaction.findMany({
-          where: {
-            date: {
-              gte: startDate ? new Date(startDate as string) : undefined,
-              lte: endDate ? new Date(endDate as string) : undefined
-            }
-          }
+          where: whereCondition,
+          ...paginationOptions
         })
-        res.status(200).json(transactions)
+
+        res.status(200).json({ totalItems, transactions })
       } catch (error) {
         console.error('Failed to retrieve transactions:', error)
         res.status(500).json({ error: 'Failed to retrieve transactions' })

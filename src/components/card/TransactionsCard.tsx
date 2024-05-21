@@ -47,10 +47,10 @@ export default function TransactionsCard() {
         ) : (
           transactions &&
           transactions.slice(0, 5).map((transaction, index) => (
-            <>
+            <div key={transaction.id}>
               <Transaction key={transaction.id} transaction={{ ...transaction, date: new Date(transaction.date) }} />
               {index !== transactions.slice(0, 5).length - 1 && <hr />}
-            </>
+            </div>
           ))
         )}
       </div>

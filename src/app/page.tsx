@@ -9,13 +9,13 @@ import { HomeContext } from '@/contexts/HomeContext'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
 import theme from '@/theme'
-import { IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
+import { IBudgetHistorics, IBudgets, ITransaction } from '@/types/index'
+import customFetch from '@/utils/fetchWrapper'
 import { Info } from '@mui/icons-material'
 import { Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
-import customFetch from '@/utils/fetchWrapper'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -39,9 +39,11 @@ export default function Home() {
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
-      const response = await customFetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`)
-      
-      const transactions = await response.json()
+      const response = await customFetch(
+        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
+      )
+
+      const { transactions } = await response.json()
       setTransactions(transactions)
       setLoadingTransactions(false)
     }
@@ -49,15 +51,15 @@ export default function Home() {
     fetchTransactions()
   }, [monthsSelected, refreshKeyTransactions])
 
-  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
-  const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
+  const { data: budgetsData, loading: loadingBudgets } = useFetch<IBudgets>('/api/budgets')
+  const { data: budgetHistoricsData, loading: loadingBudgetHistorics } = useFetch<IBudgetHistorics>(
     `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
   )
 
   useEffect(() => {
-    if (budgets && transactions && budgetHistorics) {
+    if (budgetsData && transactions && budgetHistoricsData) {
       let totalBudget = 0
-      const totalHistorics = budgetHistorics
+      const totalHistorics = budgetHistoricsData.budgetHistorics
         .filter(budgetHistoric => budgetHistoric.category !== 'Ingresos fijos') // We don't want to take into account the fixed incomes
         .reduce((acc, historic) => acc + historic.amount, 0)
       const totalSpent = transactions
@@ -67,14 +69,14 @@ export default function Home() {
       const currentDate = new Date().toISOString().split('T')[0]
       // If the second month is greater than the current date, we will take into account the budgets
       if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
-        totalBudget = budgets
+        totalBudget = budgetsData.budgets
           .filter(budget => budget.category !== 'Ingresos fijos')
           .reduce((acc, budget) => acc + budget.amount, 0)
       }
 
       setBudget(totalBudget + totalHistorics + totalSpent)
     }
-  }, [budgets, transactions, budgetHistorics])
+  }, [budgetsData, transactions, budgetHistoricsData])
 
   useEffect(() => {
     const currentDate = new Date().toISOString().split('T')[0]
@@ -140,8 +142,8 @@ export default function Home() {
           budget,
           setBudget,
           transactions,
-          budgets: present ? budgets : [],
-          budgetHistorics,
+          budgets: present ? (budgetsData ? budgetsData.budgets : []) : [],
+          budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
           loadingTransactions,
           loadingBudgets,
           loadingBudgetHistorics

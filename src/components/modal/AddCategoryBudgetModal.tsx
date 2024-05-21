@@ -61,7 +61,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
           category !== 'Ingresos fijos' &&
           category !== 'Sin categoría'
       )
-      .sort((a, b) => a.localeCompare(b))
+      .sort()
     return filteredCategories.map(category => ({ title: category, inputValue: category }))
   }, [categories, budgets, monthSelected])
 
@@ -109,9 +109,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(budgetData)
-    })
-
-    
+    })    
 
     if (response.ok) {
       const newBudget = await response.json()

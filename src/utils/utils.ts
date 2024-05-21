@@ -35,3 +35,41 @@ export const convertDate = (date: string) => {
   let [month, year] = date.split(' ')
   return { month: monthMap[month as keyof typeof monthMap], year: parseInt(year) }
 }
+
+export const handleDateFilterChange = (value: string): string[] => {
+  const today = new Date()
+  const currentYear = today.getFullYear()
+  const currentMonth = today.getMonth()
+  const timezoneOffset = today.getTimezoneOffset() * 60000
+
+  const formatDate = (year: number, month: number, day: number) =>
+    new Date(new Date(year, month, day).getTime() - timezoneOffset).toISOString().split('T')[0]
+
+  let monthsSelected = ['', '']
+
+  switch (value) {
+    case 'this_month':
+      monthsSelected = [formatDate(currentYear, currentMonth, 1), formatDate(currentYear, currentMonth + 1, 0)]
+      break
+    case 'last_month':
+      monthsSelected = [formatDate(currentYear, currentMonth - 1, 1), formatDate(currentYear, currentMonth, 0)]
+      break
+    case 'this_year':
+      monthsSelected = [formatDate(currentYear, 0, 1), formatDate(currentYear, 11, 31)]
+      break
+    case 'last_year':
+      monthsSelected = [formatDate(currentYear - 1, 0, 1), formatDate(currentYear - 1, 11, 31)]
+      break
+  }
+  return monthsSelected
+}
+
+// API
+// Helper para convertir y validar query params
+export const parseDate = (dateStr: string | undefined): Date | undefined => {
+  return dateStr ? new Date(dateStr) : undefined
+}
+
+export const parseIntSafe = (numberStr: string | undefined): number | undefined => {
+  return numberStr ? parseInt(numberStr) : undefined
+}

@@ -4,7 +4,7 @@ import FixedTransactionsCard from '@/components/card/FixedTransactionsCard'
 import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import theme from '@/theme'
-import { IBudget, IBudgetHistoric, IMonthlyTransaction } from '@/types/index'
+import { IBudget, IBudgetHistoric, IMonthlyTransaction, IMonthlyTransactions } from '@/types/index'
 import { Tab, Tabs, Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, SyntheticEvent, useCallback, useContext, useEffect, useState } from 'react'
@@ -37,10 +37,10 @@ export default function Settings() {
   }, [])
 
   // Refresh data
-  const { data, loading: loadingMonthlyTransactions } = useFetch<IMonthlyTransaction[]>('/api/monthly_transactions')
+  const { data, loading: loadingMonthlyTransactions } = useFetch<IMonthlyTransactions>('/api/monthly_transactions')
   useEffect(() => {
     if (data) {
-      setMonthlyTransactions(data)
+      setMonthlyTransactions(data.monthlyTransactions)
     }
   }, [data])
 
@@ -48,9 +48,9 @@ export default function Settings() {
     const fetchCategories = async () => {
       setLoadingCategories(true)
       const response = await customFetch(`/api/categories`)
-      
-      let categories = await response.json()
-      categories = categories.sort((a: string, b: string) => a.localeCompare(b))
+
+      let { categories } = await response.json()
+      categories = categories.sort()
       setCategories(categories)
       setLoadingCategories(false)
     }
@@ -69,8 +69,8 @@ export default function Settings() {
           `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}`
         )
       }
-      
-      const budgets = await response.json()
+
+      const { budgets } = await response.json()
       setBudgets(budgets)
       setLoadingBudgets(false)
     }
@@ -196,10 +196,9 @@ export default function Settings() {
   }
 
   const addCategory = (category: string) => {
-    console.log(category)
     setCategories(prev => {
       const updatedCategories = [...prev, category]
-      return updatedCategories.sort((a, b) => a.localeCompare(b))
+      return updatedCategories.sort()
     })
   }
 

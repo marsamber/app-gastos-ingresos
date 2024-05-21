@@ -1,6 +1,6 @@
 import { HomeContext } from '@/contexts/HomeContext'
 import useFetch from '@/hooks/useFetch'
-import { IBudgetHistoric, ITransaction } from '@/types/index'
+import { IBudgetHistorics, ITransactions } from '@/types/index'
 import { convertDate, formatMonthYear } from '@/utils/utils'
 import { CircularProgress, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
@@ -46,10 +46,10 @@ export default function HistoricDashboardCard() {
     setMonthsHistoric([monthsHistoric, monthsSelected[1]!])
   }, [monthsSelected])
 
-  const { data: transactions, loading: loadingTransactions } = useFetch<ITransaction[]>(
+  const { data: transactionsData, loading: loadingTransactions } = useFetch<ITransactions>(
     `/api/transactions?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`
   )
-  const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
+  const { data: budgetHistoricsData, loading: loadingBudgetHistorics } = useFetch<IBudgetHistorics>(
     `/api/budget_historics?startDate=${monthsHistoric[0]}&endDate=${monthsHistoric[1]}`
   )
 
@@ -69,8 +69,8 @@ export default function HistoricDashboardCard() {
     }
 
     // Merge budget historics
-    budgetHistorics
-      ?.filter(historic => historic.category !== 'Ingresos fijos')
+    budgetHistoricsData?.budgetHistorics
+      .filter(historic => historic.category !== 'Ingresos fijos')
       .forEach(historic => {
         const monthKey = formatMonthYear(historic.date as string)
         const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
@@ -79,8 +79,8 @@ export default function HistoricDashboardCard() {
       })
 
     // Merge transactions
-    transactions
-      ?.filter(transaction => transaction.category !== 'Ingresos fijos')
+    transactionsData?.transactions
+      .filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
         const monthKey = formatMonthYear(transaction.date as string)
         const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
@@ -95,7 +95,7 @@ export default function HistoricDashboardCard() {
     })
 
     setData(sortedData)
-  }, [budgets, transactions, budgetHistorics])
+  }, [budgets, transactionsData, budgetHistoricsData])
 
   // STYLES
   const titleStyle = {
@@ -147,7 +147,7 @@ export default function HistoricDashboardCard() {
           <div style={circularProgressStyle}>
             <CircularProgress />
           </div>
-        ) : !data.some(item => item.Gastado !== 0 || item.Presupuestado !== 0)  ? (
+        ) : !data.some(item => item.Gastado !== 0 || item.Presupuestado !== 0) ? (
           <p>No hay datos para mostrar</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

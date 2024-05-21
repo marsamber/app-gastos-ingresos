@@ -63,13 +63,15 @@ export default function MonthDashboardCard() {
       currentDate.setMonth(currentDate.getMonth() + 1)
     }
 
-    transactions?.forEach(transaction => {
-      const month = getMonthName(new Date(transaction.date))
-      const existingEntry = dataMap.get(month)
-      if (existingEntry) {
-        existingEntry.Gastado -= transaction.amount
-      }
-    })
+    transactions
+      ?.filter(transaction => transaction.category !== 'Ingresos fijos')
+      .forEach(transaction => {
+        const month = getMonthName(new Date(transaction.date))
+        const existingEntry = dataMap.get(month)
+        if (existingEntry) {
+          existingEntry.Gastado -= transaction.amount
+        }
+      })
 
     return Array.from(dataMap.values()).sort((a, b) => monthNames.indexOf(a.name) - monthNames.indexOf(b.name))
   }
@@ -111,7 +113,7 @@ export default function MonthDashboardCard() {
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
-          <b>{`Semana ${label}`}</b>
+          <b>{areMonthsSelectedSameMonth ? `Semana ${label}` : label}</b>
           <p style={{ color: '#FF6384' }}>{`Gastado: ${gastado} €`}</p>
         </div>
       )

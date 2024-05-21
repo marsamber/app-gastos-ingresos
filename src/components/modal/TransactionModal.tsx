@@ -1,6 +1,6 @@
 import { RefreshContext } from '@/contexts/RefreshContext'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
-import { ITransaction } from '@/types/index'
+import { ICategories, ITransaction } from '@/types/index'
 import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, ChangeEvent, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
@@ -25,26 +25,28 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   const [errors, setErrors] = useState({ amount: false, date: false, title: false, category: false })
   const [categories, setCategories] = useState<string[] | null>(null)
 
-  const { addTransaction, editTransaction } = useContext(TransactionsContext)
+  const {
+    refreshTransactions: refreshTransactionsTable,
+    page, limit, sortBy, sortOrder, type: typeTable
+  } = useContext(TransactionsContext)
   const { refreshTransactions, refreshKeyCategories } = useContext(RefreshContext)
 
   const categoriesOptions = useMemo(
     () =>
       categories
         ?.filter(category => category !== 'Sin categoría')
-        .map(category => ({ value: category, label: category }))
-        .sort((a, b) => a.label.localeCompare(b.label)) || [],
+        .sort()
+        .map(category => ({ value: category, label: category })) || [],
     [categories]
   )
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await customFetch('/api/categories', )
-      
+      const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categories = await response.json()
-        setCategories(categories)
+        const categoriesData: ICategories = await response.json()
+        setCategories(categoriesData.categories.map(category => category.id))
       }
     }
 
@@ -108,17 +110,8 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
         body: JSON.stringify(transactionData)
       })
 
-      
-
       if (response.ok) {
-        if (transaction) {
-          const updatedTransaction = await response.json()
-          editTransaction(updatedTransaction)
-        } else {
-          const newTransaction: ITransaction[] = await response.json()
-          addTransaction(newTransaction[0])
-        }
-
+        refreshTransactionsTable(page, limit, sortBy, sortOrder, typeTable)
         refreshTransactions()
         handleClose()
       }

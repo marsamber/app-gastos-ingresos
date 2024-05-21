@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/prisma'
+import { parseIntSafe } from '@/utils/utils'
 
 // pages/api/categories/index.js
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -8,9 +9,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (method) {
     case 'GET':
       try {
-        // Retrieve categories from the database
-        const categories = await prisma.category.findMany()
-        res.status(200).json(categories.map(category => category.id))
+        const { page, limit, sortBy, sortOrder } = req.query
+
+        const parsedPage = parseIntSafe(page as string)
+        const parsedLimit = parseIntSafe(limit as string)
+
+        const paginationOptions = {
+          skip: parsedPage && parsedLimit ? (parsedPage - 1) * parsedLimit : undefined,
+          take: parsedLimit,
+          orderBy: sortBy
+            ? {
+                [sortBy as string]: sortOrder === 'asc' ? 'asc' : sortOrder === 'desc' ? 'desc' : 'asc' // Default to ascending if sortOrder is incorrect
+              }
+            : undefined
+        }
+
+        // Fetching the total number of monthly transactions
+        const totalItems = await prisma.category.count()
+
+        // Fetching monthly transactions with pagination and sorting options
+        const categories = await prisma.category.findMany({
+          ...paginationOptions
+        })
+
+        res.status(200).json({ totalItems, categories })
       } catch (error) {
         console.error('Failed to retrieve categories:', error)
         res.status(500).json({ error: 'Failed to retrieve categories' })

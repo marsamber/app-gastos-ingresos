@@ -1,11 +1,11 @@
 import { RefreshContext } from '@/contexts/RefreshContext'
 import { SettingsContext } from '@/contexts/SettingsContext'
 import useFetch from '@/hooks/useFetch'
-import { IBudget, ITransaction } from '@/types/index'
+import { IBudget, ITransactions } from '@/types/index'
+import customFetch from '@/utils/fetchWrapper'
 import { Button, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useState } from 'react'
 import BasicModal from './BasicModal'
-import customFetch from '@/utils/fetchWrapper'
 
 export interface DeleteCategoryBudgetModalProps {
   open: boolean
@@ -24,7 +24,7 @@ export default function DeleteCategoryBudgetModal({
 
   const [loading, setLoading] = useState(false)
 
-  const { data: transactions } = useFetch<ITransaction[]>('/api/transactions')
+  const { data: transactionsData } = useFetch<ITransactions>('/api/transactions')
 
   const handleDeleteBudget = async () => {
     setLoading(true)
@@ -34,11 +34,8 @@ export default function DeleteCategoryBudgetModal({
         method: 'DELETE'
       })
 
-      
-
       if (response.ok) {
         deleteBudget([categoryBudget?.id!])
-        console.log('Budget deleted')
         handleClose()
       }
     } catch (error) {
@@ -65,7 +62,6 @@ export default function DeleteCategoryBudgetModal({
           })
         })
 
-        console.log('Category created')
       } catch (error) {
         console.error('Error creating category')
       }
@@ -73,10 +69,12 @@ export default function DeleteCategoryBudgetModal({
   }
 
   const updateTransactions = async () => {
-    if (!transactions || !categoryBudget) return
+    if (!transactionsData || !categoryBudget) return
 
     try {
-      const transactionsToUpdate = transactions.filter(transaction => transaction.category === categoryBudget.category)
+      const transactionsToUpdate = transactionsData.transactions.filter(
+        transaction => transaction.category === categoryBudget.category
+      )
       for (const transaction of transactionsToUpdate) {
         const response = await customFetch(`/api/transactions/${transaction.id}`, {
           method: 'PUT',
@@ -89,9 +87,7 @@ export default function DeleteCategoryBudgetModal({
           })
         })
 
-        if (response.ok) {
-          console.log('Transaction updated')
-        } else {
+        if (!response.ok) {
           console.error('Error updating transaction')
         }
       }
@@ -119,9 +115,7 @@ export default function DeleteCategoryBudgetModal({
           })
         })
 
-        if (response.ok) {
-          console.log('Monthly Transaction updated')
-        } else {
+        if (!response.ok) {
           console.error('Error updating transaction')
         }
       }
@@ -141,7 +135,6 @@ export default function DeleteCategoryBudgetModal({
         },
         body: JSON.stringify({ category: categoryBudget.category })
       })
-      console.log('Budgets deleted')
     } catch (error) {
       console.error('Error deleting budgets')
     }
@@ -158,7 +151,6 @@ export default function DeleteCategoryBudgetModal({
         },
         body: JSON.stringify({ category: categoryBudget.category })
       })
-      console.log('Budget historics deleted')
     } catch (error) {
       console.error('Error deleting budgets historics')
     }
@@ -170,14 +162,13 @@ export default function DeleteCategoryBudgetModal({
     try {
       const response = await customFetch(`/api/categories/${categoryBudget.category}`, {
         method: 'DELETE'
-      })      
+      })
 
       if (response.ok) {
         deleteBudget([categoryBudget.id!])
         deleteCategory(categoryBudget.category)
         refreshCategories()
         handleClose()
-        console.log('Category deleted')
       }
     } catch (error) {
       console.error(error)

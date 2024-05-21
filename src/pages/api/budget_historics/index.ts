@@ -1,4 +1,6 @@
 import prisma from '@/lib/prisma'
+import { IBudgetHistoric } from '@/types/index'
+import { parseDate, parseIntSafe } from '@/utils/utils'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 // pages/api/budget_historics/index.js
@@ -8,17 +10,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (method) {
     case 'GET':
       try {
-        // Retrieve budget historics from the database
-        const { startDate, endDate } = req.query
-        const budgetHistorics = await prisma.budgetHistoric.findMany({
-          where: {
-            date: {
-              gte: startDate ? new Date(startDate as string) : undefined,
-              lte: endDate ? new Date(endDate as string) : undefined
-            }
+        // Retrieve transactions from the database
+        const { startDate, endDate, page, limit, sortBy, sortOrder } = req.query
+
+        const parsedStartDate = parseDate(startDate as string)
+        const parsedEndDate = parseDate(endDate as string)
+        const parsedPage = parseIntSafe(page as string)
+        const parsedLimit = parseIntSafe(limit as string)
+
+        const whereCondition = {
+          date: {
+            gte: parsedStartDate,
+            lte: parsedEndDate
           }
+        }
+
+        const paginationOptions = {
+          skip: parsedPage ? (parsedPage - 1) * (parsedLimit ?? 0) : undefined,
+          take: parsedLimit,
+          orderBy: sortBy
+            ? {
+                [sortBy as string]: sortOrder === 'asc' ? 'asc' : 'desc'
+              }
+            : undefined
+        }
+
+        const totalItems = await prisma.budgetHistoric.count({ where: whereCondition })
+        const budgetHistorics: IBudgetHistoric[] = await prisma.budgetHistoric.findMany({
+          where: whereCondition,
+          ...paginationOptions
         })
-        res.status(200).json(budgetHistorics)
+
+        res.status(200).json({ totalItems, budgetHistorics })
       } catch (error) {
         console.error('Failed to retrieve budget historics:', error)
         res.status(500).json({ error: 'Failed to retrieve budget historics' })

@@ -3,19 +3,19 @@ import BudgetTable from '@/components/table/BudgetTable'
 import { HomeContext } from '@/contexts/HomeContext'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
-import { IBudget, IBudgetHistoric } from '@/types/index'
+import { IBudgetHistorics, IBudgets } from '@/types/index'
+import customFetch from '@/utils/fetchWrapper'
 import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
 import { SyntheticEvent, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
-import customFetch from '@/utils/fetchWrapper'
+import { handleDateFilterChange } from '@/utils/utils'
 
 export default function Budget() {
   const [value, setValue] = useState(0)
   const [filter, setFilter] = useState('')
-  const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
-    new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]
-  ])
+  const [monthsSelected, setMonthsSelected] = useState<[string, string]>(
+    handleDateFilterChange('this_month') as [string, string]
+  )
   const [present, setPresent] = useState(true)
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [loadingTransactions, setLoadingTransactions] = useState(false)
@@ -35,38 +35,13 @@ export default function Budget() {
       setFilter('all')
       setMonthsSelected(['', ''])
     } else {
-      setMonthsSelected([
-        new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-        new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]
-      ])
+      setMonthsSelected(handleDateFilterChange('this_month') as [string, string])
     }
   }
 
   const handleChangeFilter = (newValue: { label: string; value: string }) => {
     setFilter(newValue.value)
-    switch (newValue.value) {
-      case 'last_month':
-        setMonthsSelected([
-          new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear(), new Date().getMonth(), 0).toISOString().split('T')[0]
-        ])
-        break
-      case 'this_year':
-        setMonthsSelected([
-          new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear(), 11, 31).toISOString().split('T')[0]
-        ])
-        break
-      case 'last_year':
-        setMonthsSelected([
-          new Date(new Date().getFullYear() - 1, 0, 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear() - 1, 11, 31).toISOString().split('T')[0]
-        ])
-        break
-      case 'all':
-        setMonthsSelected(['', ''])
-        break
-    }
+    setMonthsSelected(handleDateFilterChange(newValue.value) as [string, string])
   }
 
   useEffect(() => {
@@ -77,9 +52,11 @@ export default function Budget() {
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
-      const response = await customFetch(`/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`)
-      
-      const transactions = await response.json()
+      const response = await customFetch(
+        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
+      )
+
+      const { transactions } = await response.json()
       setTransactions(transactions)
       setLoadingTransactions(false)
     }
@@ -87,8 +64,8 @@ export default function Budget() {
     fetchTransactions()
   }, [monthsSelected, refreshKeyTransactions])
 
-  const { data: budgets, loading: loadingBudgets } = useFetch<IBudget[]>('/api/budgets')
-  const { data: budgetHistorics, loading: loadingBudgetHistorics } = useFetch<IBudgetHistoric[]>(
+  const { data: budgetsData, loading: loadingBudgets } = useFetch<IBudgets>('/api/budgets')
+  const { data: budgetHistoricsData, loading: loadingBudgetHistorics } = useFetch<IBudgetHistorics>(
     `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
   )
 
@@ -129,9 +106,9 @@ export default function Budget() {
           monthsSelected,
           transactions,
           loadingTransactions,
-          budgets: present ? budgets : [],
+          budgets: present ? (budgetsData ? budgetsData.budgets : []) : [],
           loadingBudgets,
-          budgetHistorics,
+          budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
           loadingBudgetHistorics
         }}
       >

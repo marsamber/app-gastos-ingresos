@@ -2,26 +2,65 @@
 import TransactionModal from '@/components/modal/TransactionModal'
 import TransactionsTable from '@/components/table/TransactionsTable'
 import { TransactionsContext } from '@/contexts/TransactionsContext'
-import useFetch from '@/hooks/useFetch'
 import { ITransaction } from '@/types/index'
+import customFetch from '@/utils/fetchWrapper'
+import { handleDateFilterChange } from '@/utils/utils'
 import { Add } from '@mui/icons-material'
 import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import '../../styles.css'
-import customFetch from '@/utils/fetchWrapper'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
   const [filter, setFilter] = useState('this_month')
-  const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
-    new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]
-  ])
+  const [monthsSelected, setMonthsSelected] = useState<[string, string]>(
+    handleDateFilterChange('this_month') as [string, string]
+  )
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [addTransactionTable, setAddTransactionTable] = useState(false)
-  const [transactions, setTransactions] = useState<ITransaction[] | null>([])
   const [openEditTransaction, setOpenEditTransaction] = useState(false)
   const [transaction, setTransaction] = useState<ITransaction | null>(null)
+
+  const [page, setPage] = useState(0)
+  const [limit, setLimit] = useState(10)
+  const [sortBy, setSortBy] = useState('date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [type, setType] = useState<'income' | 'expense' | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [transactions, setTransactions] = useState<ITransaction[] | null>([])
+  const [totalItems, setTotalItems] = useState(0)
+
+  const refreshTransactions = useCallback(
+    (
+      newPage: number,
+      newLimit: number,
+      newSortBy: string,
+      newSortOrder: 'asc' | 'desc',
+      type: 'income' | 'expense' | null
+    ) => {
+      setPage(newPage)
+      setLimit(newLimit)
+      setSortBy(newSortBy)
+      setSortOrder(newSortOrder)
+      setType(type)
+      setRefreshKey(prev => prev + 1)
+    },
+    []
+  )
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const response = await customFetch(
+        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&type=${type}`
+      )
+      if (response.ok) {
+        const data = await response.json()
+        setTransactions(data.transactions)
+        setTotalItems(data.totalItems)
+      }
+    }
+    fetchTransactions()
+  }, [refreshKey, monthsSelected, page, limit, sortBy, sortOrder, type])
 
   const filterOptions = [
     { label: 'Este mes', value: 'this_month' },
@@ -31,72 +70,19 @@ export default function Transactions() {
     { label: 'Todo', value: 'all' }
   ]
 
-  const { data, loading: loadingTransactions } = useFetch<ITransaction[]>(
-    `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
-  )
-
-  useEffect(() => {
-    setTransactions(data)
-  }, [data])
-
-  const addTransaction = (newTransaction: ITransaction) => {
-    console.log(newTransaction)
-    setTransactions(prev => {
-      const updatedTransactions = [...prev!, newTransaction]
-      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      return updatedTransactions
-    })
-  }
-
-  const editTransaction = (updatedTransaction: ITransaction) => {
-    setTransactions(prev => {
-      const updatedTransactions = prev!.map(transaction =>
-        transaction.id === updatedTransaction.id ? updatedTransaction : transaction
-      )
-      updatedTransactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      return updatedTransactions
-    })
-  }
-
-  const deleteTransaction = (transactionId: number) => {
-    setTransactions(prev => prev!.filter(transaction => transaction.id !== transactionId))
-  }
-
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
+    if (newValue === 1) {
+      setType('expense')
+    } else if (newValue === 2) {
+      setType('income')
+    }
   }
 
   const handleChangeFilter = (newValue: { label: string; value: string }) => {
     setFilter(newValue.value)
-    switch (newValue.value) {
-      case 'this_month':
-        setMonthsSelected([
-          new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0]
-        ])
-        break
-      case 'last_month':
-        setMonthsSelected([
-          new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear(), new Date().getMonth(), 0).toISOString().split('T')[0]
-        ])
-        break
-      case 'this_year':
-        setMonthsSelected([
-          new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear(), 11, 31).toISOString().split('T')[0]
-        ])
-        break
-      case 'last_year':
-        setMonthsSelected([
-          new Date(new Date().getFullYear() - 1, 0, 1).toISOString().split('T')[0],
-          new Date(new Date().getFullYear() - 1, 11, 31).toISOString().split('T')[0]
-        ])
-        break
-      case 'all':
-        setMonthsSelected(['', ''])
-        break
-    }
+
+    setMonthsSelected(handleDateFilterChange(newValue.value) as [string, string])
   }
 
   const handleEditTransaction = (id: number) => {
@@ -111,9 +97,9 @@ export default function Transactions() {
     const response = await customFetch(`/api/transactions/${id}`, {
       method: 'DELETE'
     })
-    
+
     if (response.ok) {
-      deleteTransaction(id)
+      refreshTransactions(page, limit, sortBy, sortOrder, type)
     }
   }
 
@@ -144,7 +130,23 @@ export default function Transactions() {
 
   return (
     <main className="main">
-      <TransactionsContext.Provider value={{ transactions, loadingTransactions, addTransaction, editTransaction }}>
+      <TransactionsContext.Provider
+        value={{
+          transactions,
+          totalItems,
+          refreshTransactions,
+          refreshKey,
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+          type,
+          handleChangePage: (newPage: number) => setPage(newPage),
+          handleChangeLimit: (newLimit: number) => setLimit(newLimit),
+          handleChangeSort: (newSortBy: string) => setSortBy(newSortBy),
+          handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrder(newOrder)
+        }}
+      >
         {!isMobile && <h2 style={titleStyle}>Transacciones</h2>}
         <div>
           {isMobile && (

@@ -76,11 +76,9 @@ export default function FixedTransactionModal({
         : '/api/monthly_transactions'
       const response = await customFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transactionData)
       })
-
-      
 
       const monthlyTrans = await response.json()
       if (response.ok) {
