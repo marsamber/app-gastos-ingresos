@@ -10,9 +10,7 @@ interface CategoriesTableProps {
   handleDeleteCategory: (category: string) => void
 }
 
-export default function CategoriesTable({
-  handleDeleteCategory
-}: CategoriesTableProps) {
+export default function CategoriesTable({ handleDeleteCategory }: CategoriesTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const { categories, loadingCategories } = useContext(SettingsContext)
   const [rows, setRows] = useState<any[]>([])
@@ -26,18 +24,20 @@ export default function CategoriesTable({
   useEffect(() => {
     if (!categories) return
     const rows = categories
-    .filter(category => category !== 'Sin categoría')
-    .map(category => ({
-      id: category,
-      category: category,
-      actions: (
-        <div key={category}>
-          {category !== 'Ingresos fijos' && <IconButton onClick={() => handleDeleteCategory(category)}>
-            <Delete color="primary" />
-          </IconButton>}
-        </div>
-      )
-    }))
+      .filter(category => category !== 'Sin categoría')
+      .map(category => ({
+        id: category,
+        category: category,
+        actions: (
+          <div key={category}>
+            {category !== 'Ingresos fijos' && (
+              <IconButton onClick={() => handleDeleteCategory(category)}>
+                <Delete color="primary" />
+              </IconButton>
+            )}
+          </div>
+        )
+      }))
 
     rows.sort((a, b) => a.category.localeCompare(b.category))
 
@@ -65,7 +65,8 @@ export default function CategoriesTable({
           ))}{' '}
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="asc" numRowsPerPage={15} />
+        // <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="asc" numRowsPerPage={15} />
+        <BasicTable headCells={headCells} rows={rows} />
       )}
     </>
   )

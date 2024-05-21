@@ -94,21 +94,18 @@ export default function BudgetTable({ includeHistorics = false }: BudgetTablePro
     width: '100%'
   }
 
-  return (
-    loadingTransactions || loadingBudgets || (includeHistorics && loadingBudgetHistorics) ? (
-      <div style={circularProgressStyle}>
-        <CircularProgress />
-      </div>
-    ) : (
-      isMobile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {rows.map(row => (
-            <OneBudgetCard key={row.id} data={row} />
-          ))}
-        </div>
-      ) : (
-        <BasicTable headCells={headCells} rows={rows} keyOrder="category" numRowsPerPage={10} />
-      )
-    )
+  return loadingTransactions || loadingBudgets || (includeHistorics && loadingBudgetHistorics) ? (
+    <div style={circularProgressStyle}>
+      <CircularProgress />
+    </div>
+  ) : isMobile ? (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {rows.map(row => (
+        <OneBudgetCard key={row.id} data={row} />
+      ))}
+    </div>
+  ) : (
+    // <BasicTable headCells={headCells} rows={rows} keyOrder="category" numRowsPerPage={10} />
+    <BasicTable headCells={headCells} rows={rows} />
   )
 }

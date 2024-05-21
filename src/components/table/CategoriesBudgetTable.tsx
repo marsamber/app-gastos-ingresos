@@ -70,7 +70,8 @@ export default function CategoriesBudgetTable({
           ))}{' '}
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="asc" numRowsPerPage={15} />
+        // <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="asc" numRowsPerPage={15} />
+        <BasicTable headCells={headCells} rows={rows} />
       )}
     </>
   )
