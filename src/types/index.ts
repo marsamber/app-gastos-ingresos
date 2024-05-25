@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export interface ITransaction {
   id: number
   title: string
@@ -55,4 +56,16 @@ export interface ICategory {
 export interface ICategories {
   categories: ICategory[]
   totalItems: number
+}
+
+export interface BaseContextType {
+  totalItems: number;
+  page: number;
+  limit: number;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+  handleChangePage: (newPage: number) => void;
+  handleChangeLimit: (newLimit: number) => void;
+  handleChangeSort: (newSortBy: string) => void;
+  handleChangeOrder: (newOrder: 'asc' | 'desc') => void;
 }

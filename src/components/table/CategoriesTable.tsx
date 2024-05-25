@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import { SettingsContext } from '@/contexts/SettingsContext'
-import { Delete, Edit } from '@mui/icons-material'
-import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useEffect, useState } from 'react'
-import BasicTable from './BasicTable'
+import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
+import { Delete } from '@mui/icons-material'
+import { IconButton, useMediaQuery } from '@mui/material'
+import { useContext, useEffect, useState } from 'react'
 import OneCategoryCard from '../card/OneCategoryCard'
+import BasicTable from './BasicTable'
 
 interface CategoriesTableProps {
   handleDeleteCategory: (category: string) => void
@@ -12,11 +12,11 @@ interface CategoriesTableProps {
 
 export default function CategoriesTable({ handleDeleteCategory }: CategoriesTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { categories, loadingCategories } = useContext(SettingsContext)
+  const { categories } = useContext(SettingsCategoriesContext)
   const [rows, setRows] = useState<any[]>([])
 
   const headCells = [
-    { id: 'category', label: 'Categoría' },
+    { id: 'id', label: 'Categoría' },
     { id: 'actions', label: 'Acciones' }
   ]
 
@@ -27,7 +27,6 @@ export default function CategoriesTable({ handleDeleteCategory }: CategoriesTabl
       .filter(category => category !== 'Sin categoría')
       .map(category => ({
         id: category,
-        category: category,
         actions: (
           <div key={category}>
             {category !== 'Ingresos fijos' && (
@@ -39,34 +38,19 @@ export default function CategoriesTable({ handleDeleteCategory }: CategoriesTabl
         )
       }))
 
-    rows.sort((a, b) => a.category.localeCompare(b.category))
-
     setRows(rows)
   }, [categories])
 
-  // STYLES
-  const circularProgressStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%'
-  }
-
   return (
     <>
-      {loadingCategories ? (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      ) : isMobile ? (
+      { isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {rows.map(row => (
             <OneCategoryCard key={row.id} data={row} />
           ))}{' '}
         </div>
       ) : (
-        // <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="asc" numRowsPerPage={15} />
-        <BasicTable headCells={headCells} rows={rows} />
+        <BasicTable headCells={headCells} rows={rows} type='settingsCategories' />
       )}
     </>
   )

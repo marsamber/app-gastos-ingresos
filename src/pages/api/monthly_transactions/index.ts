@@ -21,18 +21,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ? {
                 [sortBy as string]: sortOrder === 'asc' ? 'asc' : sortOrder === 'desc' ? 'desc' : 'asc' // Default to ascending if sortOrder is incorrect
               }
-            : undefined,
+            : undefined
+        }
+
+        const filterOptions = {
           where: {
             amount: type === 'expense' ? { lt: 0 } : type === 'income' ? { gt: 0 } : undefined
           }
         }
 
         // Fetching the total number of monthly transactions
-        const totalItems = await prisma.monthlyTransaction.count()
+        const totalItems = await prisma.monthlyTransaction.count({
+          ...filterOptions
+        })
 
         // Fetching monthly transactions with pagination and sorting options
         const monthlyTransactions = await prisma.monthlyTransaction.findMany({
-          ...paginationOptions
+          ...paginationOptions,
+          ...filterOptions
         })
 
         res.status(200).json({ totalItems, monthlyTransactions })

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { SettingsContext } from '@/contexts/SettingsContext'
+import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
 import { Add } from '@mui/icons-material'
 import { Button, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useState } from 'react'
@@ -8,7 +8,6 @@ import DeleteCategoryModal from '../modal/DeleteCategoryModal'
 import CategoriesTable from '../table/CategoriesTable'
 import BasicCard from './BasicCard'
 
-
 export default function CategoriesCard() {
   const isTablet = useMediaQuery('(max-width: 1024px)')
   const isMobile = useMediaQuery('(max-width: 500px)')
@@ -16,10 +15,10 @@ export default function CategoriesCard() {
   const [deleteCategory, setDeleteCategory] = useState(false)
   const [category, setCategory] = useState<string | null>(null)
 
-  const { categories } = useContext(SettingsContext)
+  const {categories} = useContext(SettingsCategoriesContext)
 
   const handleDeleteCategory = (category: string) => {
-    const categoryToDelete = categories.find(cat => category === cat)
+    const categoryToDelete = categories?.find(cat => category === cat)
     setCategory(categoryToDelete!)
     setDeleteCategory(true)
   }
@@ -58,16 +57,10 @@ export default function CategoriesCard() {
         </Button>
       </div>
       <div style={containerStyle}>
-        <CategoriesTable
-          handleDeleteCategory={handleDeleteCategory}
-        />
+        <CategoriesTable handleDeleteCategory={handleDeleteCategory} />
       </div>
       <AddCategoryModal open={addCategory} handleClose={() => setAddCategory(false)} />
-      <DeleteCategoryModal
-        open={deleteCategory}
-        handleClose={() => setDeleteCategory(false)}
-        category={category}
-      />
+      <DeleteCategoryModal open={deleteCategory} handleClose={() => setDeleteCategory(false)} category={category} />
     </BasicCard>
   )
 }

@@ -3,8 +3,7 @@ import BasicCard from './BasicCard'
 
 export interface OneCategoryCardProps {
   data: {
-    id: number
-    category: string
+    id: string
     actions: ReactNode
   }
 }
@@ -20,7 +19,7 @@ export default function OneCategoryCard({ data }: OneCategoryCardProps) {
   return (
     <BasicCard>
       <div style={contentStyle}>
-        <b>{data.category}</b>
+        <b>{data.id}</b>
         {data.actions}
       </div>
     </BasicCard>

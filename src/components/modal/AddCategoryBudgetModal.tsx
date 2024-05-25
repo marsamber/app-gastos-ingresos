@@ -1,11 +1,11 @@
-import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
-import { SettingsContext } from '@/contexts/SettingsContext'
+import { RefreshContext } from '@/contexts/RefreshContext'
+import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
 import theme from '@/theme'
+import { ICategories, ICategory } from '@/types/index'
+import customFetch from '@/utils/fetchWrapper'
 import { Autocomplete, Button, TextField, createFilterOptions, useMediaQuery } from '@mui/material'
 import { CSSProperties, ChangeEvent, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
-import { RefreshContext } from '@/contexts/RefreshContext'
-import customFetch from '@/utils/fetchWrapper'
 
 export interface AddCategoryBudgetModalProps {
   open: boolean
@@ -27,13 +27,14 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   const [amount, setAmount] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState({ category: false, amount: false, message: '' })
+const [categories, setCategories] = useState<string[] | null>(null)
 
-  const { categories, budgets, monthSelected, addBudget } = useContext(SettingsContext)
-  const { refreshBudgets } = useContext(RefreshSettingsContext)
+  const { budgets, monthSelected, refreshBudgets,
+    page, limit, sortBy, sortOrder } = useContext(SettingsBudgetsContext)
   const currentDate = useMemo(() => new Date().toISOString().substring(0, 7), [])
   const present = useMemo(() => monthSelected.substring(0, 7) === currentDate, [monthSelected, currentDate])
 
-  const { refreshCategories } = useContext(RefreshContext)
+  const { refreshCategories, refreshKeyCategories } = useContext(RefreshContext)
 
   useEffect(() => {
     if (open) {
@@ -49,21 +50,30 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     }
   }, [open])
 
-  useEffect(() => {
-    refreshBudgets()
-  }, [monthSelected])
-
   const categoriesOptions = useMemo(() => {
     const filteredCategories = categories
-      .filter(
+      ?.filter(
         category =>
-          !budgets.some(budget => budget.category === category) &&
+          !budgets?.some(budget => budget.category === category) &&
           category !== 'Ingresos fijos' &&
           category !== 'Sin categoría'
       )
-      .sort()
+      .sort() || []
     return filteredCategories.map(category => ({ title: category, inputValue: category }))
-  }, [categories, budgets, monthSelected])
+  }, [categories, budgets])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await customFetch('/api/categories')
+
+      if (response.ok) {
+        const categoriesData: ICategories = await response.json()
+        setCategories(categoriesData.categories.map((category: ICategory) => category.id))
+      }
+    }
+
+    fetchCategories()
+  }, [refreshKeyCategories])
 
   const handleAddCategoryBudget = async () => {
     if (!amount || !category.title) {
@@ -75,7 +85,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
       return
     }
 
-    const duplicateBudget = budgets.some(b => b.category === category.title)
+    const duplicateBudget = budgets?.some(b => b.category === category.title)
     if (duplicateBudget) {
       setError({ ...error, message: 'Ya existe un presupuesto para esta categoría en el mes seleccionado.' })
       return
@@ -112,9 +122,8 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     })    
 
     if (response.ok) {
-      const newBudget = await response.json()
-      refreshCategories()
-      addBudget(newBudget[0])
+      refreshCategories && refreshCategories()
+      refreshBudgets(page, limit, sortBy, sortOrder)
       handleCloseModal()
     } else {
       setError({ ...error, message: 'Error al guardar el presupuesto.' })

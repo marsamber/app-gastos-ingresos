@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'GET':
       try {
         // Retrieve transactions from the database
-        const { startDate, endDate, page, limit, sortBy, sortOrder } = req.query
+        const { startDate, endDate, page, limit, sortBy, sortOrder, excludeCategory } = req.query
 
         const parsedStartDate = parseDate(startDate as string)
         const parsedEndDate = parseDate(endDate as string)
@@ -22,7 +22,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           date: {
             gte: parsedStartDate,
             lte: parsedEndDate
-          }
+          },
+          // Añadir la condición para excluir categorías si está presente
+          ...(excludeCategory && {
+            category: {
+              not: Array.isArray(excludeCategory) ? { in: excludeCategory as string[] } : (excludeCategory as string)
+            }
+          })
         }
 
         const paginationOptions = {

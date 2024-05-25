@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { SettingsContext } from '@/contexts/SettingsContext'
+import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
 import { Delete, Edit } from '@mui/icons-material'
-import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
+import { IconButton, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import OneCategoryBudgetCard from '../card/OneCategoryBudgetCard'
 import BasicTable from './BasicTable'
@@ -16,7 +16,7 @@ export default function CategoriesBudgetTable({
   handleDeleteCategoryBudget
 }: CategoriesBudgetTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { budgets, loadingBudgets } = useContext(SettingsContext)
+  const { budgets } = useContext(SettingsBudgetsContext)
   const [rows, setRows] = useState<any[]>([])
 
   const headCells = [
@@ -34,17 +34,19 @@ export default function CategoriesBudgetTable({
       budget: budget.amount,
       actions: (
         <div key={budget.id}>
-          <IconButton onClick={() => handleEditCategoryBudget(budget.id)}>
-            <Edit color="primary" />
-          </IconButton>
-          <IconButton onClick={() => handleDeleteCategoryBudget(budget.id)}>
-            <Delete color="primary" />
-          </IconButton>
+          {budget.category !== 'Ingresos fijos' && (
+            <>
+              <IconButton onClick={() => handleEditCategoryBudget(budget.id)}>
+                <Edit color="primary" />
+              </IconButton>
+              <IconButton onClick={() => handleDeleteCategoryBudget(budget.id)}>
+                <Delete color="primary" />
+              </IconButton>
+            </>
+          )}
         </div>
       )
     }))
-
-    rows.sort((a, b) => a.category.localeCompare(b.category))
 
     setRows(rows)
   }, [budgets])
@@ -59,19 +61,14 @@ export default function CategoriesBudgetTable({
 
   return (
     <>
-      {loadingBudgets ? (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      ) : isMobile ? (
+      {isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {rows.map(row => (
             <OneCategoryBudgetCard key={row.id} data={row} />
           ))}{' '}
         </div>
       ) : (
-        // <BasicTable headCells={headCells} rows={rows} keyOrder="date" orderDirection="asc" numRowsPerPage={15} />
-        <BasicTable headCells={headCells} rows={rows} />
+        <BasicTable headCells={headCells} rows={rows} type="settingsBudgets" />
       )}
     </>
   )

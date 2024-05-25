@@ -1,15 +1,16 @@
 /* eslint-disable no-unused-vars */
-import { SettingsContext } from '@/contexts/SettingsContext'
-import { IBudget } from '@/types/index'
+import useFetch from '@/hooks/useFetch'
+import { IBudget, IBudgets } from '@/types/index'
 import { Add } from '@mui/icons-material'
 import { Button, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useState } from 'react'
+import { CSSProperties, useContext, useEffect, useState } from 'react'
 import MonthPicker from '../MonthPicker'
 import AddCategoryBudgetModal from '../modal/AddCategoryBudgetModal'
 import DeleteCategoryBudgetModal from '../modal/DeleteCategoryBudgetModal'
 import EditCategoryBudgetModal from '../modal/EditCategoryBudgetModal'
 import CategoriesBudgetTable from '../table/CategoriesBudgetTable'
 import BasicCard from './BasicCard'
+import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
 
 interface CategoriesBudgetCardProps {
   setMonthSelected: (month: string) => void
@@ -23,16 +24,16 @@ export default function CategoriesBudgetCard({ setMonthSelected }: CategoriesBud
   const [deleteCategoryBudget, setDeleteCategoryBudget] = useState(false)
   const [categoryBudget, setCategoryBudget] = useState<IBudget | null>(null)
 
-  const { budgets } = useContext(SettingsContext)
+  const { budgets } = useContext(SettingsBudgetsContext)
 
   const handleEditCategoryBudget = (id: number) => {
-    const categoryBudget = budgets.find(budget => budget.id === id)
+    const categoryBudget = budgets?.find(budget => budget.id === id)
     setCategoryBudget(categoryBudget!)
     setEditCategoryBudget(true)
   }
 
   const handleDeleteCategoryBudget = (id: number) => {
-    const categoryBudget = budgets.find(budget => budget.id === id)
+    const categoryBudget = budgets?.find(budget => budget.id === id)
     setCategoryBudget(categoryBudget!)
     setDeleteCategoryBudget(true)
   }
@@ -41,6 +42,7 @@ export default function CategoriesBudgetCard({ setMonthSelected }: CategoriesBud
   const titleStyle = {
     margin: '10px 0',
     width: isMobile ? '60%' : 'unset',
+    height: 28.08
   }
 
   const cardStyle = {

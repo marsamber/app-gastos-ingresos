@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { SettingsContext } from '@/contexts/SettingsContext'
+import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
+import { SettingsMonthlyIncomeTransactionsContext } from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
 import { IMonthlyTransaction } from '@/types/index'
 import { Add } from '@mui/icons-material'
 import { Button } from '@mui/material'
@@ -20,10 +21,10 @@ export default function FixedTransactionsCard({
   const [openTransactionModal, setOpenTransactionModal] = useState(false)
   const [editTransactionModal, setEditTransactionModal] = useState(false)
   const [monthlyTransaction, setMonthlyTransaction] = useState<IMonthlyTransaction | null>(null)
-  const { monthlyTransactions } = useContext(SettingsContext)
+  const { monthlyTransactions } = useContext(transactionType === 'expense' ? SettingsMonthlyExpenseTransactionsContext : SettingsMonthlyIncomeTransactionsContext)
 
   const handleEditMonthlyTransaction = (id: number) => {
-    const foundTransaction = monthlyTransactions.find(transaction => transaction.id === id)
+    const foundTransaction = monthlyTransactions!.find(transaction => transaction.id === id)
     if (foundTransaction) {
       setMonthlyTransaction(foundTransaction)
       setEditTransactionModal(true)

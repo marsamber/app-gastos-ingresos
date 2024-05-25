@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (method) {
     case 'GET':
       try {
-        const { page, limit, sortBy, sortOrder } = req.query
+        const { page, limit, sortBy, sortOrder, excludeCategory } = req.query
 
         const parsedPage = parseIntSafe(page as string)
         const parsedLimit = parseIntSafe(limit as string)
@@ -24,12 +24,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             : undefined
         }
 
+        // Definir el filtro de exclusión de categoría
+        let filterOptions = {}
+        if (excludeCategory) {
+          filterOptions = {
+            where: {
+              id: {
+                not: Array.isArray(excludeCategory) ? { in: excludeCategory as string[] } : (excludeCategory as string)
+              }
+            }
+          }
+        }
+
         // Fetching the total number of monthly transactions
-        const totalItems = await prisma.category.count()
+        const totalItems = await prisma.category.count({
+          ...filterOptions
+        })
 
         // Fetching monthly transactions with pagination and sorting options
         const categories = await prisma.category.findMany({
-          ...paginationOptions
+          ...paginationOptions,
+          ...filterOptions
         })
 
         res.status(200).json({ totalItems, categories })

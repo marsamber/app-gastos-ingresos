@@ -1,10 +1,12 @@
 import { RefreshContext } from '@/contexts/RefreshContext'
-import { SettingsContext } from '@/contexts/SettingsContext'
+import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
+import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
+import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
 import useFetch from '@/hooks/useFetch'
-import { ITransactions } from '@/types/index'
+import { ICategories, IMonthlyTransactions, ITransactions } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
 import { Button, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useState } from 'react'
+import { CSSProperties, useContext, useEffect, useState } from 'react'
 import BasicModal from './BasicModal'
 
 export interface DeleteCategoryModalProps {
@@ -15,15 +17,51 @@ export interface DeleteCategoryModalProps {
 
 export default function DeleteCategoryModal({ open, handleClose, category }: DeleteCategoryModalProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { refreshCategories } = useContext(RefreshContext)
-  const { monthlyTransactions, categories, budgets, deleteBudget, deleteCategory } = useContext(SettingsContext)
+  const [categories, setCategories] = useState<string[] | null>(null)
+
+  const { refreshCategories, refreshKeyCategories } = useContext(RefreshContext)
+  const {
+    refreshMonthlyTransactions,
+    page: pageMonthlyExpenseTransactions,
+    limit: limitMonthlyExpenseTransactions,
+    sortBy: sortByMonthlyExpenseTransactions,
+    sortOrder: sortOrderMonthlyExpenseTransactions
+  } = useContext(SettingsMonthlyExpenseTransactionsContext)
+  const {
+    refreshCategories: refreshTableCategories,
+    page,
+    limit,
+    sortBy,
+    sortOrder
+  } = useContext(SettingsCategoriesContext)
+  const {
+    refreshBudgets,
+    page: pageBudgets,
+    limit: limitBudgets,
+    sortBy: sortByBudgets,
+    sortOrder: sortOrderBudgets
+  } = useContext(SettingsBudgetsContext)
 
   const [loading, setLoading] = useState(false)
 
   const { data: transactionsData } = useFetch<ITransactions>('/api/transactions')
+  const { data: monthlyTransactionsData } = useFetch<IMonthlyTransactions>('/api/monthly_transactions?type=expense')
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await customFetch('/api/categories')
+
+      if (response.ok) {
+        const categoriesData: ICategories = await response.json()
+        setCategories(categoriesData.categories.map(category => category.id))
+      }
+    }
+
+    fetchCategories()
+  }, [refreshKeyCategories])
 
   const createCategory = async () => {
-    const existingCategory = categories.find(category => category === 'Sin categoría')
+    const existingCategory = categories?.find(category => category === 'Sin categoría')
 
     if (!existingCategory) {
       try {
@@ -71,10 +109,10 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
   }
 
   const updateMonthlyTransactions = async () => {
-    if (!monthlyTransactions || !category) return
-
+    if (!monthlyTransactionsData || !category) return
+    
     try {
-      const transactionsToUpdate = monthlyTransactions.filter(transaction => transaction.category === category)
+      const transactionsToUpdate = monthlyTransactionsData.monthlyTransactions.filter(transaction => transaction.category === category)
       for (const transaction of transactionsToUpdate) {
         const response = await customFetch(`/api/monthly_transactions/${transaction.id}`, {
           method: 'PUT',
@@ -137,10 +175,10 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
       })
 
       if (response.ok) {
-        const budgetsId = budgets.filter(budget => budget.category === category).map(budget => budget.id)
-        deleteBudget(budgetsId)
-        deleteCategory(category)
-        refreshCategories()
+        refreshBudgets(pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets)
+        refreshTableCategories(page, limit, sortBy, sortOrder)
+        refreshMonthlyTransactions(pageMonthlyExpenseTransactions, limitMonthlyExpenseTransactions, sortByMonthlyExpenseTransactions, sortOrderMonthlyExpenseTransactions)
+        refreshCategories && refreshCategories()
         handleClose()
       }
     } catch (error) {

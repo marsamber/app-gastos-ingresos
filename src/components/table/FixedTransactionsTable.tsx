@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
+import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
+import { SettingsMonthlyIncomeTransactionsContext } from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
 import { Delete, Edit } from '@mui/icons-material'
-import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
+import { IconButton, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import OneFixedTransactionCard from '../card/OneFixedTransactionCard'
 import BasicTable from './BasicTable'
-import { SettingsContext } from '@/contexts/SettingsContext'
 
 interface FixedTransactionsTableProps {
   handleDeleteMonthlyTransaction: (id: number) => void
@@ -19,7 +20,9 @@ export default function FixedTransactionsTable({
 }: FixedTransactionsTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [rows, setRows] = useState<any[]>([])
-  const { loadingMonthlyTransactions, monthlyTransactions } = useContext(SettingsContext)
+  const { monthlyTransactions } = useContext(
+    isIncome ? SettingsMonthlyIncomeTransactionsContext : SettingsMonthlyExpenseTransactionsContext
+  )
 
   const headCells = [
     { id: 'title', label: 'Título' },
@@ -30,10 +33,8 @@ export default function FixedTransactionsTable({
 
   useEffect(() => {
     if (!monthlyTransactions) return
-    const filteredTransactions = monthlyTransactions.filter(transaction =>
-      isIncome ? transaction.amount > 0 : transaction.amount < 0
-    )
-    const mappedRows = filteredTransactions.map(transaction => ({
+
+    const mappedRows = monthlyTransactions.map(transaction => ({
       id: transaction.id,
       title: transaction.title,
       category: transaction.category,
@@ -50,8 +51,6 @@ export default function FixedTransactionsTable({
       )
     }))
 
-    mappedRows.sort((a, b) => b.title.localeCompare(a.title))
-
     setRows(mappedRows)
   }, [monthlyTransactions, isIncome])
 
@@ -66,19 +65,18 @@ export default function FixedTransactionsTable({
 
   return (
     <>
-      {loadingMonthlyTransactions ? (
-        <div style={circularProgressStyle}>
-          <CircularProgress />
-        </div>
-      ) : isMobile ? (
+      {isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {rows.map(row => (
             <OneFixedTransactionCard key={row.id} data={row} />
           ))}
         </div>
       ) : (
-        // <BasicTable headCells={headCells} rows={rows} keyOrder="title" numRowsPerPage={10} />
-        <BasicTable headCells={headCells} rows={rows} />
+        <BasicTable
+          headCells={headCells}
+          rows={rows}
+          type={isIncome ? 'settingsMonthlyIncomeTransactions' : 'settingsMonthlyExpenseTransactions'}
+        />
       )}
     </>
   )

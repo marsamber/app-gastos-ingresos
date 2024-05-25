@@ -2,11 +2,14 @@
 import { createContext } from 'react'
 
 interface RefreshContextType {
-  refreshKeyTransactions: number
-  refreshTransactions: () => void
+  refreshKeyTransactions?: number
+  refreshTransactions?: () => void
 
-  refreshKeyCategories: number
-  refreshCategories: () => void
+  refreshKeyCategories?: number
+  refreshCategories?: () => void
+
+  refreshKeyBudgets?: number
+  refreshBudgets?: () => void
 }
 
 const defaultValue: RefreshContextType = {
@@ -14,7 +17,10 @@ const defaultValue: RefreshContextType = {
   refreshTransactions: () => {},
 
   refreshKeyCategories: 0,
-  refreshCategories: () => {}
+  refreshCategories: () => {},
+
+  refreshKeyBudgets: 0,
+  refreshBudgets: () => {}
 }
 
 export const RefreshContext = createContext<RefreshContextType>(defaultValue)

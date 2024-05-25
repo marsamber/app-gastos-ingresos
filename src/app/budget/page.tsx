@@ -1,14 +1,13 @@
 'use client'
 import BudgetTable from '@/components/table/BudgetTable'
-import { HomeContext } from '@/contexts/HomeContext'
+import { BudgetsContext } from '@/contexts/BudgetsContext'
 import { RefreshContext } from '@/contexts/RefreshContext'
-import useFetch from '@/hooks/useFetch'
-import { IBudgetHistorics, IBudgets } from '@/types/index'
+import { IBudget, IBudgetHistoric } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
-import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, useContext, useEffect, useState } from 'react'
-import '../../styles.css'
 import { handleDateFilterChange } from '@/utils/utils'
+import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
+import { SyntheticEvent, useCallback, useContext, useEffect, useState } from 'react'
+import '../../styles.css'
 
 export default function Budget() {
   const [value, setValue] = useState(0)
@@ -18,9 +17,43 @@ export default function Budget() {
   )
   const [present, setPresent] = useState(true)
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const [loadingTransactions, setLoadingTransactions] = useState(false)
   const [transactions, setTransactions] = useState([])
   const { refreshKeyTransactions } = useContext(RefreshContext)
+
+  const [page, setPage] = useState(0)
+  const [limit, setLimit] = useState(10)
+  const [sortBy, setSortBy] = useState('category')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
+  const [budgets, setBudgets] = useState<IBudget[] | IBudgetHistoric[] | null>([])
+  const [totalItems, setTotalItems] = useState(0)
+
+  const refreshBudgets = useCallback(
+    (newPage: number, newLimit: number, newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+      setPage(newPage)
+      setLimit(newLimit)
+      setSortBy(newSortBy)
+      setSortOrder(newSortOrder)
+      setRefreshKeyBudgets(prev => prev + 1)
+    },
+    []
+  )
+
+  useEffect(() => {
+    const fetchBudgets = async () => {
+      const url = present
+        ? `/api/budgets?page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&excludeCategory=Ingresos fijos`
+        : `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&excludeCategory=Ingresos fijos`
+      const response = await customFetch(url)
+      if (response.ok) {
+        const data = await response.json()
+        setBudgets(data.budgets)
+        setTotalItems(data.totalItems)
+      }
+    }
+
+    fetchBudgets()
+  }, [refreshKeyBudgets, page, limit, sortBy, sortOrder])
 
   const filterOptions = [
     { label: 'Mes pasado', value: 'last_month' },
@@ -51,23 +84,16 @@ export default function Budget() {
   // DATA
   useEffect(() => {
     const fetchTransactions = async () => {
-      setLoadingTransactions(true)
       const response = await customFetch(
         `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
       )
 
       const { transactions } = await response.json()
       setTransactions(transactions)
-      setLoadingTransactions(false)
     }
 
     fetchTransactions()
   }, [monthsSelected, refreshKeyTransactions])
-
-  const { data: budgetsData, loading: loadingBudgets } = useFetch<IBudgets>('/api/budgets')
-  const { data: budgetHistoricsData, loading: loadingBudgetHistorics } = useFetch<IBudgetHistorics>(
-    `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
-  )
 
   useEffect(() => {
     const currentDate = new Date().toISOString().split('T')[0]
@@ -89,7 +115,8 @@ export default function Budget() {
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    marginBottom: '10px'
+    marginBottom: '10px',
+    height: '56px'
   }
 
   const buttonsStyle = {
@@ -101,15 +128,21 @@ export default function Budget() {
 
   return (
     <main className="main">
-      <HomeContext.Provider
+      <BudgetsContext.Provider
         value={{
-          monthsSelected,
           transactions,
-          loadingTransactions,
-          budgets: present ? (budgetsData ? budgetsData.budgets : []) : [],
-          loadingBudgets,
-          budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
-          loadingBudgetHistorics
+          budgets: budgets,
+          totalItems,
+          refreshBudgets,
+          refreshKey: refreshKeyBudgets,
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+          handleChangePage: (newPage: number) => setPage(newPage),
+          handleChangeLimit: (newLimit: number) => setLimit(newLimit),
+          handleChangeSort: (newSortBy: string) => setSortBy(newSortBy),
+          handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrder(newOrder)
         }}
       >
         {!isMobile && <h2 style={titleStyle}>Presupuesto</h2>}
@@ -168,11 +201,11 @@ export default function Budget() {
             )}
           </div>
           <div>
-            {value === 0 && <BudgetTable includeHistorics={false} />}
+            {value === 0 && <BudgetTable includeHistorics={!present} />}
             {value === 1 && <BudgetTable includeHistorics />}
           </div>
         </div>
-      </HomeContext.Provider>
+      </BudgetsContext.Provider>
     </main>
   )
 }

@@ -75,15 +75,6 @@ export default function TransactionsTable({
     }
   }, [transactions])
 
-  // STYLES
-  const circularProgressStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    width: '100%'
-  }
-
   return (
     <>
      {isMobile ? (
@@ -94,7 +85,7 @@ export default function TransactionsTable({
             ))}
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} />
+        <BasicTable headCells={headCells} rows={rows} type='transactions' />
       )}
     </>
   )

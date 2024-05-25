@@ -112,7 +112,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
       if (response.ok) {
         refreshTransactionsTable(page, limit, sortBy, sortOrder, typeTable)
-        refreshTransactions()
+        refreshTransactions && refreshTransactions()
         handleClose()
       }
     } catch (error) {

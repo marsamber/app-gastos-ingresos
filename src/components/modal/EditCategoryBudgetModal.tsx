@@ -1,10 +1,9 @@
-import { RefreshSettingsContext } from '@/contexts/RefreshSettingsContext'
-import { SettingsContext } from '@/contexts/SettingsContext'
+import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
 import { IBudget } from '@/types/index'
+import customFetch from '@/utils/fetchWrapper'
 import { Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
-import customFetch from '@/utils/fetchWrapper'
 
 export interface EditCategoryBudgetModalProps {
   open: boolean
@@ -23,8 +22,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
   const [errorAmount, setErrorAmount] = useState(false)
   const [present, setPresent] = useState(false)
 
-  const { categories, monthSelected, editBudget } = useContext(SettingsContext)
-  const { refreshBudgets } = useContext(RefreshSettingsContext)
+  const { monthSelected, refreshBudgets, page, limit, sortBy, sortOrder } = useContext(SettingsBudgetsContext)
 
   useEffect(() => {
     if (open) {
@@ -69,7 +67,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
         response = await customFetch(`/api/budgets/${categoryBudget?.id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(newCategoryBudget)
         })
@@ -77,17 +75,14 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
         response = await customFetch(`/api/budget_historics/${categoryBudget?.id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(newCategoryBudget)
         })
       }
-      const updatedBudget = await response.json()
-
-      
 
       if (response.ok) {
-        editBudget(updatedBudget)
+        refreshBudgets(page, limit, sortBy, sortOrder)
         handleCloseModal()
       }
     } catch (error) {
@@ -117,7 +112,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     const currentDate = new Date().toISOString().substring(0, 7)
     const dateSelected = monthSelected.substring(0, 7)
     setPresent(dateSelected === currentDate)
-    refreshBudgets()
+    refreshBudgets(page, limit, sortBy, sortOrder)
   }, [monthSelected])
 
   // STYLES
@@ -154,18 +149,16 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
       <div>
         <h3 style={titleStyle}>Editar presupuesto</h3>
         <div style={rowStyle}>
-          {categories && categories.length > 0 && (
-            <TextField
-              style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
-              size="small"
-              value={category}
-              label="Categoría"
-              color="primary"
-              error={errorCategory}
-              disabled
-              required
-            />
-          )}
+          <TextField
+            style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
+            size="small"
+            value={category}
+            label="Categoría"
+            color="primary"
+            error={errorCategory}
+            disabled
+            required
+          />
           <TextField
             style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
             size="small"

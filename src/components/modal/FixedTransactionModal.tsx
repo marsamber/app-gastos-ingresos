@@ -1,9 +1,13 @@
-import { SettingsContext } from '@/contexts/SettingsContext'
-import { IMonthlyTransaction } from '@/types/index'
-import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
-import { CSSProperties, ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
-import BasicModal from './BasicModal'
+import { RefreshContext } from '@/contexts/RefreshContext'
+import {
+  SettingsMonthlyIncomeTransactionsContext
+} from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
+import { ICategories, IMonthlyTransaction } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
+import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
+import { CSSProperties, ChangeEvent, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import BasicModal from './BasicModal'
+import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
 
 interface FixedTransactionModalProps {
   open: boolean
@@ -27,12 +31,46 @@ export default function FixedTransactionModal({
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({ amount: false, title: false, category: false })
 
-  const { categories, addMonthlyTransaction, editMonthlyTransaction } = useContext(SettingsContext)
+  const [categories, setCategories] = useState<string[] | null>(null)
 
-  const categoriesOptions = categories
-    .filter(category => category !== 'Sin categoría')
-    .filter(category => (transactionType === 'expense' ? category !== 'Ingresos fijos' : true))
-    .map(category => ({ value: category, label: category }))
+  const {
+    refreshMonthlyTransactions: refreshIncome,
+    page: pageIncome,
+    limit: limitIncome,
+    sortBy: sortByIncome,
+    sortOrder: sortOrderIncome
+  } = useContext(SettingsMonthlyIncomeTransactionsContext)
+  const {
+    refreshMonthlyTransactions: refreshExpense,
+    page: pageExpense,
+    limit: limitExpense,
+    sortBy: sortByExpense,
+    sortOrder: sortOrderExpense
+  } = useContext(SettingsMonthlyExpenseTransactionsContext)
+
+  const { refreshKeyCategories } = useContext(RefreshContext)
+
+  const categoriesOptions = useMemo(
+    () =>
+      categories
+        ?.filter(category => category !== 'Sin categoría')
+        .filter(category => (transactionType === 'expense' ? category !== 'Ingresos fijos' : true))
+        .map(category => ({ value: category, label: category })) || [],
+    [categories, transactionType]
+  )
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await customFetch('/api/categories')
+
+      if (response.ok) {
+        const categoriesData: ICategories = await response.json()
+        setCategories(categoriesData.categories.map(category => category.id))
+      }
+    }
+
+    fetchCategories()
+  }, [refreshKeyCategories])
 
   useEffect(() => {
     if (open) {
@@ -80,16 +118,28 @@ export default function FixedTransactionModal({
         body: JSON.stringify(transactionData)
       })
 
-      const monthlyTrans = await response.json()
       if (response.ok) {
-        monthlyTransaction ? editMonthlyTransaction(monthlyTrans) : addMonthlyTransaction(monthlyTrans)
-        handleClose()
+        if (transactionType === 'income') {
+          refreshIncome(pageIncome, limitIncome, sortByIncome, sortOrderIncome)
+        } else {
+          refreshExpense(pageExpense, limitExpense, sortByExpense, sortOrderExpense)
+        }
+        handleCloseModal()
       }
     } catch (error) {
       console.error('Failed to process transaction', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCloseModal = () => {
+    setAmount('')
+    setTitle('')
+    setCategory('')
+    setErrors({ amount: false, title: false, category: false })
+
+    handleClose()
   }
 
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -126,7 +176,7 @@ export default function FixedTransactionModal({
   }
 
   return (
-    <BasicModal open={open} handleClose={handleClose} style={modalStyle}>
+    <BasicModal open={open} handleClose={handleCloseModal} style={modalStyle}>
       <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' } : {}}>
         <h3 style={titleStyle}>{monthlyTransaction ? 'Editar transacción' : 'Agregar transacción'}</h3>
         <div style={rowStyle}>

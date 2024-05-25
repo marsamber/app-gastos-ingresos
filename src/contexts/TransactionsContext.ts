@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { ITransaction } from '@/types/index'
+import { BaseContextType, ITransaction } from '@/types/index'
 import { createContext } from 'react'
 
-interface TransactionsContextType {
+export interface TransactionsContextType extends BaseContextType {
   transactions: ITransaction[] | null
-  totalItems: number
 
   refreshTransactions: (
     page: number,
@@ -15,16 +14,7 @@ interface TransactionsContextType {
   ) => void
   refreshKey: number
 
-  page: number
-  limit: number
-  sortBy: string
-  sortOrder: 'asc' | 'desc'
   type: 'income' | 'expense' | null
-
-  handleChangePage: (newPage: number) => void
-  handleChangeLimit: (newLimit: number) => void
-  handleChangeSort: (newSortBy: string) => void
-  handleChangeOrder: (newOrder: 'asc' | 'desc') => void
 }
 
 const defaultValue: TransactionsContextType = {

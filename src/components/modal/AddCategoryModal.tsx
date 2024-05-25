@@ -1,10 +1,12 @@
 import { RefreshContext } from '@/contexts/RefreshContext'
-import { SettingsContext } from '@/contexts/SettingsContext'
+import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
+import useFetch from '@/hooks/useFetch'
 import theme from '@/theme'
+import { ICategories } from '@/types/index'
+import customFetch from '@/utils/fetchWrapper'
 import { Button, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import BasicModal from './BasicModal'
-import customFetch from '@/utils/fetchWrapper'
 
 export interface AddCategoryModalProps {
   open: boolean
@@ -19,9 +21,17 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState({ category: false, message: '' })
 
-  const { categories, addCategory } = useContext(SettingsContext)
+  const {
+    refreshCategories: refreshTableCategories,
+    page,
+    limit,
+    sortBy,
+    sortOrder
+  } = useContext(SettingsCategoriesContext)
 
   const { refreshCategories } = useContext(RefreshContext)
+
+  const { data: categoriesData } = useFetch<ICategories>('/api/categories')
 
   useEffect(() => {
     if (open) {
@@ -46,7 +56,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
       return
     }
 
-    if (categories.includes(category)) {
+    if (categoriesData?.categories.map(cat => cat.id).includes(category)) {
       setError({
         category: true,
         message: 'La categoría ya existe.'
@@ -67,12 +77,9 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
         })
       })
 
-      
-
       if (response.ok) {
-        const newCategory = await response.json()
-        addCategory(newCategory[0].id)
-        refreshCategories()
+        refreshTableCategories(page, limit, sortBy, sortOrder)
+        refreshCategories && refreshCategories()
         setLoading(false)
         handleCloseModal()
       }
