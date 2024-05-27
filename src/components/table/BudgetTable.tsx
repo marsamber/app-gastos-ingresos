@@ -1,8 +1,9 @@
 import { BudgetsContext } from '@/contexts/BudgetsContext'
 import { useMediaQuery } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import OneBudgetCard from '../card/OneBudgetCard'
 import BasicTable from './BasicTable'
+import { TablePagination } from './TablePagination'
 
 interface BudgetTableProps {
   includeHistorics?: boolean // Determina si incluir o no datos históricos
@@ -18,7 +19,9 @@ interface BudgetTableData {
 
 export default function BudgetTable({ includeHistorics = false }: BudgetTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { transactions, budgets } = useContext(BudgetsContext)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { transactions, budgets, totalItems, page, limit, handleChangeLimit, handleChangePage } =
+    useContext(BudgetsContext)
   const [rows, setRows] = useState<BudgetTableData[]>([])
 
   const headCells = [
@@ -67,6 +70,14 @@ export default function BudgetTable({ includeHistorics = false }: BudgetTablePro
           {rows.map(row => (
             <OneBudgetCard key={row.id} data={row} />
           ))}
+          <TablePagination
+            totalItems={totalItems}
+            page={page}
+            limit={limit}
+            handleChangePage={handleChangePage}
+            handleChangeLimit={handleChangeLimit}
+            containerRef={containerRef}
+          />
         </div>
       ) : (
         <BasicTable headCells={headCells} rows={rows} type="budgets" />

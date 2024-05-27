@@ -3,9 +3,10 @@ import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMo
 import { SettingsMonthlyIncomeTransactionsContext } from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
 import { Delete, Edit } from '@mui/icons-material'
 import { IconButton, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import OneFixedTransactionCard from '../card/OneFixedTransactionCard'
 import BasicTable from './BasicTable'
+import { TablePagination } from './TablePagination'
 
 interface FixedTransactionsTableProps {
   handleDeleteMonthlyTransaction: (id: number) => void
@@ -19,8 +20,9 @@ export default function FixedTransactionsTable({
   isIncome = false
 }: FixedTransactionsTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
+  const containerRef = useRef<HTMLDivElement>(null)
   const [rows, setRows] = useState<any[]>([])
-  const { monthlyTransactions } = useContext(
+  const { monthlyTransactions, totalItems, page, limit, handleChangeLimit, handleChangePage } = useContext(
     isIncome ? SettingsMonthlyIncomeTransactionsContext : SettingsMonthlyExpenseTransactionsContext
   )
 
@@ -54,15 +56,6 @@ export default function FixedTransactionsTable({
     setRows(mappedRows)
   }, [monthlyTransactions, isIncome])
 
-  // STYLES
-  const circularProgressStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    width: '100%'
-  }
-
   return (
     <>
       {isMobile ? (
@@ -70,6 +63,14 @@ export default function FixedTransactionsTable({
           {rows.map(row => (
             <OneFixedTransactionCard key={row.id} data={row} />
           ))}
+          <TablePagination
+            totalItems={totalItems}
+            page={page}
+            limit={limit}
+            handleChangePage={handleChangePage}
+            handleChangeLimit={handleChangeLimit}
+            containerRef={containerRef}
+          />
         </div>
       ) : (
         <BasicTable

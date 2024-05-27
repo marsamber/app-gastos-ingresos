@@ -42,7 +42,7 @@ export default function CategoriesBudgetCard({ setMonthSelected }: CategoriesBud
   const titleStyle = {
     margin: '10px 0',
     width: isMobile ? '60%' : 'unset',
-    height: 28.08
+    height: !isMobile ? 28.08 : 'unset'
   }
 
   const cardStyle = {

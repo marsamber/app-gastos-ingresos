@@ -2,10 +2,11 @@
 import { TransactionsContext } from '@/contexts/TransactionsContext'
 import { ITransaction } from '@/types/index'
 import { Delete, Edit } from '@mui/icons-material'
-import { CircularProgress, IconButton, useMediaQuery } from '@mui/material'
-import { CSSProperties, ReactNode, useContext, useEffect, useState } from 'react'
+import { IconButton, useMediaQuery } from '@mui/material'
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import OneTransactionCard from '../card/OneTransactionCard'
 import BasicTable from './BasicTable'
+import { TablePagination } from './TablePagination'
 
 interface ITransactionTable {
   id: number
@@ -25,10 +26,11 @@ interface TransactionsTableProps {
 export default function TransactionsTable({
   handleEditTransaction,
   handleDeleteTransaction,
-  filterFunction,
+  filterFunction
 }: TransactionsTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { transactions } = useContext(TransactionsContext)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { transactions, totalItems, page, limit, handleChangeLimit, handleChangePage } = useContext(TransactionsContext)
   const [rows, setRows] = useState<ITransactionTable[]>([])
 
   const headCells = [
@@ -77,15 +79,22 @@ export default function TransactionsTable({
 
   return (
     <>
-     {isMobile ? (
+      {isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {rows
-            .map(row => (
-              <OneTransactionCard key={row.id} data={row} />
-            ))}
+          {rows.map(row => (
+            <OneTransactionCard key={row.id} data={row} />
+          ))}
+          <TablePagination
+            totalItems={totalItems}
+            page={page}
+            limit={limit}
+            handleChangePage={handleChangePage}
+            handleChangeLimit={handleChangeLimit}
+            containerRef={containerRef}
+          />
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} type='transactions' />
+        <BasicTable headCells={headCells} rows={rows} type="transactions" />
       )}
     </>
   )

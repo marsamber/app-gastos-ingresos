@@ -2,9 +2,10 @@
 import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
 import { Delete } from '@mui/icons-material'
 import { IconButton, useMediaQuery } from '@mui/material'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import OneCategoryCard from '../card/OneCategoryCard'
 import BasicTable from './BasicTable'
+import { TablePagination } from './TablePagination'
 
 interface CategoriesTableProps {
   handleDeleteCategory: (category: string) => void
@@ -12,7 +13,9 @@ interface CategoriesTableProps {
 
 export default function CategoriesTable({ handleDeleteCategory }: CategoriesTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const { categories } = useContext(SettingsCategoriesContext)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { categories, totalItems, page, limit, handleChangeLimit, handleChangePage } =
+    useContext(SettingsCategoriesContext)
   const [rows, setRows] = useState<any[]>([])
 
   const headCells = [
@@ -43,14 +46,22 @@ export default function CategoriesTable({ handleDeleteCategory }: CategoriesTabl
 
   return (
     <>
-      { isMobile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {isMobile ? (
+        <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {rows.map(row => (
             <OneCategoryCard key={row.id} data={row} />
-          ))}{' '}
+          ))}
+          <TablePagination
+            totalItems={totalItems}
+            page={page}
+            limit={limit}
+            handleChangePage={handleChangePage}
+            handleChangeLimit={handleChangeLimit}
+            containerRef={containerRef}
+          />
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} type='settingsCategories' />
+        <BasicTable headCells={headCells} rows={rows} type="settingsCategories" />
       )}
     </>
   )
