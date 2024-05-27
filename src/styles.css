@@ -175,3 +175,7 @@
 .MuiTablePagination-actions {
   margin: 0 !important;
 }
+
+.MuiToolbar-root.MuiToolbar-gutters.MuiToolbar-regular.MuiTablePagination-toolbar.css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar{
+  padding: 0 !important;
+}
