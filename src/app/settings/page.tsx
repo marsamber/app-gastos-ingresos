@@ -411,9 +411,6 @@ export default function Settings() {
                 </div>
                 <div style={tabsStyle}>
                   <Tabs
-                    classes={{
-                      indicator: 'indicator'
-                    }}
                     textColor="secondary"
                     indicatorColor="secondary"
                     value={value}

@@ -165,9 +165,6 @@ export default function Transactions() {
           )}
           <div style={tabsStyle}>
             <Tabs
-              classes={{
-                indicator: 'indicator'
-              }}
               textColor="secondary"
               indicatorColor="secondary"
               value={value}

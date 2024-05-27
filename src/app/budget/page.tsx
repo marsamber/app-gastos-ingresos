@@ -163,9 +163,6 @@ export default function Budget() {
           )}
           <div style={tabsStyle}>
             <Tabs
-              classes={{
-                indicator: 'indicator'
-              }}
               value={value}
               onChange={handleChangeTab}
               variant={isMobile ? 'fullWidth' : 'standard'}

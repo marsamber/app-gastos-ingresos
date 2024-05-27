@@ -24,9 +24,6 @@ export default function BasicModal({ open, style, handleClose, children }: Basic
   return (
     <Modal
       sx={{ ...defaultStyle, ...style }}
-      classes={{
-        backdrop: 'backdrop'
-      }}
       open={open}
     >
       <div>
