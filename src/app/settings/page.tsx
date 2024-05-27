@@ -261,13 +261,14 @@ export default function Settings() {
   }
 
   useEffect(() => {
+    const totalIncome = monthlyIncomeTransactions?.reduce((acc, transaction) => acc + transaction.amount, 0)
     const totalBudget = budgets
       ?.filter(budget => budget.category !== 'Ingresos fijos')
       .reduce((acc, budget) => acc + budget.amount, 0)
-    const totalSpent = monthlyExpenseTransactions?.reduce((acc, transaction) => acc + transaction.amount, 0)
 
-    setRestingBudget(Number(((totalBudget ?? 0) + (totalSpent ?? 0)).toFixed(2)))
-  }, [budgets, categories, monthlyExpenseTransactions])
+
+    setRestingBudget(Number(((totalIncome ?? 0) - (totalBudget ?? 0)).toFixed(2)))
+  }, [budgets, categories, monthlyIncomeTransactions])
 
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
