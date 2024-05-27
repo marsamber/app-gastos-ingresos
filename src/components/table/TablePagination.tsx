@@ -37,7 +37,14 @@ export const TablePagination = ({
     handleChangePage(0)
 
     if (containerRef && containerRef.current) {
-      console.log(containerRef.current)
+      handleScrollToTop()
+    }
+  }
+
+  const handleChangePageMui = (event: unknown, newPage: number) => {
+    handleChangePage(newPage)
+
+    if (containerRef && containerRef.current) {
       handleScrollToTop()
     }
   }
@@ -49,7 +56,7 @@ export const TablePagination = ({
       count={totalItems}
       rowsPerPage={limit}
       page={page}
-      onPageChange={(e, newPage) => handleChangePage(newPage)}
+      onPageChange={handleChangePageMui}
       onRowsPerPageChange={handleChangeRowsPerPage}
       labelRowsPerPage="Fil/pág"
       labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}

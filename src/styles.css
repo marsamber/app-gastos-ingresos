@@ -165,3 +165,13 @@
   background-color: #fff !important;
   border-radius: 4px !important;
 }
+
+/* Table pagination */
+.MuiInputBase-root.MuiInputBase-colorPrimary.MuiTablePagination-input.css-16c50h-MuiInputBase-root-MuiTablePagination-select
+{
+  margin: 0 10px 0 5px !important;
+}
+
+.MuiTablePagination-actions {
+  margin: 0 !important;
+}
