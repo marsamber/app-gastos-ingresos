@@ -126,7 +126,7 @@ export default function HistoricDashboardCard() {
     if (active && payload && payload.length) {
       const gastado: number = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0
       const presupuestado: number = Number(payload.find(entry => entry.name === 'Presupuestado')?.value) || 0
-      const restante: number = presupuestado - gastado
+      const restante: number = Number((presupuestado - gastado).toFixed(2))
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
@@ -168,12 +168,21 @@ export default function HistoricDashboardCard() {
               <XAxis dataKey="name" xAxisId={1} hide />
               <YAxis unit=" €" />
               <Tooltip content={props => <CustomTooltip {...props} />} />
-              <Bar dataKey="Presupuestado" barSize={40} xAxisId={0} fill="#00C49F" />
               <Bar dataKey="Gastado" barSize={40} xAxisId={1} fill="#FF6384">
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.Gastado >= entry.Presupuestado ? '#FF0042' : '#FF6384'} />
                 ))}
               </Bar>
+              <Bar
+                dataKey="Presupuestado"
+                barSize={40}
+                xAxisId={0}
+                fill="#00C49F"
+                fillOpacity={0}
+                stroke="#00C49F"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+              />
               <Legend />
             </BarChart>
           </ResponsiveContainer>

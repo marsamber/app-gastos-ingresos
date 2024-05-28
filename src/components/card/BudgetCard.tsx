@@ -71,7 +71,8 @@ export default function BudgetCard() {
     mergeBudgetData(budgetData)
     addTransactionData(budgetData)
 
-    setData(Array.from(budgetData.values())) // Convert map values to array for rendering or further processing
+    const sortedData = Array.from(budgetData.entries()).sort((a, b) => a[0].localeCompare(b[0]))
+    setData(sortedData.map(entry => entry[1]))
   }, [budgets, transactions, budgetHistorics])
 
   // STYLES
@@ -104,7 +105,7 @@ export default function BudgetCard() {
     if (active && payload && payload.length) {
       const gastado: number = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0
       const presupuestado: number = Number(payload.find(entry => entry.name === 'Presupuestado')?.value) || 0
-      const restante: number = presupuestado - gastado
+      const restante: number = Number((presupuestado - gastado).toFixed(2))
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
@@ -149,12 +150,21 @@ export default function BudgetCard() {
               <YAxis unit={' €'} />
               <Tooltip content={props => <CustomTooltip {...props} />} />
               <Legend />
-              <Bar dataKey="Presupuestado" barSize={40} xAxisId={0} fill="#00C49F" />
               <Bar dataKey="Gastado" barSize={40} xAxisId={1} fill="#FF6384">
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.Gastado >= entry.Presupuestado ? '#FF0042' : '#FF6384'} />
                 ))}
               </Bar>
+              <Bar
+                dataKey="Presupuestado"
+                barSize={40}
+                xAxisId={0}
+                fill="#00C49F"
+                fillOpacity={0}
+                stroke="#00C49F"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+              />
             </BarChart>
           </ResponsiveContainer>
         )}
