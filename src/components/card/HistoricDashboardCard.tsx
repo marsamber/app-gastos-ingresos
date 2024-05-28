@@ -176,7 +176,7 @@ export default function HistoricDashboardCard() {
               </Bar>
               <Bar
                 dataKey="Presupuestado"
-                barSize={40}
+                barSize={42}
                 xAxisId={0}
                 fill={theme.palette.primary.main}
                 fillOpacity={0}
