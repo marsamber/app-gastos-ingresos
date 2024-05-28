@@ -15,6 +15,7 @@ import {
 } from 'recharts'
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import BasicCard from './BasicCard'
+import theme from '@/theme'
 
 interface IBudgetChart {
   name: string
@@ -110,7 +111,7 @@ export default function BudgetCard() {
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
           <b>{`${label}`}</b>
-          <p style={{ color: '#00C49F' }}>{`Presupuestado: ${presupuestado} €`}</p>
+          <p style={{ color: theme.palette.primary.main }}>{`Presupuestado: ${presupuestado} €`}</p>
           <p style={{ color: '#FF6384' }}>{`Gastado: ${gastado} €`}</p>
           <p style={{ color: restante <= 0 ? '#FF0042' : 'black' }}>{`Restante: ${restante} €`}</p>
         </div>
@@ -159,9 +160,9 @@ export default function BudgetCard() {
                 dataKey="Presupuestado"
                 barSize={40}
                 xAxisId={0}
-                fill="#00C49F"
+                fill={theme.palette.primary.main}
                 fillOpacity={0}
-                stroke="#00C49F"
+                stroke={theme.palette.primary.main}
                 strokeWidth={2}
                 strokeDasharray="5 5"
               />
