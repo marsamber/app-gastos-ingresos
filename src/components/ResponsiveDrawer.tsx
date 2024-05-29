@@ -20,6 +20,7 @@ import Typography from '@mui/material/Typography'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import TransactionModal from './modal/TransactionModal'
+import Image from 'next/image'
 
 const drawerWidth = 240
 
@@ -73,7 +74,7 @@ export default function ResponsiveDrawer({
   const drawer = (
     <div>
       <Toolbar style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-        <CreditCard /> Mi app de gastos
+        <Image src='/images/file.png' alt='logo' width={30} height={30} /> Mi app de gastos
       </Toolbar>
       <Divider />
       <List>
