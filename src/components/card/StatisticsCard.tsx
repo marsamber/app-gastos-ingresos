@@ -43,7 +43,7 @@ export default function StatisticsCard() {
           // If there's a transaction without a corresponding budget/budget historic, create a new category entry
           statisticsData.set(transaction.category, {
             name: transaction.category,
-            value: -transaction.amount
+            value: Number((-transaction.amount).toFixed(2))
           })
         }
       })
