@@ -9,14 +9,14 @@ import { HomeContext } from '@/contexts/HomeContext'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
 import theme from '@/theme'
-import { IBudgetHistorics, IBudgets, ITransaction } from '@/types/index'
+import { IBudgetHistorics, IBudgets, IMonthlyTransactions, ITransaction } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
+import { getTwoFirstDecimals } from '@/utils/utils'
 import { Info } from '@mui/icons-material'
 import { Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
-import { getTwoFirstDecimals } from '@/utils/utils'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -56,17 +56,11 @@ export default function Home() {
   const { data: budgetHistoricsData, loading: loadingBudgetHistorics } = useFetch<IBudgetHistorics>(
     `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
   )
+  const { data: monthlyTransactionsData } = useFetch<IMonthlyTransactions>('api/monthly_transactions?type=expense')
 
   useEffect(() => {
-    if (budgetsData && transactions && budgetHistoricsData) {
+    if (budgetsData && transactions && budgetHistoricsData && monthlyTransactionsData) {
       let totalBudget = 0
-      const totalHistorics = budgetHistoricsData.budgetHistorics
-        .filter(budgetHistoric => budgetHistoric.category !== 'Ingresos fijos') // We don't want to take into account the fixed incomes
-        .reduce((acc, historic) => acc + historic.amount, 0)
-      const totalSpent = transactions
-        .filter(transaction => transaction.category !== 'Ingresos fijos')
-        .reduce((acc, transaction) => acc + transaction.amount, 0)
-
       const currentDate = new Date().toISOString().split('T')[0]
       // If the second month is greater than the current date, we will take into account the budgets
       if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
@@ -75,7 +69,19 @@ export default function Home() {
           .reduce((acc, budget) => acc + budget.amount, 0)
       }
 
-      setBudget(getTwoFirstDecimals(totalBudget + totalHistorics + totalSpent))
+      const totalHistorics = budgetHistoricsData.budgetHistorics
+      .filter(budgetHistoric => budgetHistoric.category !== 'Ingresos fijos') // We don't want to take into account the fixed incomes
+      .reduce((acc, historic) => acc + historic.amount, 0)
+
+      const totalSpent = transactions
+      .filter(transaction => transaction.category !== 'Ingresos fijos')
+      .reduce((acc, transaction) => acc + transaction.amount, 0)
+
+      const totalFixedExpenses = monthlyTransactionsData.monthlyTransactions
+      .reduce((acc, transaction) => acc + transaction.amount, 0)
+      
+
+      setBudget(getTwoFirstDecimals(totalBudget + totalHistorics + totalSpent + totalFixedExpenses))
     }
   }, [budgetsData, transactions, budgetHistoricsData])
 
@@ -165,14 +171,14 @@ export default function Home() {
           {isMobile ? (
             <h4 style={budgetStyle}>
               Presupuesto restante: {budget} €
-              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. No incluye los ingresos fijos.">
+              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos.">
                 <Info />
               </Tooltip>
             </h4>
           ) : (
             <h3 style={budgetStyle}>
               Presupuesto restante: {budget} €
-              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. No incluye los ingresos fijos.">
+              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos.">
                 <Info />
               </Tooltip>
             </h3>
