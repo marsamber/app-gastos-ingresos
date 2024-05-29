@@ -1,7 +1,7 @@
 'use client'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import theme from '@/theme'
-import { Add, Calculate, CreditCard, CurrencyExchange, Home, Logout, Settings } from '@mui/icons-material'
+import { Add, Calculate, CurrencyExchange, Home, Logout, Settings } from '@mui/icons-material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { Fab, ThemeProvider } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
@@ -17,10 +17,10 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import TransactionModal from './modal/TransactionModal'
-import Image from 'next/image'
 
 const drawerWidth = 240
 
