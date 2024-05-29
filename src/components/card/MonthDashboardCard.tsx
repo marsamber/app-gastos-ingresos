@@ -204,7 +204,7 @@ export default function MonthDashboardCard() {
 
   const cardStyle = {
     width: isMobile ? '100%' : '40%',
-    height: isTablet ? '500px' : '450px'
+    height: isTablet ? '520px' : '450px'
   }
 
   const containerStyle: CSSProperties = {
