@@ -119,6 +119,51 @@ export default function BudgetCard() {
     }
   }
 
+  const splitTextIntoLines = (text: string, maxCharsPerLine: number): string[] => {
+    const words = text.split(' ')
+    let lines: string[] = []
+    let currentLine = ''
+
+    words.forEach(word => {
+      if ((currentLine + word).length <= maxCharsPerLine) {
+        currentLine += `${word} `
+      } else {
+        lines.push(currentLine.trim())
+        currentLine = `${word} `
+      }
+    })
+
+    lines.push(currentLine.trim())
+
+    return lines
+  }
+
+  const CustomizedTick = (props: any) => {
+    const { x, y, payload } = props
+
+    const lines = splitTextIntoLines(payload.value, 12)
+
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text
+          x={0}
+          y={0}
+          dy={10}
+          textAnchor="end"
+          fill="#666"
+          transform={isMobile ? 'rotate(-45)' : 'rotate(-25)'}
+          fontSize={isMobile ? '10px' : '12px'}
+        >
+          {lines.map((line, index) => (
+            <tspan x={0} dy={index > 0 ? 14 : 10} key={index}>
+              {line}
+            </tspan>
+          ))}
+        </text>
+      </g>
+    )
+  }
+
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Presupuesto</h3>
@@ -139,18 +184,24 @@ export default function BudgetCard() {
                 top: 20,
                 right: 30,
                 left: 20,
-                bottom: 5
+                bottom: 40
               }}
               style={{
                 fontSize: '14px'
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" xAxisId={0} />
+              <XAxis
+                dataKey="name"
+                xAxisId={0}
+                tick={<CustomizedTick />}
+                angle={isMobile ? -45 : -25}
+                textAnchor="end"
+              />
               <XAxis dataKey="name" xAxisId={1} hide />
               <YAxis unit={' €'} />
               <Tooltip content={props => <CustomTooltip {...props} />} />
-              <Legend />
+              <Legend verticalAlign="top" height={36} />
               <Bar dataKey="Gastado" barSize={40} xAxisId={1} fill="#FF6384">
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.Gastado >= entry.Presupuestado ? '#FF0042' : '#FF6384'} />

@@ -160,12 +160,18 @@ export default function HistoricDashboardCard() {
                 top: 10,
                 right: 30,
                 left: 0,
-                bottom: 0
+                bottom: 10
               }}
               style={{ fontSize: '14px' }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" xAxisId={0} />
+              <XAxis
+                dataKey="name"
+                xAxisId={0}
+                tick={{ fontSize: isMobile ? 10 : 12 }}
+                angle={isMobile ? -45 : -25}
+                textAnchor="end"
+              />
               <XAxis dataKey="name" xAxisId={1} hide />
               <YAxis unit=" €" />
               <Tooltip content={props => <CustomTooltip {...props} />} />
@@ -184,7 +190,7 @@ export default function HistoricDashboardCard() {
                 strokeWidth={2}
                 strokeDasharray="5 5"
               />
-              <Legend />
+              <Legend verticalAlign='top' height={36} />
             </BarChart>
           </ResponsiveContainer>
         )}
