@@ -41,7 +41,11 @@ export default function BudgetCard() {
         if (existingEntry) {
           existingEntry.Presupuestado = getTwoFirstDecimals(existingEntry.Presupuestado + item.amount)
         } else {
-          budgetData.set(item.category, { name: item.category, Gastado: 0, Presupuestado: getTwoFirstDecimals(item.amount) })
+          budgetData.set(item.category, {
+            name: item.category,
+            Gastado: 0,
+            Presupuestado: getTwoFirstDecimals(item.amount)
+          })
         }
       }
     })
@@ -205,7 +209,10 @@ export default function BudgetCard() {
               <Legend verticalAlign="top" height={36} />
               <Bar dataKey="Gastado" barSize={40} xAxisId={1} fill="#FF6384">
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.Gastado >= entry.Presupuestado ? '#FF0042' : '#FF6384'} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.Gastado >= entry.Presupuestado ? '#FF0042' : entry.Gastado < 0 ? '#00C49F' : '#FF6384'}
+                  />
                 ))}
               </Bar>
               <Bar

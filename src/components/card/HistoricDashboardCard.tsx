@@ -63,9 +63,9 @@ export default function HistoricDashboardCard() {
       dataMap.set(currentMonthKey, {
         name: currentMonthKey,
         Gastado: 0,
-        Presupuestado: getTwoFirstDecimals(budgets
-          .filter(budget => budget.category !== 'Ingresos fijos')
-          .reduce((acc, budget) => acc + budget.amount, 0))
+        Presupuestado: getTwoFirstDecimals(
+          budgets.filter(budget => budget.category !== 'Ingresos fijos').reduce((acc, budget) => acc + budget.amount, 0)
+        )
       })
     }
 
@@ -177,7 +177,10 @@ export default function HistoricDashboardCard() {
               <Tooltip content={props => <CustomTooltip {...props} />} />
               <Bar dataKey="Gastado" barSize={40} xAxisId={1} fill="#FF6384">
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.Gastado >= entry.Presupuestado ? '#FF0042' : '#FF6384'} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.Gastado >= entry.Presupuestado ? '#FF0042' : entry.Gastado < 0 ? '#00C49F' : '#FF6384'}
+                  />
                 ))}
               </Bar>
               <Bar
@@ -190,7 +193,7 @@ export default function HistoricDashboardCard() {
                 strokeWidth={2}
                 strokeDasharray="5 5"
               />
-              <Legend verticalAlign='top' height={36} />
+              <Legend verticalAlign="top" height={36} />
             </BarChart>
           </ResponsiveContainer>
         )}
