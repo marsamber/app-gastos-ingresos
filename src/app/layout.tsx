@@ -5,7 +5,13 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Mi app de gastos',
-  description: 'Una app para llevar el control de tus gastos'
+  description: 'Una app para llevar el control de tus gastos',
+  icons: [
+    {
+      url: '/images/file.png',
+      href: '/images/file.png',
+    }
+  ],
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
