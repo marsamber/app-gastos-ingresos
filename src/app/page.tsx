@@ -61,25 +61,25 @@ export default function Home() {
   useEffect(() => {
     if (budgetsData && transactions && budgetHistoricsData && monthlyTransactionsData) {
       let totalBudget = 0
+      let totalFixedExpenses = 0
       const currentDate = new Date().toISOString().split('T')[0]
       // If the second month is greater than the current date, we will take into account the budgets
       if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
         totalBudget = budgetsData.budgets
           .filter(budget => budget.category !== 'Ingresos fijos')
           .reduce((acc, budget) => acc + budget.amount, 0)
+
+        totalFixedExpenses = monthlyTransactionsData.monthlyTransactions
+          .reduce((acc, transaction) => acc + transaction.amount, 0)
       }
 
       const totalHistorics = budgetHistoricsData.budgetHistorics
-      .filter(budgetHistoric => budgetHistoric.category !== 'Ingresos fijos') // We don't want to take into account the fixed incomes
-      .reduce((acc, historic) => acc + historic.amount, 0)
+        .filter(budgetHistoric => budgetHistoric.category !== 'Ingresos fijos') // We don't want to take into account the fixed incomes
+        .reduce((acc, historic) => acc + historic.amount, 0)
 
       const totalSpent = transactions
-      .filter(transaction => transaction.category !== 'Ingresos fijos')
-      .reduce((acc, transaction) => acc + transaction.amount, 0)
-
-      const totalFixedExpenses = monthlyTransactionsData.monthlyTransactions
-      .reduce((acc, transaction) => acc + transaction.amount, 0)
-      
+        .filter(transaction => transaction.category !== 'Ingresos fijos')
+        .reduce((acc, transaction) => acc + transaction.amount, 0)
 
       setBudget(getTwoFirstDecimals(totalBudget + totalHistorics + totalSpent + totalFixedExpenses))
     }
@@ -171,14 +171,14 @@ export default function Home() {
           {isMobile ? (
             <h4 style={budgetStyle}>
               Presupuesto restante: {budget} €
-              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos.">
+              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos del mes presente.">
                 <Info />
               </Tooltip>
             </h4>
           ) : (
             <h3 style={budgetStyle}>
               Presupuesto restante: {budget} €
-              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos.">
+              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos del mes presente.">
                 <Info />
               </Tooltip>
             </h3>
