@@ -1,7 +1,7 @@
 import { HomeContext } from '@/contexts/HomeContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudgetHistorics, ITransactions } from '@/types/index'
-import { convertDate, formatMonthYear } from '@/utils/utils'
+import { convertDate, formatMonthYear, getTwoFirstDecimals } from '@/utils/utils'
 import { CircularProgress, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import {
@@ -63,9 +63,9 @@ export default function HistoricDashboardCard() {
       dataMap.set(currentMonthKey, {
         name: currentMonthKey,
         Gastado: 0,
-        Presupuestado: budgets
+        Presupuestado: getTwoFirstDecimals(budgets
           .filter(budget => budget.category !== 'Ingresos fijos')
-          .reduce((acc, budget) => acc + budget.amount, 0)
+          .reduce((acc, budget) => acc + budget.amount, 0))
       })
     }
 
@@ -75,7 +75,7 @@ export default function HistoricDashboardCard() {
       .forEach(historic => {
         const monthKey = formatMonthYear(historic.date as string)
         const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
-        entry.Presupuestado += historic.amount
+        entry.Presupuestado = getTwoFirstDecimals(entry.Presupuestado + historic.amount)
         dataMap.set(monthKey, entry)
       })
 
@@ -85,7 +85,7 @@ export default function HistoricDashboardCard() {
       .forEach(transaction => {
         const monthKey = formatMonthYear(transaction.date as string)
         const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
-        entry.Gastado -= transaction.amount
+        entry.Gastado = getTwoFirstDecimals(entry.Gastado - transaction.amount)
         dataMap.set(monthKey, entry)
       })
 
@@ -127,7 +127,7 @@ export default function HistoricDashboardCard() {
     if (active && payload && payload.length) {
       const gastado: number = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0
       const presupuestado: number = Number(payload.find(entry => entry.name === 'Presupuestado')?.value) || 0
-      const restante: number = Number((presupuestado - gastado).toFixed(2))
+      const restante: number = getTwoFirstDecimals(presupuestado - gastado)
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>

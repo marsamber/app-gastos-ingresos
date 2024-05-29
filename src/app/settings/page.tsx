@@ -15,9 +15,10 @@ import { Tab, Tabs, Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, SyntheticEvent, useCallback, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
+import { getTwoFirstDecimals } from '@/utils/utils'
 
 export default function Settings() {
-  const {refreshCategories: refreshAllCategories} = useContext(RefreshContext)
+  const { refreshCategories: refreshAllCategories } = useContext(RefreshContext)
   const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1400px)')
   const [monthSelected, setMonthSelected] = useState<string>(dayjs().startOf('month').format('YYYY-MM-DD'))
@@ -266,8 +267,7 @@ export default function Settings() {
       ?.filter(budget => budget.category !== 'Ingresos fijos')
       .reduce((acc, budget) => acc + budget.amount, 0)
 
-
-    setRestingBudget(Number(((totalIncome ?? 0) - (totalBudget ?? 0)).toFixed(2)))
+    setRestingBudget(getTwoFirstDecimals((totalIncome ?? 0) - (totalBudget ?? 0)))
   }, [budgets, categories, monthlyIncomeTransactions])
 
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
@@ -319,150 +319,150 @@ export default function Settings() {
 
   return (
     <main className="main">
-        <SettingsMonthlyExpenseTransactionsContext.Provider
+      <SettingsMonthlyExpenseTransactionsContext.Provider
+        value={{
+          monthlyTransactions: monthlyExpenseTransactions,
+          totalItems: totalItemsMonthlyExpenseTransactions,
+          refreshMonthlyTransactions: refreshMonthlyExpenseTransactions,
+          refreshKey: refreshKeyMonthlyExpenseTransactions,
+          page: pageMonthlyExpenseTransactions,
+          limit: limitMonthlyExpenseTransactions,
+          sortBy: sortByMonthlyExpenseTransactions,
+          sortOrder: sortOrderMonthlyExpenseTransactions,
+          handleChangeLimit: (newLimit: number) => setLimitMonthlyExpenseTransactions(newLimit),
+          handleChangePage: (newPage: number) => setPageMonthlyExpenseTransactions(newPage),
+          handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderMonthlyExpenseTransactions(newOrder),
+          handleChangeSort: (newSortBy: string) => setSortByMonthlyExpenseTransactions(newSortBy)
+        }}
+      >
+        <SettingsMonthlyIncomeTransactionsContext.Provider
           value={{
-            monthlyTransactions: monthlyExpenseTransactions,
-            totalItems: totalItemsMonthlyExpenseTransactions,
-            refreshMonthlyTransactions: refreshMonthlyExpenseTransactions,
-            refreshKey: refreshKeyMonthlyExpenseTransactions,
-            page: pageMonthlyExpenseTransactions,
-            limit: limitMonthlyExpenseTransactions,
-            sortBy: sortByMonthlyExpenseTransactions,
-            sortOrder: sortOrderMonthlyExpenseTransactions,
-            handleChangeLimit: (newLimit: number) => setLimitMonthlyExpenseTransactions(newLimit),
-            handleChangePage: (newPage: number) => setPageMonthlyExpenseTransactions(newPage),
-            handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderMonthlyExpenseTransactions(newOrder),
-            handleChangeSort: (newSortBy: string) => setSortByMonthlyExpenseTransactions(newSortBy)
+            monthlyTransactions: monthlyIncomeTransactions,
+            totalItems: totalItemsMonthlyIncomeTransactions,
+            refreshMonthlyTransactions: refreshMonthlyIncomeTransactions,
+            refreshKey: refreshKeyMonthlyIncomeTransactions,
+            page: pageMonthlyIncomeTransactions,
+            limit: limitMonthlyIncomeTransactions,
+            sortBy: sortByMonthlyIncomeTransactions,
+            sortOrder: sortOrderMonthlyIncomeTransactions,
+            handleChangeLimit: (newLimit: number) => setLimitMonthlyIncomeTransactions(newLimit),
+            handleChangePage: (newPage: number) => setPageMonthlyIncomeTransactions(newPage),
+            handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderMonthlyIncomeTransactions(newOrder),
+            handleChangeSort: (newSortBy: string) => setSortByMonthlyIncomeTransactions(newSortBy)
           }}
         >
-          <SettingsMonthlyIncomeTransactionsContext.Provider
+          <SettingsCategoriesContext.Provider
             value={{
-              monthlyTransactions: monthlyIncomeTransactions,
-              totalItems: totalItemsMonthlyIncomeTransactions,
-              refreshMonthlyTransactions: refreshMonthlyIncomeTransactions,
-              refreshKey: refreshKeyMonthlyIncomeTransactions,
-              page: pageMonthlyIncomeTransactions,
-              limit: limitMonthlyIncomeTransactions,
-              sortBy: sortByMonthlyIncomeTransactions,
-              sortOrder: sortOrderMonthlyIncomeTransactions,
-              handleChangeLimit: (newLimit: number) => setLimitMonthlyIncomeTransactions(newLimit),
-              handleChangePage: (newPage: number) => setPageMonthlyIncomeTransactions(newPage),
-              handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderMonthlyIncomeTransactions(newOrder),
-              handleChangeSort: (newSortBy: string) => setSortByMonthlyIncomeTransactions(newSortBy)
+              categories,
+              totalItems: totalItemsCategories,
+              refreshCategories,
+              refreshKey: refreshKeyCategories,
+              page: pageCategories,
+              limit: limitCategories,
+              sortBy: sortByCategories,
+              sortOrder: sortOrderCategories,
+              handleChangeLimit: (newLimit: number) => setLimitCategories(newLimit),
+              handleChangePage: (newPage: number) => setPageCategories(newPage),
+              handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderCategories(newOrder),
+              handleChangeSort: (newSortBy: string) => setSortByCategories(newSortBy)
             }}
           >
-            <SettingsCategoriesContext.Provider
+            <SettingsBudgetsContext.Provider
               value={{
-                categories,
-                totalItems: totalItemsCategories,
-                refreshCategories,
-                refreshKey: refreshKeyCategories,
-                page: pageCategories,
-                limit: limitCategories,
-                sortBy: sortByCategories,
-                sortOrder: sortOrderCategories,
-                handleChangeLimit: (newLimit: number) => setLimitCategories(newLimit),
-                handleChangePage: (newPage: number) => setPageCategories(newPage),
-                handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderCategories(newOrder),
-                handleChangeSort: (newSortBy: string) => setSortByCategories(newSortBy)
+                budgets,
+                totalItems: totalItemsBudgets,
+                refreshBudgets,
+                refreshKey: refreshKeyBudgets,
+                page: pageBudgets,
+                limit: limitBudgets,
+                sortBy: sortByBudgets,
+                sortOrder: sortOrderBudgets,
+                handleChangeLimit: (newLimit: number) => setLimitBudgets(newLimit),
+                handleChangePage: (newPage: number) => setPageBudgets(newPage),
+                handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderBudgets(newOrder),
+                handleChangeSort: (newSortBy: string) => setSortByBudgets(newSortBy),
+                monthSelected
               }}
             >
-              <SettingsBudgetsContext.Provider
-                value={{
-                  budgets,
-                  totalItems: totalItemsBudgets,
-                  refreshBudgets,
-                  refreshKey: refreshKeyBudgets,
-                  page: pageBudgets,
-                  limit: limitBudgets,
-                  sortBy: sortByBudgets,
-                  sortOrder: sortOrderBudgets,
-                  handleChangeLimit: (newLimit: number) => setLimitBudgets(newLimit),
-                  handleChangePage: (newPage: number) => setPageBudgets(newPage),
-                  handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderBudgets(newOrder),
-                  handleChangeSort: (newSortBy: string) => setSortByBudgets(newSortBy),
-                  monthSelected
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%'
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%'
-                  }}
+                {!isMobile && <h2 style={titleStyle}>Configuración</h2>}
+                {present && isMobile ? (
+                  <h4 style={budgetStyle}>
+                    Presupuesto sin asignar: {restingBudget} €
+                    <Tooltip title="Cantidad del presupuesto no asignada a categorías específicas, después de considerar los ingresos fijos y los presupuestos ya asignados a otras categorías.">
+                      <Info />
+                    </Tooltip>
+                  </h4>
+                ) : present && !isMobile ? (
+                  <h3 style={budgetStyle}>
+                    Presupuesto sin asignar: {restingBudget} €
+                    <Tooltip title="Cantidad del presupuesto no asignada a categorías específicas, después de considerar los ingresos fijos y los presupuestos ya asignados a otras categorías.">
+                      <Info />
+                    </Tooltip>
+                  </h3>
+                ) : null}
+              </div>
+              <div style={tabsStyle}>
+                <Tabs
+                  textColor="secondary"
+                  indicatorColor="secondary"
+                  value={value}
+                  onChange={handleChangeTab}
+                  variant={isMobile ? 'fullWidth' : 'standard'}
                 >
-                  {!isMobile && <h2 style={titleStyle}>Configuración</h2>}
-                  {present && isMobile ? (
-                    <h4 style={budgetStyle}>
-                      Presupuesto sin asignar: {restingBudget} €
-                      <Tooltip title="Cantidad del presupuesto no asignada a categorías específicas, después de considerar los ingresos fijos y los presupuestos ya asignados a otras categorías.">
-                        <Info />
-                      </Tooltip>
-                    </h4>
-                  ) : present && !isMobile ? (
-                    <h3 style={budgetStyle}>
-                      Presupuesto sin asignar: {restingBudget} €
-                      <Tooltip title="Cantidad del presupuesto no asignada a categorías específicas, después de considerar los ingresos fijos y los presupuestos ya asignados a otras categorías.">
-                        <Info />
-                      </Tooltip>
-                    </h3>
-                  ) : null}
-                </div>
-                <div style={tabsStyle}>
-                  <Tabs
-                    textColor="secondary"
-                    indicatorColor="secondary"
-                    value={value}
-                    onChange={handleChangeTab}
-                    variant={isMobile ? 'fullWidth' : 'standard'}
-                  >
-                    <Tab
-                      classes={{
-                        selected: 'tabSelected'
-                      }}
-                      label="Transacciones fijas"
-                      value={0}
+                  <Tab
+                    classes={{
+                      selected: 'tabSelected'
+                    }}
+                    label="Transacciones fijas"
+                    value={0}
+                  />
+                  <Tab
+                    classes={{
+                      selected: 'tabSelected'
+                    }}
+                    label="Categorías y presupuestos"
+                    value={1}
+                  />
+                </Tabs>
+              </div>
+              {value === 0 && (
+                <div style={containerStyle}>
+                  <div style={columnStyle}>
+                    <FixedTransactionsCard
+                      handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
+                      transactionType="income"
                     />
-                    <Tab
-                      classes={{
-                        selected: 'tabSelected'
-                      }}
-                      label="Categorías y presupuestos"
-                      value={1}
+                  </div>
+                  <div style={columnStyle}>
+                    <FixedTransactionsCard
+                      handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
+                      transactionType="expense"
                     />
-                  </Tabs>
+                  </div>
                 </div>
-                {value === 0 && (
-                  <div style={containerStyle}>
-                    <div style={columnStyle}>
-                      <FixedTransactionsCard
-                        handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
-                        transactionType="income"
-                      />
-                    </div>
-                    <div style={columnStyle}>
-                      <FixedTransactionsCard
-                        handleDeleteMonthlyTransaction={handleDeleteMonthlyTransaction}
-                        transactionType="expense"
-                      />
-                    </div>
+              )}
+              {value === 1 && (
+                <div style={containerStyle}>
+                  <div style={columnStyle}>
+                    <CategoriesCard />
                   </div>
-                )}
-                {value === 1 && (
-                  <div style={containerStyle}>
-                    <div style={columnStyle}>
-                      <CategoriesCard />
-                    </div>
-                    <div style={columnStyle}>
-                      <CategoriesBudgetCard setMonthSelected={setMonthSelected} />
-                    </div>
+                  <div style={columnStyle}>
+                    <CategoriesBudgetCard setMonthSelected={setMonthSelected} />
                   </div>
-                )}
-              </SettingsBudgetsContext.Provider>
-            </SettingsCategoriesContext.Provider>
-          </SettingsMonthlyIncomeTransactionsContext.Provider>
-        </SettingsMonthlyExpenseTransactionsContext.Provider>
+                </div>
+              )}
+            </SettingsBudgetsContext.Provider>
+          </SettingsCategoriesContext.Provider>
+        </SettingsMonthlyIncomeTransactionsContext.Provider>
+      </SettingsMonthlyExpenseTransactionsContext.Provider>
     </main>
   )
 }

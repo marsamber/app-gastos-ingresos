@@ -1,5 +1,5 @@
 import { HomeContext } from '@/contexts/HomeContext'
-import { formatMonthYear, getDateWeekOfMonth, monthNames } from '@/utils/utils'
+import { formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, monthNames } from '@/utils/utils'
 import { Autocomplete, CircularProgress, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts'
@@ -40,9 +40,9 @@ export default function MonthDashboardCard() {
         const key = `${week} (${month})`
         const existingEntry = dataMap.get(key)
         if (existingEntry) {
-          existingEntry.Gastado -= transaction.amount
+          existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
         } else {
-          dataMap.set(key, { name: `Sem. ${week} (${month})`, Gastado: -transaction.amount })
+          dataMap.set(key, { name: `Sem. ${week} (${month})`, Gastado: getTwoFirstDecimals(-transaction.amount) })
         }
       })
 
@@ -94,7 +94,7 @@ export default function MonthDashboardCard() {
         const key = formatMonthYear(transaction.date.toLocaleString())
         const existingEntry = dataMap.get(key)
         if (existingEntry) {
-          existingEntry.Gastado -= transaction.amount
+          existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
         }
       })
 
@@ -127,9 +127,9 @@ export default function MonthDashboardCard() {
         })
         const existingEntry = dataMap.get(dayKey)
         if (existingEntry) {
-          existingEntry.Gastado -= transaction.amount
+          existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
         } else {
-          dataMap.set(dayKey, { name: dateString, Gastado: -transaction.amount })
+          dataMap.set(dayKey, { name: dateString, Gastado: getTwoFirstDecimals(-transaction.amount) })
         }
       })
 

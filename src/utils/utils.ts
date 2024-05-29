@@ -36,6 +36,10 @@ export const convertDate = (date: string) => {
   return { month: monthMap[month as keyof typeof monthMap], year: parseInt(year) }
 }
 
+export const getTwoFirstDecimals = (number: number) => {
+  return Number(number.toFixed(2))
+}
+
 export const handleDateFilterChange = (value: string): string[] => {
   const today = new Date()
   const currentYear = today.getFullYear()

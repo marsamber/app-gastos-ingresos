@@ -16,6 +16,7 @@ import { Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
+import { getTwoFirstDecimals } from '@/utils/utils'
 
 export default function Home() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
@@ -74,7 +75,7 @@ export default function Home() {
           .reduce((acc, budget) => acc + budget.amount, 0)
       }
 
-      setBudget(totalBudget + totalHistorics + totalSpent)
+      setBudget(getTwoFirstDecimals(totalBudget + totalHistorics + totalSpent))
     }
   }, [budgetsData, transactions, budgetHistoricsData])
 

@@ -1,4 +1,6 @@
 import { HomeContext } from '@/contexts/HomeContext'
+import theme from '@/theme'
+import { getTwoFirstDecimals } from '@/utils/utils'
 import { CircularProgress, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import {
@@ -15,7 +17,6 @@ import {
 } from 'recharts'
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import BasicCard from './BasicCard'
-import theme from '@/theme'
 
 interface IBudgetChart {
   name: string
@@ -38,9 +39,9 @@ export default function BudgetCard() {
       if (item.amount > 0) {
         const existingEntry = budgetData.get(item.category)
         if (existingEntry) {
-          existingEntry.Presupuestado += item.amount
+          existingEntry.Presupuestado = getTwoFirstDecimals(existingEntry.Presupuestado + item.amount)
         } else {
-          budgetData.set(item.category, { name: item.category, Gastado: 0, Presupuestado: item.amount })
+          budgetData.set(item.category, { name: item.category, Gastado: 0, Presupuestado: getTwoFirstDecimals(item.amount) })
         }
       }
     })
@@ -53,12 +54,12 @@ export default function BudgetCard() {
       .forEach(transaction => {
         const category = budgetData.get(transaction.category)
         if (category) {
-          category.Gastado -= transaction.amount
+          category.Gastado = getTwoFirstDecimals(category.Gastado - transaction.amount)
         } else {
           // If there's a transaction without a corresponding budget/budget historic, create a new category entry
           budgetData.set(transaction.category, {
             name: transaction.category,
-            Gastado: -transaction.amount,
+            Gastado: getTwoFirstDecimals(-transaction.amount),
             Presupuestado: 0
           })
         }
@@ -106,7 +107,7 @@ export default function BudgetCard() {
     if (active && payload && payload.length) {
       const gastado: number = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0
       const presupuestado: number = Number(payload.find(entry => entry.name === 'Presupuestado')?.value) || 0
-      const restante: number = Number((presupuestado - gastado).toFixed(2))
+      const restante: number = getTwoFirstDecimals(presupuestado - gastado)
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>

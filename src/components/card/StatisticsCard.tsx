@@ -1,4 +1,5 @@
 import { HomeContext } from '@/contexts/HomeContext'
+import { getTwoFirstDecimals } from '@/utils/utils'
 import { CircularProgress, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts'
@@ -38,12 +39,12 @@ export default function StatisticsCard() {
       .forEach(transaction => {
         const category = statisticsData.get(transaction.category)
         if (category) {
-          category.value -= transaction.amount
+          category.value = getTwoFirstDecimals(category.value - transaction.amount)
         } else {
           // If there's a transaction without a corresponding budget/budget historic, create a new category entry
           statisticsData.set(transaction.category, {
             name: transaction.category,
-            value: Number((-transaction.amount).toFixed(2))
+            value: getTwoFirstDecimals(-transaction.amount)
           })
         }
       })
