@@ -9,6 +9,12 @@
   color: #257CA3 !important;
 }
 
+/* Modal */
+.backdropModal{
+  background-color: white !important;
+  border-radius: 4px !important;
+}
+
 /* Month range picker */
 .monthRangePicker .ant-picker-input:first-child > input {
   cursor: pointer;
@@ -151,7 +157,13 @@
 }
 
 @media (max-width: 600px) {  
-  .monthRangePicker .ant-picker-input > input {
+  .monthRangePicker .ant-picker-input:first-child > input {
     font-size: 1.17em !important;
+    font-weight: bold !important;
+  }
+
+  .ant-picker-large .ant-picker-input > input {
+    font-size: 1.17em !important;
+    font-weight: bold !important;
   }
 }

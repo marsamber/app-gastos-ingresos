@@ -24,7 +24,7 @@ const theme = createTheme({
         },
         toolbar: {
           padding: 0
-        }
+        },
       }
     },
     MuiModal: {
@@ -32,10 +32,6 @@ const theme = createTheme({
         root: {
           borderRadius: 4
         },
-        backdrop: {
-          backgroundColor: 'white',
-          borderRadius: 4
-        }
       }
     },
     MuiTabs: {
