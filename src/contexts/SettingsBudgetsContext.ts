@@ -6,7 +6,13 @@ export interface SettingsBudgetsContextType extends BaseContextType {
   budgets: IBudget[] | IBudgetHistoric[] | null
   monthSelected: string
 
-  refreshBudgets: (page: number, limit: number, sortBy: string, sortOrder: 'asc' | 'desc') => void
+  refreshBudgets: (
+    page: number,
+    limit: number,
+    sortBy: string,
+    sortOrder: 'asc' | 'desc',
+    filters: Record<string, string>
+  ) => void
   refreshKey: number
 }
 
@@ -22,11 +28,13 @@ const defaultValue: SettingsBudgetsContextType = {
   limit: 15,
   sortBy: 'category',
   sortOrder: 'asc',
+  filters: {},
 
   handleChangePage: () => {},
   handleChangeLimit: () => {},
   handleChangeSort: () => {},
-  handleChangeOrder: () => {}
+  handleChangeOrder: () => {},
+  handleChangeFilters: () => {}
 }
 
 export const SettingsBudgetsContext = createContext<SettingsBudgetsContextType>(defaultValue)

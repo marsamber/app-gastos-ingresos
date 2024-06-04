@@ -5,7 +5,13 @@ import { createContext } from 'react'
 export interface SettingsMonthlyIncomeTransactionsContextType extends BaseContextType {
   monthlyTransactions: IMonthlyTransaction[] | null
 
-  refreshMonthlyTransactions: (page: number, limit: number, sortBy: string, sortOrder: 'asc' | 'desc') => void
+  refreshMonthlyTransactions: (
+    page: number,
+    limit: number,
+    sortBy: string,
+    sortOrder: 'asc' | 'desc',
+    filters: Record<string, string>
+  ) => void
   refreshKey: number
 }
 
@@ -20,11 +26,13 @@ const defaultValue: SettingsMonthlyIncomeTransactionsContextType = {
   limit: 10,
   sortBy: 'title',
   sortOrder: 'asc',
+  filters: {},
 
   handleChangePage: () => {},
   handleChangeLimit: () => {},
   handleChangeSort: () => {},
-  handleChangeOrder: () => {}
+  handleChangeOrder: () => {},
+  handleChangeFilters: () => {}
 }
 
 export const SettingsMonthlyIncomeTransactionsContext =

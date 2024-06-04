@@ -24,16 +24,25 @@ export default function Budget() {
   const [limit, setLimit] = useState(10)
   const [sortBy, setSortBy] = useState('category')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [filters, setFilters] = useState<Record<string, string>>({})
+
   const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
   const [budgets, setBudgets] = useState<IBudget[] | IBudgetHistoric[] | null>([])
   const [totalItems, setTotalItems] = useState(0)
 
   const refreshBudgets = useCallback(
-    (newPage: number, newLimit: number, newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    (
+      newPage: number,
+      newLimit: number,
+      newSortBy: string,
+      newSortOrder: 'asc' | 'desc',
+      newFilters: Record<string, string>
+    ) => {
       setPage(newPage)
       setLimit(newLimit)
       setSortBy(newSortBy)
       setSortOrder(newSortOrder)
+      setFilters(newFilters)
       setRefreshKeyBudgets(prev => prev + 1)
     },
     []
@@ -43,7 +52,7 @@ export default function Budget() {
     const fetchBudgets = async () => {
       const url = present
         ? `/api/budgets?page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&excludeCategory=Ingresos fijos`
-        : `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&excludeCategory=Ingresos fijos`
+        : `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&filters=${JSON.stringify(filters)}&excludeCategory=Ingresos fijos`
       const response = await customFetch(url)
       if (response.ok) {
         const data = await response.json()
@@ -53,7 +62,7 @@ export default function Budget() {
     }
 
     fetchBudgets()
-  }, [refreshKeyBudgets, page, limit, sortBy, sortOrder])
+  }, [refreshKeyBudgets, page, limit, sortBy, sortOrder, filters, monthsSelected])
 
   const filterOptions = [
     { label: 'Mes pasado', value: 'last_month' },
@@ -139,10 +148,12 @@ export default function Budget() {
           limit,
           sortBy,
           sortOrder,
+          filters,
           handleChangePage: (newPage: number) => setPage(newPage),
           handleChangeLimit: (newLimit: number) => setLimit(newLimit),
           handleChangeSort: (newSortBy: string) => setSortBy(newSortBy),
-          handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrder(newOrder)
+          handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrder(newOrder),
+          handleChangeFilters: (newFilters: Record<string, string>) => setFilters(newFilters)
         }}
       >
         {!isMobile && <h2 style={titleStyle}>Presupuesto</h2>}
@@ -162,11 +173,7 @@ export default function Budget() {
             </div>
           )}
           <div style={tabsStyle}>
-            <Tabs
-              value={value}
-              onChange={handleChangeTab}
-              variant={isMobile ? 'fullWidth' : 'standard'}
-            >
+            <Tabs value={value} onChange={handleChangeTab} variant={isMobile ? 'fullWidth' : 'standard'}>
               <Tab
                 classes={{
                   selected: 'tabSelected'

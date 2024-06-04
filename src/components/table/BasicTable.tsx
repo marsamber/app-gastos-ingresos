@@ -1,6 +1,14 @@
 /* eslint-disable no-unused-vars */
-import * as React from 'react'
+import { BudgetsContext } from '@/contexts/BudgetsContext'
+import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
+import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
+import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
+import { SettingsMonthlyIncomeTransactionsContext } from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
+import { TransactionsContext } from '@/contexts/TransactionsContext'
+import { Clear, FilterAlt, Search } from '@mui/icons-material'
+import { IconButton, InputAdornment, TextField } from '@mui/material'
 import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -8,15 +16,10 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
-import Paper from '@mui/material/Paper'
 import { visuallyHidden } from '@mui/utils'
-import { ChangeEvent, MouseEvent, useMemo, useState, useContext } from 'react'
-import { TransactionsContext } from '@/contexts/TransactionsContext'
-import { BudgetsContext } from '@/contexts/BudgetsContext'
-import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
-import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
-import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
-import { SettingsMonthlyIncomeTransactionsContext } from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
+import * as React from 'react'
+import { MouseEvent, useContext, useState } from 'react'
+import IconButtonWithDropdown from '../IconButtonWithDropdown'
 import { TablePagination } from './TablePagination'
 
 export interface HeadCell {
@@ -73,11 +76,15 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
     limit,
     sortBy,
     sortOrder,
+    filters,
     handleChangePage,
     handleChangeLimit,
     handleChangeSort,
-    handleChangeOrder
+    handleChangeOrder,
+    handleChangeFilters
   } = context
+
+  const [localFilters, setLocalFilters] = useState<Record<string, string>>(filters)
 
   const handleRequestSort = (event: MouseEvent<unknown>, property: string) => {
     const isAsc = sortBy === property && sortOrder === 'asc'
@@ -86,6 +93,19 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
   }
 
   const containerRef = React.useRef<HTMLDivElement>(null)
+
+  const handleLocalFilterChange = (filter: string, value: string) => {
+    setLocalFilters(prevFilters => ({ ...prevFilters, [filter]: value }))
+  }
+
+  const handleApplyFilters = () => {
+    handleChangeFilters(localFilters)
+  }
+
+  const handleClearFilter = (property: string) => {
+    setLocalFilters(prevFilters => ({ ...prevFilters, [property]: '' }))
+    handleChangeFilters({ ...filters, [property]: '' })
+  }
 
   return (
     <Paper sx={{ width: '100%', mb: 2 }} ref={containerRef}>
@@ -96,6 +116,12 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
             orderBy={sortBy}
             onRequestSort={handleRequestSort}
             headCells={headCells}
+            filters={localFilters}
+            onFilterChange={handleLocalFilterChange}
+            onClearFilter={handleClearFilter}
+            onApplyFilters={handleApplyFilters}
+            setLocalFilters={setLocalFilters}
+            getFilters={filters}
           />
           <TableBody>
             {rows.map(row => {
@@ -119,8 +145,12 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
                         <TableCell key={index} align="left">
                           {row[cell].toLocaleDateString()}
                         </TableCell>
-                      ) : (
+                      ) : cell === 'actions' ? (
                         <TableCell key={index} align="left">
+                          {row[cell]}
+                        </TableCell>
+                      ) : (
+                        <TableCell key={index} align="left" style={{ paddingLeft: 52 }}>
                           {row[cell]}
                         </TableCell>
                       )
@@ -148,12 +178,33 @@ interface EnhancedTableProps {
   order: 'asc' | 'desc'
   orderBy: string
   headCells: HeadCell[]
+  filters: any
+  onFilterChange: (filter: string, value: string) => void
+  onClearFilter: (property: string) => void
+  onApplyFilters: () => void
+  setLocalFilters: any
+  getFilters: any
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { order, orderBy, onRequestSort, headCells } = props
+  const {
+    order,
+    orderBy,
+    onRequestSort,
+    headCells,
+    filters,
+    onFilterChange,
+    onClearFilter,
+    onApplyFilters,
+    setLocalFilters,
+    getFilters
+  } = props
   const createSortHandler = (property: string) => (event: MouseEvent<unknown>) => {
     onRequestSort(event, property)
+  }
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
+    setLocalFilters(getFilters)
   }
 
   return (
@@ -161,25 +212,61 @@ function EnhancedTableHead(props: EnhancedTableProps) {
       <TableRow>
         {headCells.map(headCell => (
           <TableCell key={headCell.id} align="left" sortDirection={orderBy === headCell.id ? order : false}>
-            {headCell.id !== 'actions' &&
-            headCell.id !== 'spent' &&
-            headCell.id !== 'remaining' &&
-            headCell.id !== 'total' ? (
-              <TableSortLabel
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
-                onClick={createSortHandler(headCell.id)}
-              >
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {(headCell.id === 'title' ||
+                headCell.id === 'category' ||
+                headCell.id === 'id') && (
+                  <IconButtonWithDropdown
+                    icon={<FilterAlt fontSize="small" />}
+                    onClick={event => handleClick(event, headCell.id)}
+                    options={[
+                      <TextField
+                        key={headCell.id}
+                        label="Filtrar"
+                        value={filters[headCell.id] || ''}
+                        onChange={event => onFilterChange(headCell.id, event.target.value)}
+                        size="small"
+                        style={{ width: 200 }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                aria-label="clear filter"
+                                onClick={() => onClearFilter(headCell.id)}
+                                edge="end"
+                              >
+                                <Clear fontSize="small" />
+                              </IconButton>
+                              <IconButton aria-label="apply filter" onClick={() => onApplyFilters()} edge="end">
+                                <Search fontSize="small" />
+                              </IconButton>
+                            </InputAdornment>
+                          )
+                        }}
+                      />
+                    ]}
+                  />
+                )}
+              {headCell.id !== 'actions' &&
+              headCell.id !== 'spent' &&
+              headCell.id !== 'remaining' &&
+              headCell.id !== 'total' ? (
+                <TableSortLabel
+                  active={orderBy === headCell.id}
+                  direction={orderBy === headCell.id ? order : 'asc'}
+                  onClick={createSortHandler(headCell.id)}
+                >
+                  <b>{headCell.label}</b>
+                  {orderBy === headCell.id ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
+              ) : (
                 <b>{headCell.label}</b>
-                {orderBy === headCell.id ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            ) : (
-              <b>{headCell.label}</b>
-            )}
+              )}
+            </div>
           </TableCell>
         ))}
       </TableRow>

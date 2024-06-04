@@ -64,8 +64,10 @@ export interface BaseContextType {
   limit: number;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
+  filters: Record<string, string>;
   handleChangePage: (newPage: number) => void;
   handleChangeLimit: (newLimit: number) => void;
   handleChangeSort: (newSortBy: string) => void;
   handleChangeOrder: (newOrder: 'asc' | 'desc') => void;
+  handleChangeFilters: (newFilters: Record<string, string>) => void;
 }

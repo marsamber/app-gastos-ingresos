@@ -11,12 +11,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'GET':
       try {
         // Retrieve transactions from the database
-        const { startDate, endDate, page, limit, sortBy, sortOrder, excludeCategory } = req.query
+        const { startDate, endDate, page, limit, sortBy, sortOrder, excludeCategory, filters } = req.query
 
         const parsedStartDate = parseDate(startDate as string)
         const parsedEndDate = parseDate(endDate as string)
         const parsedPage = parseIntSafe(page as string)
         const parsedLimit = parseIntSafe(limit as string)
+        const filtersJson = filters && filters !== '{}' ? JSON.parse(filters as string) : undefined
 
         const whereCondition = {
           date: {
@@ -28,6 +29,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             category: {
               not: Array.isArray(excludeCategory) ? { in: excludeCategory as string[] } : (excludeCategory as string)
             }
+          }),
+          // Añadir la condición para filtrar por categoría, cantidad y fecha si está presente
+          ...(filtersJson && {
+            category: filtersJson.category ? { contains: filtersJson.category, mode: 'insensitive' } : undefined
           })
         }
 

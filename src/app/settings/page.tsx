@@ -28,6 +28,7 @@ export default function Settings() {
   const [limitMonthlyIncomeTransactions, setLimitMonthlyIncomeTransactions] = useState(10)
   const [sortByMonthlyIncomeTransactions, setSortByMonthlyIncomeTransactions] = useState('title')
   const [sortOrderMonthlyIncomeTransactions, setSortOrderMonthlyIncomeTransactions] = useState<'asc' | 'desc'>('asc')
+  const [filtersMonthlyIncomeTransactions, setFiltersMonthlyIncomeTransactions] = useState<Record<string, string>>({})
   const [refreshKeyMonthlyIncomeTransactions, setRefreshKeyMonthlyIncomeTransactions] = useState(0)
   const [monthlyIncomeTransactions, setMonthlyIncomeTransactions] = useState<IMonthlyTransaction[] | null>([])
   const [totalItemsMonthlyIncomeTransactions, setTotalItemsMonthlyIncomeTransactions] = useState(0)
@@ -36,6 +37,7 @@ export default function Settings() {
   const [limitMonthlyExpenseTransactions, setLimitMonthlyExpenseTransactions] = useState(10)
   const [sortByMonthlyExpenseTransactions, setSortByMonthlyExpenseTransactions] = useState('title')
   const [sortOrderMonthlyExpenseTransactions, setSortOrderMonthlyExpenseTransactions] = useState<'asc' | 'desc'>('asc')
+  const [filtersMonthlyExpenseTransactions, setFiltersMonthlyExpenseTransactions] = useState<Record<string, string>>({})
   const [refreshKeyMonthlyExpenseTransactions, setRefreshKeyMonthlyExpenseTransactions] = useState(0)
   const [monthlyExpenseTransactions, setMonthlyExpenseTransactions] = useState<IMonthlyTransaction[] | null>([])
   const [totalItemsMonthlyExpenseTransactions, setTotalItemsMonthlyExpenseTransactions] = useState(0)
@@ -44,6 +46,8 @@ export default function Settings() {
   const [limitCategories, setLimitCategories] = useState(15)
   const [sortByCategories, setSortByCategories] = useState('id')
   const [sortOrderCategories, setSortOrderCategories] = useState<'asc' | 'desc'>('asc')
+  const [filtersCategories, setFiltersCategories] = useState<Record<string, string>>({})
+
   const [refreshKeyCategories, setRefreshKeyCategories] = useState(0)
   const [categories, setCategories] = useState<string[]>([])
   const [totalItemsCategories, setTotalItemsCategories] = useState(0)
@@ -53,6 +57,7 @@ export default function Settings() {
   const [limitBudgets, setLimitBudgets] = useState(15)
   const [sortByBudgets, setSortByBudgets] = useState('category')
   const [sortOrderBudgets, setSortOrderBudgets] = useState<'asc' | 'desc'>('asc')
+  const [filtersBudgets, setFiltersBudgets] = useState<Record<string, string>>({})
   const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
   const [budgets, setBudgets] = useState<IBudget[] | IBudgetHistoric[] | null>([])
   const [totalItemsBudgets, setTotalItemsBudgets] = useState(0)
@@ -61,11 +66,18 @@ export default function Settings() {
   const [value, setValue] = useState(0)
 
   const refreshMonthlyIncomeTransactions = useCallback(
-    (newPage: number, newLimit: number, newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    (
+      newPage: number,
+      newLimit: number,
+      newSortBy: string,
+      newSortOrder: 'asc' | 'desc',
+      newFilters: Record<string, string>
+    ) => {
       setPageMonthlyIncomeTransactions(newPage)
       setLimitMonthlyIncomeTransactions(newLimit)
       setSortByMonthlyIncomeTransactions(newSortBy)
       setSortOrderMonthlyIncomeTransactions(newSortOrder)
+      setFiltersMonthlyIncomeTransactions(newFilters)
       setRefreshKeyMonthlyIncomeTransactions(prev => prev + 1)
     },
     []
@@ -74,7 +86,7 @@ export default function Settings() {
   useEffect(() => {
     const fetchMonthlyIncomeTransactions = async () => {
       const response = await customFetch(
-        `/api/monthly_transactions?type=income&page=${pageMonthlyIncomeTransactions + 1}&limit=${limitMonthlyIncomeTransactions}&sortBy=${sortByMonthlyIncomeTransactions}&sortOrder=${sortOrderMonthlyIncomeTransactions}`
+        `/api/monthly_transactions?type=income&page=${pageMonthlyIncomeTransactions + 1}&limit=${limitMonthlyIncomeTransactions}&sortBy=${sortByMonthlyIncomeTransactions}&sortOrder=${sortOrderMonthlyIncomeTransactions}&filters=${JSON.stringify(filtersMonthlyIncomeTransactions)}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -89,15 +101,23 @@ export default function Settings() {
     pageMonthlyIncomeTransactions,
     limitMonthlyIncomeTransactions,
     sortByMonthlyIncomeTransactions,
-    sortOrderMonthlyIncomeTransactions
+    sortOrderMonthlyIncomeTransactions,
+    filtersMonthlyIncomeTransactions
   ])
 
   const refreshMonthlyExpenseTransactions = useCallback(
-    (newPage: number, newLimit: number, newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    (
+      newPage: number,
+      newLimit: number,
+      newSortBy: string,
+      newSortOrder: 'asc' | 'desc',
+      newFilters: Record<string, string>
+    ) => {
       setPageMonthlyExpenseTransactions(newPage)
       setLimitMonthlyExpenseTransactions(newLimit)
       setSortByMonthlyExpenseTransactions(newSortBy)
       setSortOrderMonthlyExpenseTransactions(newSortOrder)
+      setFiltersMonthlyExpenseTransactions(newFilters)
       setRefreshKeyMonthlyExpenseTransactions(prev => prev + 1)
     },
     []
@@ -106,7 +126,7 @@ export default function Settings() {
   useEffect(() => {
     const fetchMonthlyExpenseTransactions = async () => {
       const response = await customFetch(
-        `/api/monthly_transactions?type=expense&page=${pageMonthlyExpenseTransactions + 1}&limit=${limitMonthlyExpenseTransactions}&sortBy=${sortByMonthlyExpenseTransactions}&sortOrder=${sortOrderMonthlyExpenseTransactions}`
+        `/api/monthly_transactions?type=expense&page=${pageMonthlyExpenseTransactions + 1}&limit=${limitMonthlyExpenseTransactions}&sortBy=${sortByMonthlyExpenseTransactions}&sortOrder=${sortOrderMonthlyExpenseTransactions}&filters=${JSON.stringify(filtersMonthlyExpenseTransactions)}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -121,15 +141,23 @@ export default function Settings() {
     pageMonthlyExpenseTransactions,
     limitMonthlyExpenseTransactions,
     sortByMonthlyExpenseTransactions,
-    sortOrderMonthlyExpenseTransactions
+    sortOrderMonthlyExpenseTransactions,
+    filtersMonthlyExpenseTransactions
   ])
 
   const refreshCategories = useCallback(
-    (newPage: number, newLimit: number, newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    (
+      newPage: number,
+      newLimit: number,
+      newSortBy: string,
+      newSortOrder: 'asc' | 'desc',
+      newFilters: Record<string, string>
+    ) => {
       setPageCategories(newPage)
       setLimitCategories(newLimit)
       setSortByCategories(newSortBy)
       setSortOrderCategories(newSortOrder)
+      setFiltersCategories(newFilters)
       setRefreshKeyCategories(prev => prev + 1)
     },
     []
@@ -139,7 +167,7 @@ export default function Settings() {
     const fetchCategories = async () => {
       setLoadingCategories(true)
       const response = await customFetch(
-        `/api/categories?page=${pageCategories + 1}&limit=${limitCategories}&sortBy=${sortByCategories}&sortOrder=${sortOrderCategories}&excludeCategory=Sin categoría`
+        `/api/categories?page=${pageCategories + 1}&limit=${limitCategories}&sortBy=${sortByCategories}&sortOrder=${sortOrderCategories}&excludeCategory=Sin categoría&filters=${JSON.stringify(filtersCategories)}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -150,14 +178,21 @@ export default function Settings() {
     }
 
     fetchCategories()
-  }, [refreshKeyCategories, pageCategories, limitCategories, sortByCategories, sortOrderCategories])
+  }, [refreshKeyCategories, pageCategories, limitCategories, sortByCategories, sortOrderCategories, filtersCategories])
 
   const refreshBudgets = useCallback(
-    (newPage: number, newLimit: number, newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    (
+      newPage: number,
+      newLimit: number,
+      newSortBy: string,
+      newSortOrder: 'asc' | 'desc',
+      newFilters: Record<string, string>
+    ) => {
       setPageBudgets(newPage)
       setLimitBudgets(newLimit)
       setSortByBudgets(newSortBy)
       setSortOrderBudgets(newSortOrder)
+      setFiltersBudgets(newFilters)
       setRefreshKeyBudgets(prev => prev + 1)
     },
     []
@@ -166,8 +201,8 @@ export default function Settings() {
   useEffect(() => {
     const fetchBudgets = async () => {
       const url = present
-        ? `/api/budgets?page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}`
-        : `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}`
+        ? `/api/budgets?page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
+        : `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}&page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
       const response = await customFetch(url)
       if (response.ok) {
         const data = await response.json()
@@ -177,7 +212,16 @@ export default function Settings() {
     }
 
     fetchBudgets()
-  }, [refreshKeyBudgets, pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets, monthSelected, present])
+  }, [
+    refreshKeyBudgets,
+    pageBudgets,
+    limitBudgets,
+    sortByBudgets,
+    sortOrderBudgets,
+    filtersBudgets,
+    monthSelected,
+    present
+  ])
 
   useEffect(() => {
     document.title = 'Configuración - Mis Finanzas'
@@ -227,8 +271,8 @@ export default function Settings() {
         })
       })
       .then(() => {
-        refreshCategories(pageCategories, limitCategories, sortByCategories, sortOrderCategories)
-        refreshBudgets(pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets)
+        refreshCategories(pageCategories, limitCategories, sortByCategories, sortOrderCategories, filtersCategories)
+        refreshBudgets(pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets, filtersBudgets)
         refreshAllCategories && refreshAllCategories()
       })
       .catch(error => {
@@ -250,13 +294,15 @@ export default function Settings() {
         pageMonthlyIncomeTransactions,
         limitMonthlyIncomeTransactions,
         sortByMonthlyIncomeTransactions,
-        sortOrderMonthlyIncomeTransactions
+        sortOrderMonthlyIncomeTransactions,
+        filtersMonthlyIncomeTransactions
       )
       refreshMonthlyExpenseTransactions(
         pageMonthlyExpenseTransactions,
         limitMonthlyExpenseTransactions,
         sortByMonthlyExpenseTransactions,
-        sortOrderMonthlyExpenseTransactions
+        sortOrderMonthlyExpenseTransactions,
+        filtersMonthlyExpenseTransactions
       )
     }
   }
@@ -329,10 +375,12 @@ export default function Settings() {
           limit: limitMonthlyExpenseTransactions,
           sortBy: sortByMonthlyExpenseTransactions,
           sortOrder: sortOrderMonthlyExpenseTransactions,
+          filters: filtersMonthlyExpenseTransactions,
           handleChangeLimit: (newLimit: number) => setLimitMonthlyExpenseTransactions(newLimit),
           handleChangePage: (newPage: number) => setPageMonthlyExpenseTransactions(newPage),
           handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderMonthlyExpenseTransactions(newOrder),
-          handleChangeSort: (newSortBy: string) => setSortByMonthlyExpenseTransactions(newSortBy)
+          handleChangeSort: (newSortBy: string) => setSortByMonthlyExpenseTransactions(newSortBy),
+          handleChangeFilters: (newFilters: Record<string, string>) => setFiltersMonthlyExpenseTransactions(newFilters)
         }}
       >
         <SettingsMonthlyIncomeTransactionsContext.Provider
@@ -345,10 +393,12 @@ export default function Settings() {
             limit: limitMonthlyIncomeTransactions,
             sortBy: sortByMonthlyIncomeTransactions,
             sortOrder: sortOrderMonthlyIncomeTransactions,
+            filters: filtersMonthlyIncomeTransactions,
             handleChangeLimit: (newLimit: number) => setLimitMonthlyIncomeTransactions(newLimit),
             handleChangePage: (newPage: number) => setPageMonthlyIncomeTransactions(newPage),
             handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderMonthlyIncomeTransactions(newOrder),
-            handleChangeSort: (newSortBy: string) => setSortByMonthlyIncomeTransactions(newSortBy)
+            handleChangeSort: (newSortBy: string) => setSortByMonthlyIncomeTransactions(newSortBy),
+            handleChangeFilters: (newFilters: Record<string, string>) => setFiltersMonthlyIncomeTransactions(newFilters)
           }}
         >
           <SettingsCategoriesContext.Provider
@@ -361,10 +411,12 @@ export default function Settings() {
               limit: limitCategories,
               sortBy: sortByCategories,
               sortOrder: sortOrderCategories,
+              filters: filtersCategories,
               handleChangeLimit: (newLimit: number) => setLimitCategories(newLimit),
               handleChangePage: (newPage: number) => setPageCategories(newPage),
               handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderCategories(newOrder),
-              handleChangeSort: (newSortBy: string) => setSortByCategories(newSortBy)
+              handleChangeSort: (newSortBy: string) => setSortByCategories(newSortBy),
+              handleChangeFilters: (newFilters: Record<string, string>) => setFiltersCategories(newFilters)
             }}
           >
             <SettingsBudgetsContext.Provider
@@ -377,10 +429,12 @@ export default function Settings() {
                 limit: limitBudgets,
                 sortBy: sortByBudgets,
                 sortOrder: sortOrderBudgets,
+                filters: filtersBudgets,
                 handleChangeLimit: (newLimit: number) => setLimitBudgets(newLimit),
                 handleChangePage: (newPage: number) => setPageBudgets(newPage),
                 handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderBudgets(newOrder),
                 handleChangeSort: (newSortBy: string) => setSortByBudgets(newSortBy),
+                handleChangeFilters: (newFilters: Record<string, string>) => setFiltersBudgets(newFilters),
                 monthSelected
               }}
             >

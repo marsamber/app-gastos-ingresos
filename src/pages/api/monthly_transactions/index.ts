@@ -9,10 +9,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (method) {
     case 'GET':
       try {
-        const { type, page, limit, sortBy, sortOrder } = req.query
+        const { type, page, limit, sortBy, sortOrder, filters } = req.query
 
         const parsedPage = parseIntSafe(page as string)
         const parsedLimit = parseIntSafe(limit as string)
+        const filtersJson = filters && filters !== '{}' ? JSON.parse(filters as string) : undefined
 
         const paginationOptions = {
           skip: parsedPage && parsedLimit ? (parsedPage - 1) * parsedLimit : undefined,
@@ -26,7 +27,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const filterOptions = {
           where: {
-            amount: type === 'expense' ? { lt: 0 } : type === 'income' ? { gt: 0 } : undefined
+            amount: type === 'expense' ? { lt: 0 } : type === 'income' ? { gt: 0 } : undefined,
+            ...(filtersJson && {
+              title: filtersJson.title ? { contains: filtersJson.title, mode: 'insensitive' } : undefined,
+              category: filtersJson.category ? { contains: filtersJson.category, mode: 'insensitive' } : undefined
+            })
           }
         }
 

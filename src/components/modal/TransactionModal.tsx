@@ -27,7 +27,12 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
   const {
     refreshTransactions: refreshTransactionsTable,
-    page, limit, sortBy, sortOrder, type: typeTable
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    type: typeTable,
+    filters
   } = useContext(TransactionsContext)
   const { refreshTransactions, refreshKeyCategories } = useContext(RefreshContext)
 
@@ -111,7 +116,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
       })
 
       if (response.ok) {
-        refreshTransactionsTable(page, limit, sortBy, sortOrder, typeTable)
+        refreshTransactionsTable(page, limit, sortBy, sortOrder, typeTable, filters)
         refreshTransactions && refreshTransactions()
         handleClose()
       }

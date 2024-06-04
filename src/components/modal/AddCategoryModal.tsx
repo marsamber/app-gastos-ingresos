@@ -26,7 +26,8 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
     page,
     limit,
     sortBy,
-    sortOrder
+    sortOrder,
+    filters
   } = useContext(SettingsCategoriesContext)
 
   const { refreshCategories } = useContext(RefreshContext)
@@ -78,7 +79,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
       })
 
       if (response.ok) {
-        refreshTableCategories(page, limit, sortBy, sortOrder)
+        refreshTableCategories(page, limit, sortBy, sortOrder, filters)
         refreshCategories && refreshCategories()
         setLoading(false)
         handleCloseModal()

@@ -26,6 +26,7 @@ export default function Transactions() {
   const [sortBy, setSortBy] = useState('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [type, setType] = useState<'income' | 'expense' | null>(null)
+  const [filters, setFilters] = useState<Record<string, string>>({})
   const [refreshKey, setRefreshKey] = useState(0)
   const [transactions, setTransactions] = useState<ITransaction[] | null>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -36,13 +37,15 @@ export default function Transactions() {
       newLimit: number,
       newSortBy: string,
       newSortOrder: 'asc' | 'desc',
-      type: 'income' | 'expense' | null
+      type: 'income' | 'expense' | null,
+      newFilters: Record<string, string>
     ) => {
       setPage(newPage)
       setLimit(newLimit)
       setSortBy(newSortBy)
       setSortOrder(newSortOrder)
       setType(type)
+      setFilters(newFilters)
       setRefreshKey(prev => prev + 1)
     },
     []
@@ -51,7 +54,7 @@ export default function Transactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       const response = await customFetch(
-        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&type=${type}`
+        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&type=${type}&filters=${JSON.stringify(filters)}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -60,7 +63,7 @@ export default function Transactions() {
       }
     }
     fetchTransactions()
-  }, [refreshKey, monthsSelected, page, limit, sortBy, sortOrder, type])
+  }, [refreshKey, monthsSelected, page, limit, sortBy, sortOrder, type, filters])
 
   const filterOptions = [
     { label: 'Este mes', value: 'this_month' },
@@ -99,7 +102,7 @@ export default function Transactions() {
     })
 
     if (response.ok) {
-      refreshTransactions(page, limit, sortBy, sortOrder, type)
+      refreshTransactions(page, limit, sortBy, sortOrder, type, filters)
     }
   }
 
@@ -141,10 +144,12 @@ export default function Transactions() {
           sortBy,
           sortOrder,
           type,
+          filters,
           handleChangePage: (newPage: number) => setPage(newPage),
           handleChangeLimit: (newLimit: number) => setLimit(newLimit),
           handleChangeSort: (newSortBy: string) => setSortBy(newSortBy),
-          handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrder(newOrder)
+          handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrder(newOrder),
+          handleChangeFilters: (newFilters: Record<string, string>) => setFilters(newFilters)
         }}
       >
         {!isMobile && <h2 style={titleStyle}>Transacciones</h2>}

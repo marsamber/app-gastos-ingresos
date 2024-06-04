@@ -10,7 +10,8 @@ export interface TransactionsContextType extends BaseContextType {
     limit: number,
     sortBy: string,
     sortOrder: 'asc' | 'desc',
-    type: 'income' | 'expense' | null
+    type: 'income' | 'expense' | null,
+    filters: Record<string, string>
   ) => void
   refreshKey: number
 
@@ -29,11 +30,13 @@ const defaultValue: TransactionsContextType = {
   sortBy: 'date',
   sortOrder: 'desc',
   type: null,
+  filters: {},
 
   handleChangePage: () => {},
   handleChangeLimit: () => {},
   handleChangeSort: () => {},
-  handleChangeOrder: () => {}
+  handleChangeOrder: () => {},
+  handleChangeFilters: () => {}
 }
 
 export const TransactionsContext = createContext<TransactionsContextType>(defaultValue)

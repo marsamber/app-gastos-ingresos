@@ -5,7 +5,13 @@ import { createContext } from 'react'
 export interface SettingsCategoriesContextType extends BaseContextType {
   categories: string[] | null
 
-  refreshCategories: (page: number, limit: number, sortBy: string, sortOrder: 'asc' | 'desc') => void
+  refreshCategories: (
+    page: number,
+    limit: number,
+    sortBy: string,
+    sortOrder: 'asc' | 'desc',
+    filters: Record<string, string>
+  ) => void
   refreshKey: number
 }
 
@@ -20,11 +26,13 @@ const defaultValue: SettingsCategoriesContextType = {
   limit: 15,
   sortBy: 'id',
   sortOrder: 'asc',
+  filters: {},
 
   handleChangePage: () => {},
   handleChangeLimit: () => {},
   handleChangeSort: () => {},
-  handleChangeOrder: () => {}
+  handleChangeOrder: () => {},
+  handleChangeFilters: () => {}
 }
 
 export const SettingsCategoriesContext = createContext<SettingsCategoriesContextType>(defaultValue)

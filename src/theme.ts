@@ -49,7 +49,22 @@ const theme = createTheme({
           }
         }
       }
-    }
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          "&:hover": {
+            backgroundColor: 'transparent'
+          },
+          "&.Mui-selected": {
+            backgroundColor: 'transparent'
+          },
+          "&.Mui-focusVisible": {
+            backgroundColor: 'transparent'
+          }
+        }
+      }
+    },
   }
 })
 

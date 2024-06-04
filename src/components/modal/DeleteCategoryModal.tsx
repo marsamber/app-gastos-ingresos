@@ -25,21 +25,24 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
     page: pageMonthlyExpenseTransactions,
     limit: limitMonthlyExpenseTransactions,
     sortBy: sortByMonthlyExpenseTransactions,
-    sortOrder: sortOrderMonthlyExpenseTransactions
+    sortOrder: sortOrderMonthlyExpenseTransactions,
+    filters: filtersMonthlyExpenseTransactions
   } = useContext(SettingsMonthlyExpenseTransactionsContext)
   const {
     refreshCategories: refreshTableCategories,
     page,
     limit,
     sortBy,
-    sortOrder
+    sortOrder,
+    filters
   } = useContext(SettingsCategoriesContext)
   const {
     refreshBudgets,
     page: pageBudgets,
     limit: limitBudgets,
     sortBy: sortByBudgets,
-    sortOrder: sortOrderBudgets
+    sortOrder: sortOrderBudgets,
+    filters: filtersBudgets
   } = useContext(SettingsBudgetsContext)
 
   const [loading, setLoading] = useState(false)
@@ -110,9 +113,11 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
 
   const updateMonthlyTransactions = async () => {
     if (!monthlyTransactionsData || !category) return
-    
+
     try {
-      const transactionsToUpdate = monthlyTransactionsData.monthlyTransactions.filter(transaction => transaction.category === category)
+      const transactionsToUpdate = monthlyTransactionsData.monthlyTransactions.filter(
+        transaction => transaction.category === category
+      )
       for (const transaction of transactionsToUpdate) {
         const response = await customFetch(`/api/monthly_transactions/${transaction.id}`, {
           method: 'PUT',
@@ -175,9 +180,15 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
       })
 
       if (response.ok) {
-        refreshBudgets(pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets)
-        refreshTableCategories(page, limit, sortBy, sortOrder)
-        refreshMonthlyTransactions(pageMonthlyExpenseTransactions, limitMonthlyExpenseTransactions, sortByMonthlyExpenseTransactions, sortOrderMonthlyExpenseTransactions)
+        refreshBudgets(pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets, filtersBudgets)
+        refreshTableCategories(page, limit, sortBy, sortOrder, filters)
+        refreshMonthlyTransactions(
+          pageMonthlyExpenseTransactions,
+          limitMonthlyExpenseTransactions,
+          sortByMonthlyExpenseTransactions,
+          sortOrderMonthlyExpenseTransactions,
+          filtersMonthlyExpenseTransactions
+        )
         refreshCategories && refreshCategories()
         handleClose()
       }

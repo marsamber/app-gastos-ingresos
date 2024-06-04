@@ -1,7 +1,5 @@
 import { RefreshContext } from '@/contexts/RefreshContext'
-import {
-  SettingsMonthlyIncomeTransactionsContext
-} from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
+import { SettingsMonthlyIncomeTransactionsContext } from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
 import { ICategories, IMonthlyTransaction } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
 import { Autocomplete, Button, TextField, useMediaQuery } from '@mui/material'
@@ -38,14 +36,16 @@ export default function FixedTransactionModal({
     page: pageIncome,
     limit: limitIncome,
     sortBy: sortByIncome,
-    sortOrder: sortOrderIncome
+    sortOrder: sortOrderIncome,
+    filters: filtersIncome
   } = useContext(SettingsMonthlyIncomeTransactionsContext)
   const {
     refreshMonthlyTransactions: refreshExpense,
     page: pageExpense,
     limit: limitExpense,
     sortBy: sortByExpense,
-    sortOrder: sortOrderExpense
+    sortOrder: sortOrderExpense,
+    filters: filtersExpense
   } = useContext(SettingsMonthlyExpenseTransactionsContext)
 
   const { refreshKeyCategories } = useContext(RefreshContext)
@@ -120,9 +120,9 @@ export default function FixedTransactionModal({
 
       if (response.ok) {
         if (transactionType === 'income') {
-          refreshIncome(pageIncome, limitIncome, sortByIncome, sortOrderIncome)
+          refreshIncome(pageIncome, limitIncome, sortByIncome, sortOrderIncome, filtersIncome)
         } else {
-          refreshExpense(pageExpense, limitExpense, sortByExpense, sortOrderExpense)
+          refreshExpense(pageExpense, limitExpense, sortByExpense, sortOrderExpense, filtersExpense)
         }
         handleCloseModal()
       }

@@ -9,10 +9,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (method) {
     case 'GET':
       try {
-        const { page, limit, sortBy, sortOrder, excludeCategory } = req.query
+        const { page, limit, sortBy, sortOrder, excludeCategory, filters } = req.query
 
         const parsedPage = parseIntSafe(page as string)
         const parsedLimit = parseIntSafe(limit as string)
+        const filtersJson = filters && filters !== '{}' ? JSON.parse(filters as string) : undefined
 
         const paginationOptions = {
           skip: parsedPage && parsedLimit ? (parsedPage - 1) * parsedLimit : undefined,
@@ -23,16 +24,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               }
             : undefined
         }
-        
+
         // Definir el filtro de exclusión de categoría
-        let filterOptions = {}
-        if (excludeCategory) {
-          filterOptions = {
-            where: {
+        const filterOptions = {
+          where: {
+            ...(excludeCategory && {
               category: {
                 not: Array.isArray(excludeCategory) ? { in: excludeCategory as string[] } : (excludeCategory as string)
               }
-            }
+            }),
+            ...(filtersJson && {
+              category: filtersJson.category ? { contains: filtersJson.category, mode: 'insensitive' } : undefined
+            })
           }
         }
 

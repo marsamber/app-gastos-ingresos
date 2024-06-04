@@ -11,20 +11,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'GET':
       try {
         // Retrieve transactions from the database
-        const { startDate, endDate, type, page, limit, sortBy, sortOrder } = req.query
+        const { startDate, endDate, type, page, limit, sortBy, sortOrder, filters } = req.query
 
         const parsedStartDate = parseDate(startDate as string)
         const parsedEndDate = parseDate(endDate as string)
         const parsedPage = parseIntSafe(page as string)
         const parsedLimit = parseIntSafe(limit as string)
+        const filtersJson = filters && filters !== '{}' ? JSON.parse(filters as string) : undefined
 
         const whereCondition = {
           date: {
             gte: parsedStartDate,
             lte: parsedEndDate
           },
-          amount: type === 'expense' ? { lt: 0 } : type === 'income' ? { gt: 0 } : undefined
+          amount: type === 'expense' ? { lt: 0 } : type === 'income' ? { gt: 0 } : undefined,
+          ...(filtersJson && {
+            title: filtersJson.title ? { contains: filtersJson.title, mode: 'insensitive' } : undefined,
+            category: filtersJson.category ? { contains: filtersJson.category, mode: 'insensitive' } : undefined
+          })
         }
+
+        console.log('whereCondition:', whereCondition)
 
         const paginationOptions = {
           skip: parsedPage ? (parsedPage - 1) * (parsedLimit ?? 0) : undefined,

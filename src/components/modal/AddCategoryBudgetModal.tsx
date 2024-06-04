@@ -27,10 +27,10 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   const [amount, setAmount] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState({ category: false, amount: false, message: '' })
-const [categories, setCategories] = useState<string[] | null>(null)
+  const [categories, setCategories] = useState<string[] | null>(null)
 
-  const { budgets, monthSelected, refreshBudgets,
-    page, limit, sortBy, sortOrder } = useContext(SettingsBudgetsContext)
+  const { budgets, monthSelected, refreshBudgets, page, limit, sortBy, sortOrder, filters } =
+    useContext(SettingsBudgetsContext)
   const currentDate = useMemo(() => new Date().toISOString().substring(0, 7), [])
   const present = useMemo(() => monthSelected.substring(0, 7) === currentDate, [monthSelected, currentDate])
 
@@ -51,14 +51,15 @@ const [categories, setCategories] = useState<string[] | null>(null)
   }, [open])
 
   const categoriesOptions = useMemo(() => {
-    const filteredCategories = categories
-      ?.filter(
-        category =>
-          !budgets?.some(budget => budget.category === category) &&
-          category !== 'Ingresos fijos' &&
-          category !== 'Sin categoría'
-      )
-      .sort() || []
+    const filteredCategories =
+      categories
+        ?.filter(
+          category =>
+            !budgets?.some(budget => budget.category === category) &&
+            category !== 'Ingresos fijos' &&
+            category !== 'Sin categoría'
+        )
+        .sort() || []
     return filteredCategories.map(category => ({ title: category, inputValue: category }))
   }, [categories, budgets])
 
@@ -119,11 +120,11 @@ const [categories, setCategories] = useState<string[] | null>(null)
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(budgetData)
-    })    
+    })
 
     if (response.ok) {
       refreshCategories && refreshCategories()
-      refreshBudgets(page, limit, sortBy, sortOrder)
+      refreshBudgets(page, limit, sortBy, sortOrder, filters)
       handleCloseModal()
     } else {
       setError({ ...error, message: 'Error al guardar el presupuesto.' })
