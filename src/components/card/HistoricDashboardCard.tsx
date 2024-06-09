@@ -1,7 +1,7 @@
 import { HomeContext } from '@/contexts/HomeContext'
 import useFetch from '@/hooks/useFetch'
 import { IBudgetHistorics, ITransactions } from '@/types/index'
-import { convertDate, formatMonthYear, getTwoFirstDecimals } from '@/utils/utils'
+import { convertDate, formatDate, formatMonthYear, getTwoFirstDecimals } from '@/utils/utils'
 import { CircularProgress, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import {
@@ -40,7 +40,7 @@ export default function HistoricDashboardCard() {
       const isLeapYear = date.getFullYear() % 4 === 0
       const daysToSubtract = isLeapYear ? 365 : 364
       date.setDate(date.getDate() - daysToSubtract)
-      return date.toISOString().split('T')[0]
+      return formatDate(date.getFullYear(), date.getMonth(), 1, 0, 0)
     }
 
     const monthsHistoric = calculateMonthsHistoric()

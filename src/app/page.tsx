@@ -11,17 +11,18 @@ import useFetch from '@/hooks/useFetch'
 import theme from '@/theme'
 import { IBudgetHistorics, IBudgets, IMonthlyTransactions, ITransaction } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
-import { getTwoFirstDecimals } from '@/utils/utils'
+import { formatDate, getTwoFirstDecimals } from '@/utils/utils'
 import { Info } from '@mui/icons-material'
 import { Tooltip, useMediaQuery } from '@mui/material'
-import dayjs from 'dayjs'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
 
 export default function Home() {
+  const today = new Date()
+
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
-    dayjs().startOf('month').format('YYYY-MM-DD'),
-    dayjs().endOf('month').format('YYYY-MM-DD')
+    formatDate(today.getFullYear(), today.getMonth(), 1, 0, 0),
+    formatDate(today.getFullYear(), today.getMonth() + 1, 0, 23, 59)
   ])
   const [budget, setBudget] = useState<number>(0)
   const [present, setPresent] = useState<boolean>(true)
@@ -62,15 +63,17 @@ export default function Home() {
     if (budgetsData && transactions && budgetHistoricsData && monthlyTransactionsData) {
       let totalBudget = 0
       let totalFixedExpenses = 0
-      const currentDate = new Date().toISOString().split('T')[0]
+      const currentDate = formatDate(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours(), today.getMinutes())
       // If the second month is greater than the current date, we will take into account the budgets
       if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
         totalBudget = budgetsData.budgets
           .filter(budget => budget.category !== 'Ingresos fijos')
           .reduce((acc, budget) => acc + budget.amount, 0)
 
-        totalFixedExpenses = monthlyTransactionsData.monthlyTransactions
-          .reduce((acc, transaction) => acc + transaction.amount, 0)
+        totalFixedExpenses = monthlyTransactionsData.monthlyTransactions.reduce(
+          (acc, transaction) => acc + transaction.amount,
+          0
+        )
       }
 
       const totalHistorics = budgetHistoricsData.budgetHistorics
@@ -86,7 +89,7 @@ export default function Home() {
   }, [budgetsData, transactions, budgetHistoricsData])
 
   useEffect(() => {
-    const currentDate = new Date().toISOString().split('T')[0]
+    const currentDate = formatDate(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours(), today.getMinutes())
     if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
       setPresent(true)
     } else {

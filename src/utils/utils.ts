@@ -40,29 +40,36 @@ export const getTwoFirstDecimals = (number: number) => {
   return Number(number.toFixed(2))
 }
 
+export const formatDate = (year: number, month: number, day: number, hour: number, minute: number): string => {
+  const date = new Date(Date.UTC(year, month, day, hour, minute))
+  return date.toISOString()
+}
+
 export const handleDateFilterChange = (value: string): string[] => {
   const today = new Date()
   const currentYear = today.getFullYear()
   const currentMonth = today.getMonth()
-  const timezoneOffset = today.getTimezoneOffset() * 60000
-
-  const formatDate = (year: number, month: number, day: number) =>
-    new Date(new Date(year, month, day).getTime() - timezoneOffset).toISOString().split('T')[0]
 
   let monthsSelected = ['', '']
 
   switch (value) {
     case 'this_month':
-      monthsSelected = [formatDate(currentYear, currentMonth, 1), formatDate(currentYear, currentMonth + 1, 0)]
+      monthsSelected = [
+        formatDate(currentYear, currentMonth, 1, 0, 0),
+        formatDate(currentYear, currentMonth + 1, 0, 23, 59)
+      ]
       break
     case 'last_month':
-      monthsSelected = [formatDate(currentYear, currentMonth - 1, 1), formatDate(currentYear, currentMonth, 0)]
+      monthsSelected = [
+        formatDate(currentYear, currentMonth - 1, 1, 0, 0),
+        formatDate(currentYear, currentMonth, 0, 23, 59)
+      ]
       break
     case 'this_year':
-      monthsSelected = [formatDate(currentYear, 0, 1), formatDate(currentYear, 11, 31)]
+      monthsSelected = [formatDate(currentYear, 0, 1, 0, 0), formatDate(currentYear, 11, 31, 23, 59)]
       break
     case 'last_year':
-      monthsSelected = [formatDate(currentYear - 1, 0, 1), formatDate(currentYear - 1, 11, 31)]
+      monthsSelected = [formatDate(currentYear - 1, 0, 1, 0, 0), formatDate(currentYear - 1, 11, 31, 23, 59)]
       break
   }
   return monthsSelected

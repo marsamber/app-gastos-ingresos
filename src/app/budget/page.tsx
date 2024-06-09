@@ -4,7 +4,7 @@ import { BudgetsContext } from '@/contexts/BudgetsContext'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import { IBudget, IBudgetHistoric } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
-import { handleDateFilterChange } from '@/utils/utils'
+import { formatDate, handleDateFilterChange } from '@/utils/utils'
 import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
 import { SyntheticEvent, useCallback, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
@@ -105,7 +105,7 @@ export default function Budget() {
   }, [monthsSelected, refreshKeyTransactions])
 
   useEffect(() => {
-    const currentDate = new Date().toISOString().split('T')[0]
+    const currentDate = formatDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0)
     if (new Date(monthsSelected[1]) >= new Date(currentDate) || monthsSelected[1] === '') {
       setPresent(true)
     } else {

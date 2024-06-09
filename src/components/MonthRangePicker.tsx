@@ -6,6 +6,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/es'
 import '../styles.css'
 import { useMediaQuery } from '@mui/material'
+import { formatDate } from '@/utils/utils'
 
 interface MonthRangePickerProps {
   setMonthsSelected: (dates: [string, string]) => void
@@ -15,9 +16,11 @@ export default function MonthRangePicker({ setMonthsSelected }: MonthRangePicker
   const isMobile = useMediaQuery('(max-width: 600px)')
 
   const handleOnChangeDates = (monthsSelected: [Dayjs, Dayjs]) => {
+    const start = monthsSelected[0]
+    const end = monthsSelected[1]
     setMonthsSelected([
-      monthsSelected[0].startOf('month').format('YYYY-MM-DD'),
-      monthsSelected[1].endOf('month').format('YYYY-MM-DD')
+      formatDate(start.year(), start.month(), 1, 0, 0),
+      formatDate(end.year(), end.month() + 1, 0, 23, 59)
     ])
   }
 
