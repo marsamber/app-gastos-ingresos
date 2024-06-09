@@ -4,7 +4,11 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 // pages/api/update_historic/index.js
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+
   const authHeader = req.headers['authorization']
+  console.log("Headers", req.headers)
+  console.log("Authorization Header:", authHeader);
+  console.log("Expected Header:", `Bearer ${process.env.CRON_SECRET}`);
   if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).json({ success: false })
   }
