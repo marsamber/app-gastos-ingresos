@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Lista de rutas que no requieren autenticación
-  const openPaths = ['/api/login']
+  const openPaths = ['/api/login', '/api/update_historic']
 
   if (openPaths.includes(pathname)) {
     return NextResponse.next()
