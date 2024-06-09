@@ -15,13 +15,13 @@ import { Tab, Tabs, Tooltip, useMediaQuery } from '@mui/material'
 import dayjs from 'dayjs'
 import { CSSProperties, SyntheticEvent, useCallback, useContext, useEffect, useState } from 'react'
 import '../../styles.css'
-import { getTwoFirstDecimals } from '@/utils/utils'
+import { formatDate, getTwoFirstDecimals } from '@/utils/utils'
 
 export default function Settings() {
   const { refreshCategories: refreshAllCategories } = useContext(RefreshContext)
   const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1400px)')
-  const [monthSelected, setMonthSelected] = useState<string>(dayjs().startOf('month').format('YYYY-MM-DD'))
+  const [monthSelected, setMonthSelected] = useState<string>(formatDate(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0))
   const [present, setPresent] = useState<boolean>(true)
 
   const [pageMonthlyIncomeTransactions, setPageMonthlyIncomeTransactions] = useState(0)
@@ -200,9 +200,12 @@ export default function Settings() {
 
   useEffect(() => {
     const fetchBudgets = async () => {
+      const endDate = new Date(dayjs(monthSelected).endOf('month').toISOString())
+      const formattedEndDate = formatDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59)
+      
       const url = present
         ? `/api/budgets?page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
-        : `/api/budget_historics?startDate=${monthSelected}&endDate=${dayjs(monthSelected).endOf('month').format('YYYY-MM-DD')}&page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
+        : `/api/budget_historics?startDate=${monthSelected}&endDate=${formattedEndDate}&page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
       const response = await customFetch(url)
       if (response.ok) {
         const data = await response.json()
@@ -319,7 +322,7 @@ export default function Settings() {
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue)
     if (newValue === 1) {
-      setMonthSelected(dayjs().startOf('month').format('YYYY-MM-DD'))
+      setMonthSelected(formatDate(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0))
     }
   }
 

@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import { KeyboardArrowRight } from '@mui/icons-material'
 import { DatePicker } from 'antd'
 import locale from 'antd/es/date-picker/locale/es_ES'
 import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/es'
 import '../styles.css'
+import { formatDate } from '@/utils/utils'
 
 interface MonthPickerProps {
   setMonthSelected: (monthSelected: string) => void
@@ -12,7 +12,7 @@ interface MonthPickerProps {
 
 export default function MonthPicker({ setMonthSelected }: MonthPickerProps) {
   const handleOnChangeDate = (monthSelected: Dayjs) => {
-    setMonthSelected(monthSelected.startOf('month').format('YYYY-MM-DD'))
+    setMonthSelected(formatDate(monthSelected.year(), monthSelected.month(), 1, 0, 0))
   }
 
   return (
