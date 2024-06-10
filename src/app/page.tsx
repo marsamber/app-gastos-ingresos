@@ -14,23 +14,16 @@ import customFetch from '@/utils/fetchWrapper'
 import { formatDate, getTwoFirstDecimals } from '@/utils/utils'
 import { Info } from '@mui/icons-material'
 import { CircularProgress, Tooltip, useMediaQuery } from '@mui/material'
-import { useSearchParams } from 'next/navigation'
 import { CSSProperties, Suspense, useContext, useEffect, useState } from 'react'
 import '../styles.css'
+import SearchParamsHandler from '@/components/SearchParamsHandler '
 
 export default function Home() {
   const today = new Date()
-  const searchParams = useSearchParams()
-  const [monthsSelected, setMonthsSelected] = useState<[string, string]>(() => {
-    if (searchParams && searchParams.has('startDate') && searchParams.has('endDate')) {
-      return [searchParams.get('startDate') as string, searchParams.get('endDate') as string]
-    } else {
-      return [
-        formatDate(today.getFullYear(), today.getMonth(), 1, 0, 0),
-        formatDate(today.getFullYear(), today.getMonth() + 1, 0, 23, 59)
-      ]
-    }
-  })
+  const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
+    formatDate(today.getFullYear(), today.getMonth(), 1, 0, 0),
+    formatDate(today.getFullYear(), today.getMonth() + 1, 0, 23, 59)
+  ])
 
   const [budget, setBudget] = useState<number>(0)
   const [present, setPresent] = useState<boolean>(true)
@@ -113,7 +106,6 @@ export default function Home() {
     const [year, month, day] = monthsSelected[1].split('-').map(date => parseInt(date))
     const endDate = formatDate(year, month - 1, day, 23, 59)
     if (new Date(endDate) >= new Date(currentDate)) {
-      console.log('Present')
       setPresent(true)
     } else {
       setPresent(false)
@@ -167,28 +159,23 @@ export default function Home() {
   }
 
   return (
-    <Suspense
-      fallback={
-        <div>
-          <CircularProgress />
-        </div>
-      }
-    >
-      <main className="main">
-        <HomeContext.Provider
-          value={{
-            monthsSelected,
-            setMonthsSelected,
-            budget,
-            setBudget,
-            transactions,
-            budgets: present ? (budgetsData ? budgetsData.budgets : []) : null,
-            budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
-            loadingTransactions,
-            loadingBudgets,
-            loadingBudgetHistorics
-          }}
-        >
+    <main className="main">
+      <HomeContext.Provider
+        value={{
+          monthsSelected,
+          setMonthsSelected,
+          budget,
+          setBudget,
+          transactions,
+          budgets: present ? (budgetsData ? budgetsData.budgets : []) : null,
+          budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
+          loadingTransactions,
+          loadingBudgets,
+          loadingBudgetHistorics
+        }}
+      >
+        <Suspense fallback={<CircularProgress />}>
+          <SearchParamsHandler setMonthsSelected={setMonthsSelected} />
           <div style={headerStyle}>
             <div
               style={{
@@ -229,8 +216,8 @@ export default function Home() {
             </div>
             <HistoricDashboardCard />
           </div>
-        </HomeContext.Provider>
-      </main>
-    </Suspense>
+        </Suspense>
+      </HomeContext.Provider>
+    </main>
   )
 }
