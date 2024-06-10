@@ -20,6 +20,7 @@ import { formatDate, getTwoFirstDecimals } from '@/utils/utils'
 export default function Settings() {
   const { refreshCategories: refreshAllCategories } = useContext(RefreshContext)
   const isMobile = useMediaQuery('(max-width: 600px)')
+  const sideBarCollapsed = useMediaQuery('(max-width: 899px)')
   const isTablet = useMediaQuery('(max-width: 1400px)')
   const [monthSelected, setMonthSelected] = useState<string>(formatDate(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0))
   const [present, setPresent] = useState<boolean>(true)
@@ -202,7 +203,7 @@ export default function Settings() {
     const fetchBudgets = async () => {
       const endDate = new Date(dayjs(monthSelected).endOf('month').toISOString())
       const formattedEndDate = formatDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59)
-      
+
       const url = present
         ? `/api/budgets?page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
         : `/api/budget_historics?startDate=${monthSelected}&endDate=${formattedEndDate}&page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
@@ -449,7 +450,7 @@ export default function Settings() {
                   width: '100%'
                 }}
               >
-                {!isMobile && <h2 style={titleStyle}>Configuración</h2>}
+                {!sideBarCollapsed && <h2 style={titleStyle}>Configuración</h2>}
                 {present && isMobile ? (
                   <h4 style={budgetStyle}>
                     Presupuesto sin asignar: {restingBudget} €

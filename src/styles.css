@@ -91,6 +91,11 @@
     background: #4A9ABE;
 }
 
+.ant-picker.ant-picker-outlined:hover {
+  border-color: #257CA3;
+  background-color: #ffffff;
+}
+
 .ant-picker.ant-picker-outlined:focus{
   border-color: #257CA3 !important;
 }
@@ -111,7 +116,7 @@
   background-color: transparent;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1030px) {
   .ant-picker-panel-container {
     overflow: scroll !important;
     height: 100% !important;
@@ -162,7 +167,7 @@
     font-weight: bold !important;
   }
 
-  .ant-picker-large .ant-picker-input > input {
+  .monthRangePicker:nth-child(2) .ant-picker-input > input {
     font-size: 1.17em !important;
     font-weight: bold !important;
   }

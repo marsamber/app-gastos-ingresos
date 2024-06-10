@@ -31,6 +31,7 @@ export default function Home() {
   const [loadingTransactions, setLoadingTransactions] = useState<boolean>(true)
 
   const isMobile = useMediaQuery('(max-width: 600px)')
+  const sideBarCollapsed = useMediaQuery('(max-width: 899px)')
 
   useEffect(() => {
     document.title = `Dashboard`
@@ -43,7 +44,7 @@ export default function Home() {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
       const response = await customFetch(
-        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
+        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&orderBy=date&order=desc`
       )
 
       const { transactions } = await response.json()
@@ -185,7 +186,7 @@ export default function Home() {
                 gap: isMobile ? 0 : '10px'
               }}
             >
-              {!isMobile && <h2 style={titleStyle}>Dashboard</h2>}
+              {!sideBarCollapsed && <h2 style={titleStyle}>Dashboard</h2>}
               <MonthRangePicker
                 monthsSelected={monthsSelected}
                 setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)}

@@ -17,6 +17,7 @@ export default function Transactions() {
     handleDateFilterChange('this_month') as [string, string]
   )
   const isMobile = useMediaQuery('(max-width: 600px)')
+  const sideBarCollapsed = useMediaQuery('(max-width: 899px)')
   const [addTransactionTable, setAddTransactionTable] = useState(false)
   const [openEditTransaction, setOpenEditTransaction] = useState(false)
   const [transaction, setTransaction] = useState<ITransaction | null>(null)
@@ -152,7 +153,7 @@ export default function Transactions() {
           handleChangeFilters: (newFilters: Record<string, string>) => setFilters(newFilters)
         }}
       >
-        {!isMobile && <h2 style={titleStyle}>Transacciones</h2>}
+        {!sideBarCollapsed && <h2 style={titleStyle}>Transacciones</h2>}
         <div>
           {isMobile && (
             <div style={buttonsStyle}>

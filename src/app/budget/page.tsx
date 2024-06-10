@@ -17,6 +17,7 @@ export default function Budget() {
   )
   const [present, setPresent] = useState(true)
   const isMobile = useMediaQuery('(max-width: 600px)')
+  const sideBarCollapsed = useMediaQuery('(max-width: 899px)')
   const [transactions, setTransactions] = useState([])
   const { refreshKeyTransactions } = useContext(RefreshContext)
 
@@ -156,7 +157,7 @@ export default function Budget() {
           handleChangeFilters: (newFilters: Record<string, string>) => setFilters(newFilters)
         }}
       >
-        {!isMobile && <h2 style={titleStyle}>Presupuesto</h2>}
+        {!sideBarCollapsed && <h2 style={titleStyle}>Presupuesto</h2>}
         <div>
           {isMobile && value === 1 && (
             <div style={buttonsStyle}>
