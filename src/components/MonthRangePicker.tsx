@@ -1,19 +1,24 @@
 /* eslint-disable no-unused-vars */
-import { KeyboardArrowRight } from '@mui/icons-material'
-import { DatePicker } from 'antd'
-import locale from 'antd/es/date-picker/locale/es_ES'
-import dayjs, { Dayjs } from 'dayjs'
-import 'dayjs/locale/es'
-import '../styles.css'
-import { useMediaQuery } from '@mui/material'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/utils';
+import { KeyboardArrowRight } from '@mui/icons-material';
+import { useMediaQuery } from '@mui/material';
+import { DatePicker } from 'antd';
+import locale from 'antd/es/date-picker/locale/es_ES';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/es';
+import utc from 'dayjs/plugin/utc';
+import { useRouter } from 'next/navigation';
+import '../styles.css';
 
 interface MonthRangePickerProps {
+  monthsSelected: [string, string]
   setMonthsSelected: (dates: [string, string]) => void
 }
 
-export default function MonthRangePicker({ setMonthsSelected }: MonthRangePickerProps) {
+export default function MonthRangePicker({ monthsSelected, setMonthsSelected }: MonthRangePickerProps) {
+  const router = useRouter()
   const isMobile = useMediaQuery('(max-width: 600px)')
+  dayjs.extend(utc)
 
   const handleOnChangeDates = (monthsSelected: [Dayjs, Dayjs]) => {
     const start = monthsSelected[0]
@@ -22,6 +27,8 @@ export default function MonthRangePicker({ setMonthsSelected }: MonthRangePicker
       formatDate(start.year(), start.month(), 1, 0, 0),
       formatDate(end.year(), end.month() + 1, 0, 23, 59)
     ])
+    
+    router.push(`/?startDate=${formatDate(start.year(), start.month(), 1, 0, 0)}&endDate=${formatDate(end.year(), end.month() + 1, 0, 23, 59)}`)
   }
 
   return (
@@ -31,7 +38,7 @@ export default function MonthRangePicker({ setMonthsSelected }: MonthRangePicker
       placeholder={['Inicio', 'Fin']}
       locale={locale}
       disabledDate={current => current && current.toDate() > new Date()}
-      defaultValue={[dayjs().startOf('month'), dayjs().endOf('month')]}
+      defaultValue={[dayjs.utc(monthsSelected[0]), dayjs.utc(monthsSelected[1])]}
       format={'MMM YY'}
       allowClear={false}
       size="large"

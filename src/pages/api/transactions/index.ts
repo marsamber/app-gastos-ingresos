@@ -31,8 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
         }
 
-        console.log('whereCondition:', whereCondition)
-
         const paginationOptions = {
           skip: parsedPage ? (parsedPage - 1) * (parsedLimit ?? 0) : undefined,
           take: parsedLimit,

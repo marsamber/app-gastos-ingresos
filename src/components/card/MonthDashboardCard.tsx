@@ -1,5 +1,12 @@
 import { HomeContext } from '@/contexts/HomeContext'
-import { formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, monthNames } from '@/utils/utils'
+import {
+  formatDate,
+  formatDayMonthYear,
+  formatMonthYear,
+  getDateWeekOfMonth,
+  getTwoFirstDecimals,
+  monthNames
+} from '@/utils/utils'
 import { Autocomplete, CircularProgress, TextField, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts'
@@ -32,17 +39,22 @@ export default function MonthDashboardCard() {
     transactions
       ?.filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
-        const month = formatMonthYear(transaction.date.toLocaleString())
-        if (!months.includes(month)) {
-          months.push(month)
+        const [year, month, day] = transaction.date
+          .toLocaleString()
+          .split('T')[0]
+          .split('-')
+          .map(part => parseInt(part))
+        const monthYear = formatMonthYear(year, month - 1, day, 0, 0)
+        if (!months.includes(monthYear)) {
+          months.push(monthYear)
         }
         const week = getDateWeekOfMonth(new Date(transaction.date))
-        const key = `${week} (${month})`
+        const key = `${week} (${monthYear})`
         const existingEntry = dataMap.get(key)
         if (existingEntry) {
           existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
         } else {
-          dataMap.set(key, { name: `Sem. ${week} (${month})`, Gastado: getTwoFirstDecimals(-transaction.amount) })
+          dataMap.set(key, { name: `Sem. ${week} (${monthYear})`, Gastado: getTwoFirstDecimals(-transaction.amount) })
         }
       })
 
@@ -77,11 +89,14 @@ export default function MonthDashboardCard() {
 
   const getMonthData = () => {
     const dataMap = new Map()
-    const [startDate, endDate] = monthsSelected.map(date => new Date(date))
-    const currentDate = new Date(startDate)
+    const [startDate, endDate] = monthsSelected.map(date => {
+      const [year, month] = date.split('-').map(part => parseInt(part))
+      return new Date(Date.UTC(year, month - 1, 1, 0, 0))
+    })
+    const currentDate = startDate
 
     while (currentDate <= endDate) {
-      const key = formatMonthYear(currentDate.toISOString())
+      const key = formatMonthYear(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0)
       if (!dataMap.has(key)) {
         dataMap.set(key, { name: key, Gastado: 0 })
       }
@@ -91,7 +106,12 @@ export default function MonthDashboardCard() {
     transactions
       ?.filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
-        const key = formatMonthYear(transaction.date.toLocaleString())
+        const [year, month, day] = transaction.date
+          .toLocaleString()
+          .split('T')[0]
+          .split('-')
+          .map(part => parseInt(part))
+        const key = formatMonthYear(year, month - 1, day, 0, 0)
         const existingEntry = dataMap.get(key)
         if (existingEntry) {
           existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
@@ -115,17 +135,17 @@ export default function MonthDashboardCard() {
 
   const getDayData = () => {
     const dataMap = new Map()
+
+    // Filter and process transactions
     transactions
       ?.filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
         const date = new Date(transaction.date)
-        const dayKey = date.toISOString().split('T')[0] // Formato YYYY-MM-DD
-        const dateString = date.toLocaleDateString('es-ES', {
-          day: '2-digit',
-          month: 'short',
-          year: '2-digit'
-        })
+        const dayKey = formatDate(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0)
+        const dateString = formatDayMonthYear(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0)
         const existingEntry = dataMap.get(dayKey)
+
+        // Update existing entry or add new entry to data map
         if (existingEntry) {
           existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
         } else {
@@ -133,25 +153,41 @@ export default function MonthDashboardCard() {
         }
       })
 
-    // Asegurar que todos los días entre las fechas seleccionadas están representados
-    const [startDate, endDate]: Date[] = monthsSelected.map(date => new Date(date))
+    // Ensure all days between selected dates are represented
+    const [startDate, endDate] = monthsSelected.map(date => {
+      const [year, month, day] = date.split('-').map(part => parseInt(part))
+      return new Date(Date.UTC(year, month - 1, day, 0, 0))
+    })
     const currentDate = new Date(startDate)
 
     while (currentDate <= endDate) {
-      const dayKey = currentDate.toISOString().split('T')[0]
-      const dateString = currentDate.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: '2-digit'
-      })
+      const dayKey = formatDate(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0)
+      const dateString = formatDayMonthYear(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+        0,
+        0
+      )
+
       if (!dataMap.has(dayKey)) {
         dataMap.set(dayKey, { name: dateString, Gastado: 0 })
       }
       currentDate.setDate(currentDate.getDate() + 1)
     }
 
-    return Array.from(dataMap.values()).sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime())
+    // Convert data map values to array and sort by date
+    return Array.from(dataMap.values()).sort((a, b) => stringToDate(a.name).getTime() - stringToDate(b.name).getTime())
   }
+
+  const stringToDate = (dateString: string): Date => {
+    const [day, month, year] = dateString.split(' ')
+    const monthCapitalized = month.charAt(0).toUpperCase() + month.slice(1)
+    const yearNumber = Number(`20${year}`)
+
+    return new Date(yearNumber, monthNames.indexOf(monthCapitalized), parseInt(day))
+  }
+
   useEffect(() => {
     let sortedData: ISummaryChart[] = []
     if (areMonthsSelectedSameMonth) {

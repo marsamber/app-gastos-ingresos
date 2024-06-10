@@ -59,7 +59,8 @@ export default function HistoricDashboardCard() {
 
     // Initialize with current month from budgets
     if (budgets) {
-      const currentMonthKey = formatMonthYear(monthsSelected[1]!)
+      const [year, month, day] = monthsSelected[1]!.split('-').map(date => parseInt(date))
+      const currentMonthKey = formatMonthYear(year, month - 1, day, 0, 0)
       dataMap.set(currentMonthKey, {
         name: currentMonthKey,
         Gastado: 0,
@@ -73,7 +74,8 @@ export default function HistoricDashboardCard() {
     budgetHistoricsData?.budgetHistorics
       .filter(historic => historic.category !== 'Ingresos fijos')
       .forEach(historic => {
-        const monthKey = formatMonthYear(historic.date as string)
+        const [year, month, day] = (historic.date as string).split('-').map(date => parseInt(date))
+        const monthKey = formatMonthYear(year, month - 1, day, 0, 0)
         const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
         entry.Presupuestado = getTwoFirstDecimals(entry.Presupuestado + historic.amount)
         dataMap.set(monthKey, entry)
@@ -83,7 +85,8 @@ export default function HistoricDashboardCard() {
     transactionsData?.transactions
       .filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
-        const monthKey = formatMonthYear(transaction.date as string)
+        const [year, month, day] = (transaction.date as string).split('-').map(date => parseInt(date))
+        const monthKey = formatMonthYear(year, month - 1, day, 0, 0)
         const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
         entry.Gastado = getTwoFirstDecimals(entry.Gastado - transaction.amount)
         dataMap.set(monthKey, entry)

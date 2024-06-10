@@ -14,16 +14,24 @@ import customFetch from '@/utils/fetchWrapper'
 import { formatDate, getTwoFirstDecimals } from '@/utils/utils'
 import { Info } from '@mui/icons-material'
 import { Tooltip, useMediaQuery } from '@mui/material'
+import { useSearchParams } from 'next/navigation'
 import { CSSProperties, useContext, useEffect, useState } from 'react'
 import '../styles.css'
 
 export default function Home() {
   const today = new Date()
+  const searchParams = useSearchParams()
+  const [monthsSelected, setMonthsSelected] = useState<[string, string]>(() => {
+    if (searchParams && searchParams.has('startDate') && searchParams.has('endDate')) {
+      return [searchParams.get('startDate') as string, searchParams.get('endDate') as string]
+    } else {
+      return [
+        formatDate(today.getFullYear(), today.getMonth(), 1, 0, 0),
+        formatDate(today.getFullYear(), today.getMonth() + 1, 0, 23, 59)
+      ]
+    }
+  })
 
-  const [monthsSelected, setMonthsSelected] = useState<[string, string]>([
-    formatDate(today.getFullYear(), today.getMonth(), 1, 0, 0),
-    formatDate(today.getFullYear(), today.getMonth() + 1, 0, 23, 59)
-  ])
   const [budget, setBudget] = useState<number>(0)
   const [present, setPresent] = useState<boolean>(true)
   const [transactions, setTransactions] = useState<ITransaction[] | null>([])
@@ -63,7 +71,13 @@ export default function Home() {
     if (budgetsData && transactions && budgetHistoricsData && monthlyTransactionsData) {
       let totalBudget = 0
       let totalFixedExpenses = 0
-      const currentDate = formatDate(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours(), today.getMinutes())
+      const currentDate = formatDate(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        today.getHours(),
+        today.getMinutes()
+      )
       // If the second month is greater than the current date, we will take into account the budgets
       if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
         totalBudget = budgetsData.budgets
@@ -89,8 +103,17 @@ export default function Home() {
   }, [budgetsData, transactions, budgetHistoricsData])
 
   useEffect(() => {
-    const currentDate = formatDate(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours(), today.getMinutes())
-    if (new Date(monthsSelected[1]) >= new Date(currentDate)) {
+    const currentDate = formatDate(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      today.getHours(),
+      today.getMinutes()
+    )
+    const [year, month, day] = monthsSelected[1].split('-').map(date => parseInt(date))
+    const endDate = formatDate(year, month-1, day, 23, 59)
+    if (new Date(endDate) >= new Date(currentDate)) {
+      console.log('Present')
       setPresent(true)
     } else {
       setPresent(false)
@@ -152,7 +175,7 @@ export default function Home() {
           budget,
           setBudget,
           transactions,
-          budgets: present ? (budgetsData ? budgetsData.budgets : []) : [],
+          budgets: present ? (budgetsData ? budgetsData.budgets : []) : null,
           budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
           loadingTransactions,
           loadingBudgets,
@@ -169,7 +192,7 @@ export default function Home() {
             }}
           >
             {!isMobile && <h2 style={titleStyle}>Dashboard</h2>}
-            <MonthRangePicker setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)} />
+            <MonthRangePicker monthsSelected={monthsSelected} setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)} />
           </div>
           {isMobile ? (
             <h4 style={budgetStyle}>

@@ -26,8 +26,8 @@ export const getMonthName = (date: Date) => {
   return monthNames[date.getMonth()]
 }
 
-export const formatMonthYear = (dateString: string) => {
-  const date = new Date(dateString)
+export const formatMonthYear = (year: number, month: number, day: number, hour: number, minute: number) => {
+  const date = new Date(Date.UTC(year, month, day, hour, minute))
   return `${getMonthName(date)} ${date.getFullYear().toString().substring(2)}`
 }
 
@@ -43,6 +43,15 @@ export const getTwoFirstDecimals = (number: number) => {
 export const formatDate = (year: number, month: number, day: number, hour: number, minute: number): string => {
   const date = new Date(Date.UTC(year, month, day, hour, minute))
   return date.toISOString()
+}
+
+export const formatDayMonthYear = (year: number, month: number, day: number, hour: number, minute: number): string => {
+  const date = new Date(Date.UTC(year, month, day, hour, minute))
+  return date.toLocaleString('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit'
+  })
 }
 
 export const handleDateFilterChange = (value: string): string[] => {
