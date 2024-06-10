@@ -44,7 +44,7 @@ export default function Home() {
     const fetchTransactions = async () => {
       setLoadingTransactions(true)
       const response = await customFetch(
-        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&orderBy=date&order=desc`
+        `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&sortBy=date&sortOrder=desc`
       )
 
       const { transactions } = await response.json()
