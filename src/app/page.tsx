@@ -13,9 +13,9 @@ import { IBudgetHistorics, IBudgets, IMonthlyTransactions, ITransaction } from '
 import customFetch from '@/utils/fetchWrapper'
 import { formatDate, getTwoFirstDecimals } from '@/utils/utils'
 import { Info } from '@mui/icons-material'
-import { Tooltip, useMediaQuery } from '@mui/material'
+import { CircularProgress, Tooltip, useMediaQuery } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { CSSProperties, useContext, useEffect, useState } from 'react'
+import { CSSProperties, Suspense, useContext, useEffect, useState } from 'react'
 import '../styles.css'
 
 export default function Home() {
@@ -111,7 +111,7 @@ export default function Home() {
       today.getMinutes()
     )
     const [year, month, day] = monthsSelected[1].split('-').map(date => parseInt(date))
-    const endDate = formatDate(year, month-1, day, 23, 59)
+    const endDate = formatDate(year, month - 1, day, 23, 59)
     if (new Date(endDate) >= new Date(currentDate)) {
       console.log('Present')
       setPresent(true)
@@ -167,59 +167,70 @@ export default function Home() {
   }
 
   return (
-    <main className="main">
-      <HomeContext.Provider
-        value={{
-          monthsSelected,
-          setMonthsSelected,
-          budget,
-          setBudget,
-          transactions,
-          budgets: present ? (budgetsData ? budgetsData.budgets : []) : null,
-          budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
-          loadingTransactions,
-          loadingBudgets,
-          loadingBudgetHistorics
-        }}
-      >
-        <div style={headerStyle}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
-              alignItems: isMobile ? 'unset' : 'center',
-              gap: isMobile ? 0 : '10px'
-            }}
-          >
-            {!isMobile && <h2 style={titleStyle}>Dashboard</h2>}
-            <MonthRangePicker monthsSelected={monthsSelected} setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)} />
-          </div>
-          {isMobile ? (
-            <h4 style={budgetStyle}>
-              Presupuesto restante: {budget} €
-              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos del mes presente.">
-                <Info />
-              </Tooltip>
-            </h4>
-          ) : (
-            <h3 style={budgetStyle}>
-              Presupuesto restante: {budget} €
-              <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos del mes presente.">
-                <Info />
-              </Tooltip>
-            </h3>
-          )}
+    <Suspense
+      fallback={
+        <div>
+          <CircularProgress />
         </div>
-        <div style={containerStyle}>
-          <BudgetCard />
-          <div style={rowStyle}>
-            <TransactionsCard />
-            <MonthDashboardCard />
-            <StatisticsCard />
+      }
+    >
+      <main className="main">
+        <HomeContext.Provider
+          value={{
+            monthsSelected,
+            setMonthsSelected,
+            budget,
+            setBudget,
+            transactions,
+            budgets: present ? (budgetsData ? budgetsData.budgets : []) : null,
+            budgetHistorics: budgetHistoricsData ? budgetHistoricsData.budgetHistorics : [],
+            loadingTransactions,
+            loadingBudgets,
+            loadingBudgetHistorics
+          }}
+        >
+          <div style={headerStyle}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: isMobile ? 'unset' : 'center',
+                gap: isMobile ? 0 : '10px'
+              }}
+            >
+              {!isMobile && <h2 style={titleStyle}>Dashboard</h2>}
+              <MonthRangePicker
+                monthsSelected={monthsSelected}
+                setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)}
+              />
+            </div>
+            {isMobile ? (
+              <h4 style={budgetStyle}>
+                Presupuesto restante: {budget} €
+                <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos del mes presente.">
+                  <Info />
+                </Tooltip>
+              </h4>
+            ) : (
+              <h3 style={budgetStyle}>
+                Presupuesto restante: {budget} €
+                <Tooltip title="Presupuesto restante: Calculado a partir de los presupuestos asignados a las categorías y los gastos registrados. Incluye los gastos fijos del mes presente.">
+                  <Info />
+                </Tooltip>
+              </h3>
+            )}
           </div>
-          <HistoricDashboardCard />
-        </div>
-      </HomeContext.Provider>
-    </main>
+          <div style={containerStyle}>
+            <BudgetCard />
+            <div style={rowStyle}>
+              <TransactionsCard />
+              <MonthDashboardCard />
+              <StatisticsCard />
+            </div>
+            <HistoricDashboardCard />
+          </div>
+        </HomeContext.Provider>
+      </main>
+    </Suspense>
   )
 }
