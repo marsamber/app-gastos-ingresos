@@ -3,17 +3,19 @@ import useFetch from '@/hooks/useFetch'
 import { ICategories, IMonthlyTransactions, ITransactions, TableReportData } from '@/types/index'
 import { formatDate, formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, monthNames } from '@/utils/utils'
 import { Download, PictureAsPdf } from '@mui/icons-material'
-import { CircularProgress, Fab } from '@mui/material'
+import { Button, CircularProgress, Fab, useMediaQuery } from '@mui/material'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { useContext, useEffect, useState } from 'react'
 import BarChart from './BarChart'
 import IncomeExpenseReport from './IncomeExpenseReport'
 import LineChart from './LineChart'
+import BasicModal from '../modal/BasicModal'
 
 const DownloadReportButton = () => {
+  const isDesktop = useMediaQuery('(min-width:1000px)')
+
   const [isClient, setIsClient] = useState(false)
   const [generateReport, setGenerateReport] = useState(false)
-  // const [progress, setProgress] = useState(0)
   const [previousMonth, setPreviousMonth] = useState<[string, string]>(['', ''])
 
   const { transactions, monthsSelected } = useContext(HomeContext)
@@ -45,22 +47,6 @@ const DownloadReportButton = () => {
   useEffect(() => {
     setIsClient(true)
   }, [])
-
-  // useEffect(() => {
-  //   const totalTimeout = 8000 // Total time including timeouts for all components
-  //   const startTime = Date.now()
-
-  //   const updateProgress = () => {
-  //     const elapsedTime = Date.now() - startTime
-  //     const newProgress = (elapsedTime / totalTimeout) * 100
-  //     setProgress(Math.min(newProgress, 100))
-  //   }
-
-  //   const progressInterval = setInterval(updateProgress, 100)
-
-  //   // Cleanup
-  //   return () => clearInterval(progressInterval)
-  // }, [monthsSelected])
 
   // Retrieve data for the charts
   const getDailyData = () => {
@@ -413,9 +399,9 @@ const DownloadReportButton = () => {
         return {
           sr: index + 1,
           month: item.month,
-          income: item.income,
-          expense: item.expense,
-          balance: item.balance
+          income: getTwoFirstDecimals(item.income),
+          expense: getTwoFirstDecimals(item.expense),
+          balance: getTwoFirstDecimals(item.balance)
         }
       })
 
@@ -438,7 +424,6 @@ const DownloadReportButton = () => {
     if (generateReport) {
       if (transactions) {
         const oneMonth = monthsSelected[0].split('-')[1] === monthsSelected[1].split('-')[1]
-        // setProgress(0)
         setFirstChartSrc(null)
         setSecondLineChartSrc(null)
         setBarChartSrc(null)
@@ -476,6 +461,15 @@ const DownloadReportButton = () => {
     setGenerateReport(false)
   }, [monthsSelected])
 
+  const [openModalConfirm, setOpenModalConfirm] = useState(false)
+
+  const handleClickGenerateReport = () => {
+    if (isDesktop) {
+      setGenerateReport(true)
+    }
+    setOpenModalConfirm(true)
+  }
+
   return !isClient ? (
     <></>
   ) : (
@@ -511,12 +505,9 @@ const DownloadReportButton = () => {
                 }}
                 color="error"
                 disabled={loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc}
-                // onClick={() => setTimeout(() => setGenerateReport(false), 1000)}
               >
                 {loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc ? (
-                  <CircularProgress
-                  // variant="determinate" value={progress}
-                  />
+                  <CircularProgress />
                 ) : (
                   <Download />
                 )}
@@ -525,17 +516,91 @@ const DownloadReportButton = () => {
           </PDFDownloadLink>
         </>
       ) : (
-        <Fab
-          style={{
-            position: 'fixed',
-            bottom: '86px',
-            right: '20px'
-          }}
-          color="error"
-          onClick={() => setGenerateReport(true)}
-        >
-          <PictureAsPdf />
-        </Fab>
+        <>
+          <Fab
+            style={{
+              position: 'fixed',
+              bottom: '86px',
+              right: '20px'
+            }}
+            color="error"
+            onClick={handleClickGenerateReport}
+          >
+            <PictureAsPdf />
+          </Fab>
+          <BasicModal
+            handleClose={() => setOpenModalConfirm(false)}
+            open={openModalConfirm}
+            style={{
+              width: '80%',
+              height: '250px'
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                height: '186px'
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Generar informe
+                </p>
+                <p
+                  style={{
+                    fontSize: '12px'
+                  }}
+                >
+                  El informe no se realizará correctamente a no ser que estés en vista de ordenador, ¿estás seguro de
+                  que deseas generar el informe?
+                </p>
+                <p
+                  style={{
+                    color: 'gray',
+                    fontSize: '10px'
+                  }}
+                >
+                  Esto se solucionará más adelante en próximas actualizaciones
+                </p>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  margin: '20px 8px 0px 8px'
+                }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setGenerateReport(true)}
+                  style={{
+                    fontSize: '12px'
+                  }}
+                >
+                  Aceptar
+                </Button>
+                <Button
+                  variant="text"
+                  color="primary"
+                  onClick={() => setOpenModalConfirm(false)}
+                  style={{
+                    fontSize: '12px'
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </BasicModal>
+        </>
       )}
     </>
   )

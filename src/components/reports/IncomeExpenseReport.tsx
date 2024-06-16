@@ -2,6 +2,7 @@
 import { TableReportData } from '@/types/index'
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import Table from './Table'
+import { getTwoFirstDecimals } from '@/utils/utils'
 
 const styles = StyleSheet.create({
   page: {
@@ -94,7 +95,7 @@ const IncomeExpenseReport = ({
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text>Ahorro neto:</Text>
             <Text>
-              {totalIncome - totalExpense} € {monthsNameSelected[1] !== '' ? '' : `(${percentageChangeBalance}%)`}
+              {getTwoFirstDecimals(totalIncome - totalExpense)} € {monthsNameSelected[1] !== '' ? '' : `(${percentageChangeBalance}%)`}
             </Text>
           </View>
         </View>
