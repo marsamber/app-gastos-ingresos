@@ -172,3 +172,12 @@
     font-weight: bold !important;
   }
 }
+
+/* Report */
+.report-line-chart .recharts-default-legend {
+  font-size: 36px !important;
+}
+
+.report-bar-chart .recharts-default-legend {
+  font-size: 18px !important;
+}

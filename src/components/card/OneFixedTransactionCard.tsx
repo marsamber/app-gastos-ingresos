@@ -4,7 +4,7 @@ import BasicCard from './BasicCard'
 export interface OneFixedTransactionCardProps {
   data: {
     id: number
-    description: string
+    title: string
     amount: number
     actions: ReactNode
   }
@@ -30,7 +30,7 @@ export default function OneFixedTransactionCard({ data }: OneFixedTransactionCar
   return (
     <BasicCard>
       <p>
-        <b>{data.description}</b>
+        <b>{data.title}</b>
       </p>
       <div style={contentStyle}>
         <div>

@@ -5,6 +5,7 @@ import HistoricDashboardCard from '@/components/card/HistoricDashboardCard'
 import MonthDashboardCard from '@/components/card/MonthDashboardCard'
 import StatisticsCard from '@/components/card/StatisticsCard'
 import TransactionsCard from '@/components/card/TransactionsCard'
+import DownloadReportButton from '@/components/reports/DownloadReportButton'
 import { HomeContext } from '@/contexts/HomeContext'
 import { RefreshContext } from '@/contexts/RefreshContext'
 import useFetch from '@/hooks/useFetch'
@@ -217,6 +218,7 @@ export default function Home() {
             </div>
             <HistoricDashboardCard />
           </div>
+          <DownloadReportButton />
         </Suspense>
       </HomeContext.Provider>
     </main>

@@ -314,7 +314,7 @@ export default function MonthDashboardCard() {
                 angle={isMobile ? -45 : -25}
                 textAnchor="end"
               />
-              <YAxis unit=" €" />
+              <YAxis unit="€" />
               <Tooltip content={props => <CustomTooltip {...props} />} />
               <Legend verticalAlign="top" height={36} />
               <Line dataKey="Gastado" type="monotone" fill="#FF6384" stroke="#FF6384" />

@@ -71,3 +71,14 @@ export interface BaseContextType {
   handleChangeOrder: (newOrder: 'asc' | 'desc') => void;
   handleChangeFilters: (newFilters: Record<string, string>) => void;
 }
+
+export interface TableReportData {
+  headers: string[]
+  items: Array<{
+    sr: number
+    month: string
+    income: number
+    expense: number
+    balance: number
+  }>
+}
