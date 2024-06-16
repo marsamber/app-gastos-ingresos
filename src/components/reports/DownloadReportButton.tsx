@@ -3,13 +3,13 @@ import useFetch from '@/hooks/useFetch'
 import { ICategories, IMonthlyTransactions, ITransactions, TableReportData } from '@/types/index'
 import { formatDate, formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, monthNames } from '@/utils/utils'
 import { Download, PictureAsPdf } from '@mui/icons-material'
-import { Button, CircularProgress, Fab, useMediaQuery } from '@mui/material'
+import { CircularProgress, Fab, useMediaQuery } from '@mui/material'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { useContext, useEffect, useState } from 'react'
 import BarChart from './BarChart'
+import { ConfirmGenerateReportModal } from './ConfirmGenerateReportModal'
 import IncomeExpenseReport from './IncomeExpenseReport'
 import LineChart from './LineChart'
-import BasicModal from '../modal/BasicModal'
 
 const DownloadReportButton = () => {
   const isDesktop = useMediaQuery('(min-width:1000px)')
@@ -528,78 +528,11 @@ const DownloadReportButton = () => {
           >
             <PictureAsPdf />
           </Fab>
-          <BasicModal
-            handleClose={() => setOpenModalConfirm(false)}
+          <ConfirmGenerateReportModal
             open={openModalConfirm}
-            style={{
-              width: '80%',
-              height: '250px'
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                height: '186px'
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  Generar informe
-                </p>
-                <p
-                  style={{
-                    fontSize: '12px'
-                  }}
-                >
-                  El informe no se realizará correctamente a no ser que estés en vista de ordenador, ¿estás seguro de
-                  que deseas generar el informe?
-                </p>
-                <p
-                  style={{
-                    color: 'gray',
-                    fontSize: '10px'
-                  }}
-                >
-                  Esto se solucionará más adelante en próximas actualizaciones
-                </p>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  margin: '20px 8px 0px 8px'
-                }}
-              >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setGenerateReport(true)}
-                  style={{
-                    fontSize: '12px'
-                  }}
-                >
-                  Aceptar
-                </Button>
-                <Button
-                  variant="text"
-                  color="primary"
-                  onClick={() => setOpenModalConfirm(false)}
-                  style={{
-                    fontSize: '12px'
-                  }}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          </BasicModal>
+            handleClose={() => setOpenModalConfirm(false)}
+            handleAccept={() => setGenerateReport(true)}
+          />
         </>
       )}
     </>
