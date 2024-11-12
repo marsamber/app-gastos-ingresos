@@ -5,7 +5,7 @@ import { formatDate, formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, m
 import { Download, PictureAsPdf } from '@mui/icons-material'
 import { CircularProgress, Fab, useMediaQuery } from '@mui/material'
 import { BlobProviderParams, PDFDownloadLink } from '@react-pdf/renderer'
-import { useContext, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import BarChart from './BarChart'
 import { ConfirmGenerateReportModal } from './ConfirmGenerateReportModal'
 import IncomeExpenseReport from './IncomeExpenseReport'
@@ -496,7 +496,7 @@ const DownloadReportButton = () => {
             }
             fileName="InformeIngresosGastos.pdf"
           >
-            {(params: BlobProviderParams) => {
+            {(params: BlobProviderParams): ReactNode => {
               const { loading } = params
               return (
                 <Fab
