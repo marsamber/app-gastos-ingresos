@@ -59,17 +59,21 @@ export interface ICategories {
 }
 
 export interface BaseContextType {
-  totalItems: number;
-  page: number;
-  limit: number;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
   filters: Record<string, string>;
-  handleChangePage: (newPage: number) => void;
-  handleChangeLimit: (newLimit: number) => void;
+
   handleChangeSort: (newSortBy: string) => void;
   handleChangeOrder: (newOrder: 'asc' | 'desc') => void;
   handleChangeFilters: (newFilters: Record<string, string>) => void;
+}
+
+export interface BaseContextTypeWithPagination extends BaseContextType {
+  totalItems: number;
+  page: number;
+  limit: number;
+  handleChangePage: (newPage: number) => void;
+  handleChangeLimit: (newLimit: number) => void;
 }
 
 export interface TableReportData {

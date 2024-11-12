@@ -2,10 +2,9 @@
 import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
 import { Delete, Edit } from '@mui/icons-material'
 import { IconButton, useMediaQuery } from '@mui/material'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import OneCategoryBudgetCard from '../card/OneCategoryBudgetCard'
 import BasicTable from './BasicTable'
-import { TablePagination } from './TablePagination'
 
 interface CategoriesBudgetTableProps {
   handleEditCategoryBudget: (id: number) => void
@@ -17,8 +16,7 @@ export default function CategoriesBudgetTable({
   handleDeleteCategoryBudget
 }: CategoriesBudgetTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const containerRef = useRef<HTMLDivElement>(null)
-  const { budgets, totalItems, page, limit, handleChangeLimit, handleChangePage } = useContext(SettingsBudgetsContext)
+  const { budgets } = useContext(SettingsBudgetsContext)
   const [rows, setRows] = useState<any[]>([])
 
   const headCells = [
@@ -60,14 +58,6 @@ export default function CategoriesBudgetTable({
           {rows.map(row => (
             <OneCategoryBudgetCard key={row.id} data={row} />
           ))}
-          <TablePagination
-            totalItems={totalItems}
-            page={page}
-            limit={limit}
-            handleChangePage={handleChangePage}
-            handleChangeLimit={handleChangeLimit}
-            containerRef={containerRef}
-          />
         </div>
       ) : (
         <BasicTable headCells={headCells} rows={rows} type="settingsBudgets" />

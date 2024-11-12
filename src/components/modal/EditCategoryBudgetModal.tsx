@@ -22,7 +22,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
   const [errorAmount, setErrorAmount] = useState(false)
   const [present, setPresent] = useState(false)
 
-  const { monthSelected, refreshBudgets, page, limit, sortBy, sortOrder, filters } = useContext(SettingsBudgetsContext)
+  const { monthSelected, refreshBudgets, sortBy, sortOrder, filters } = useContext(SettingsBudgetsContext)
 
   useEffect(() => {
     if (open) {
@@ -82,7 +82,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
       }
 
       if (response.ok) {
-        refreshBudgets(page, limit, sortBy, sortOrder, filters)
+        refreshBudgets(sortBy, sortOrder, filters)
         handleCloseModal()
       }
     } catch (error) {
@@ -112,7 +112,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     const currentDate = new Date().toISOString().substring(0, 7)
     const dateSelected = monthSelected.substring(0, 7)
     setPresent(dateSelected === currentDate)
-    refreshBudgets(page, limit, sortBy, sortOrder, filters)
+    refreshBudgets(sortBy, sortOrder, filters)
   }, [monthSelected])
 
   // STYLES

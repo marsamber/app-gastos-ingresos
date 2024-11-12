@@ -47,12 +47,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const totalItems = await prisma.budgetHistoric.count({ where: whereCondition })
+        const totalAmount = await prisma.budgetHistoric.aggregate({
+          _sum: {
+            amount: true
+          }
+        })
+
         const budgetHistorics: IBudgetHistoric[] = await prisma.budgetHistoric.findMany({
           where: whereCondition,
           ...paginationOptions
         })
 
-        res.status(200).json({ totalItems, budgetHistorics })
+        res.status(200).json({ totalItems, totalAmount: totalAmount._sum.amount, budgetHistorics })
       } catch (error) {
         console.error('Failed to retrieve budget historics:', error)
         res.status(500).json({ error: 'Failed to retrieve budget historics' })

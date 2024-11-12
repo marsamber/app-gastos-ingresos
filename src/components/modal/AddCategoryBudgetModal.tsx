@@ -29,7 +29,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   const [error, setError] = useState({ category: false, amount: false, message: '' })
   const [categories, setCategories] = useState<string[] | null>(null)
 
-  const { budgets, monthSelected, refreshBudgets, page, limit, sortBy, sortOrder, filters } =
+  const { budgets, monthSelected, refreshBudgets, sortBy, sortOrder, filters } =
     useContext(SettingsBudgetsContext)
   const currentDate = useMemo(() => new Date().toISOString().substring(0, 7), [])
   const present = useMemo(() => monthSelected.substring(0, 7) === currentDate, [monthSelected, currentDate])
@@ -124,7 +124,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
 
     if (response.ok) {
       refreshCategories && refreshCategories()
-      refreshBudgets(page, limit, sortBy, sortOrder, filters)
+      refreshBudgets(sortBy, sortOrder, filters)
       handleCloseModal()
     } else {
       setError({ ...error, message: 'Error al guardar el presupuesto.' })

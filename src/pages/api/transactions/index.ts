@@ -42,12 +42,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const totalItems = await prisma.transaction.count({ where: whereCondition })
+
+        const totalAmount = await prisma.transaction.aggregate({
+          _sum: {
+            amount: true
+          }
+        })
+
         const transactions: ITransaction[] = await prisma.transaction.findMany({
           where: whereCondition,
           ...paginationOptions
         })
 
-        res.status(200).json({ totalItems, transactions })
+        res.status(200).json({ totalItems, totalAmount: totalAmount._sum.amount, transactions })
       } catch (error) {
         console.error('Failed to retrieve transactions:', error)
         res.status(500).json({ error: 'Failed to retrieve transactions' })

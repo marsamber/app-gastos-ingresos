@@ -34,13 +34,11 @@ export default function DeleteCategoryBudgetModal({
   } = useContext(SettingsMonthlyExpenseTransactionsContext)
   const {
     refreshCategories: refreshTableCategories,
-    page: pageCategories,
-    limit: limitCategories,
     sortBy: sortByCategories,
     sortOrder: sortOrderCategories,
     filters: filtersCategories
   } = useContext(SettingsCategoriesContext)
-  const { refreshBudgets, page, limit, sortBy, sortOrder, filters } = useContext(SettingsBudgetsContext)
+  const { refreshBudgets, sortBy, sortOrder, filters } = useContext(SettingsBudgetsContext)
   const [loading, setLoading] = useState(false)
 
   const { data: transactionsData } = useFetch<ITransactions>('/api/transactions')
@@ -68,7 +66,7 @@ export default function DeleteCategoryBudgetModal({
       })
 
       if (response.ok) {
-        refreshBudgets(page, limit, sortBy, sortOrder, filters)
+        refreshBudgets(sortBy, sortOrder, filters)
         handleClose()
       }
     } catch (error) {
@@ -197,10 +195,8 @@ export default function DeleteCategoryBudgetModal({
       })
 
       if (response.ok) {
-        refreshBudgets(page, limit, sortBy, sortOrder, filters)
+        refreshBudgets( sortBy, sortOrder, filters)
         refreshTableCategories(
-          pageCategories,
-          limitCategories,
           sortByCategories,
           sortOrderCategories,
           filtersCategories

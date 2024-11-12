@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { BaseContextType, IMonthlyTransaction } from '@/types/index'
+import { BaseContextTypeWithPagination, IMonthlyTransaction } from '@/types/index'
 import { createContext } from 'react'
 
-export interface SettingsMonthlyIncomeTransactionsContextType extends BaseContextType {
+export interface SettingsMonthlyIncomeTransactionsContextType extends BaseContextTypeWithPagination {
   monthlyTransactions: IMonthlyTransaction[] | null
 
   refreshMonthlyTransactions: (

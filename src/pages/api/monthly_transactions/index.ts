@@ -40,13 +40,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ...filterOptions
         })
 
+        const totalAmount = await prisma.monthlyTransaction.aggregate({
+          _sum: {
+            amount: true
+          }
+        })
+
         // Fetching monthly transactions with pagination and sorting options
         const monthlyTransactions = await prisma.monthlyTransaction.findMany({
           ...paginationOptions,
           ...filterOptions
         })
 
-        res.status(200).json({ totalItems, monthlyTransactions })
+        res.status(200).json({ totalItems, totalAmount: totalAmount._sum.amount, monthlyTransactions })
       } catch (error) {
         console.error('Failed to retrieve monthly_transactions:', error)
         res.status(500).json({ error: 'Failed to retrieve monthly_transactions' })

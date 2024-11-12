@@ -22,7 +22,9 @@ export default function Settings() {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const sideBarCollapsed = useMediaQuery('(max-width: 899px)')
   const isTablet = useMediaQuery('(max-width: 1400px)')
-  const [monthSelected, setMonthSelected] = useState<string>(formatDate(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0))
+  const [monthSelected, setMonthSelected] = useState<string>(
+    formatDate(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0)
+  )
   const [present, setPresent] = useState<boolean>(true)
 
   const [pageMonthlyIncomeTransactions, setPageMonthlyIncomeTransactions] = useState(0)
@@ -43,25 +45,19 @@ export default function Settings() {
   const [monthlyExpenseTransactions, setMonthlyExpenseTransactions] = useState<IMonthlyTransaction[] | null>([])
   const [totalItemsMonthlyExpenseTransactions, setTotalItemsMonthlyExpenseTransactions] = useState(0)
 
-  const [pageCategories, setPageCategories] = useState(0)
-  const [limitCategories, setLimitCategories] = useState(15)
   const [sortByCategories, setSortByCategories] = useState('id')
   const [sortOrderCategories, setSortOrderCategories] = useState<'asc' | 'desc'>('asc')
   const [filtersCategories, setFiltersCategories] = useState<Record<string, string>>({})
 
   const [refreshKeyCategories, setRefreshKeyCategories] = useState(0)
   const [categories, setCategories] = useState<string[]>([])
-  const [totalItemsCategories, setTotalItemsCategories] = useState(0)
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true)
 
-  const [pageBudgets, setPageBudgets] = useState(0)
-  const [limitBudgets, setLimitBudgets] = useState(15)
   const [sortByBudgets, setSortByBudgets] = useState('category')
   const [sortOrderBudgets, setSortOrderBudgets] = useState<'asc' | 'desc'>('asc')
   const [filtersBudgets, setFiltersBudgets] = useState<Record<string, string>>({})
   const [refreshKeyBudgets, setRefreshKeyBudgets] = useState(0)
   const [budgets, setBudgets] = useState<IBudget[] | IBudgetHistoric[] | null>([])
-  const [totalItemsBudgets, setTotalItemsBudgets] = useState(0)
 
   const [restingBudget, setRestingBudget] = useState<number>(0)
   const [value, setValue] = useState(0)
@@ -147,15 +143,7 @@ export default function Settings() {
   ])
 
   const refreshCategories = useCallback(
-    (
-      newPage: number,
-      newLimit: number,
-      newSortBy: string,
-      newSortOrder: 'asc' | 'desc',
-      newFilters: Record<string, string>
-    ) => {
-      setPageCategories(newPage)
-      setLimitCategories(newLimit)
+    (newSortBy: string, newSortOrder: 'asc' | 'desc', newFilters: Record<string, string>) => {
       setSortByCategories(newSortBy)
       setSortOrderCategories(newSortOrder)
       setFiltersCategories(newFilters)
@@ -168,29 +156,21 @@ export default function Settings() {
     const fetchCategories = async () => {
       setLoadingCategories(true)
       const response = await customFetch(
-        `/api/categories?page=${pageCategories + 1}&limit=${limitCategories}&sortBy=${sortByCategories}&sortOrder=${sortOrderCategories}&excludeCategory=Sin categoría&filters=${JSON.stringify(filtersCategories)}`
+        `/api/categories?sortBy=${sortByCategories}&sortOrder=${sortOrderCategories}&excludeCategory=Sin categoría&filters=${JSON.stringify(filtersCategories)}`
       )
       if (response.ok) {
         const data = await response.json()
         setCategories(data.categories.map((category: ICategory) => category.id))
-        setTotalItemsCategories(data.totalItems)
         setLoadingCategories(false)
       }
     }
 
     fetchCategories()
-  }, [refreshKeyCategories, pageCategories, limitCategories, sortByCategories, sortOrderCategories, filtersCategories])
+  }, [refreshKeyCategories, sortByCategories, sortOrderCategories, filtersCategories])
 
   const refreshBudgets = useCallback(
-    (
-      newPage: number,
-      newLimit: number,
-      newSortBy: string,
-      newSortOrder: 'asc' | 'desc',
-      newFilters: Record<string, string>
-    ) => {
-      setPageBudgets(newPage)
-      setLimitBudgets(newLimit)
+    (newSortBy: string, newSortOrder: 'asc' | 'desc', newFilters: Record<string, string>) => {
+      console.log("refresh",newSortBy, newSortOrder, newFilters)
       setSortByBudgets(newSortBy)
       setSortOrderBudgets(newSortOrder)
       setFiltersBudgets(newFilters)
@@ -203,29 +183,19 @@ export default function Settings() {
     const fetchBudgets = async () => {
       const endDate = new Date(dayjs(monthSelected).endOf('month').toISOString())
       const formattedEndDate = formatDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59)
-
+      console.log("FRONT",sortByBudgets, sortOrderBudgets, filtersBudgets)
       const url = present
-        ? `/api/budgets?page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
-        : `/api/budget_historics?startDate=${monthSelected}&endDate=${formattedEndDate}&page=${pageBudgets + 1}&limit=${limitBudgets}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
+        ? `/api/budgets?sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
+        : `/api/budget_historics?startDate=${monthSelected}&endDate=${formattedEndDate}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
       const response = await customFetch(url)
       if (response.ok) {
         const data = await response.json()
         setBudgets(present ? data.budgets : data.budgetHistorics)
-        setTotalItemsBudgets(data.totalItems)
       }
     }
 
     fetchBudgets()
-  }, [
-    refreshKeyBudgets,
-    pageBudgets,
-    limitBudgets,
-    sortByBudgets,
-    sortOrderBudgets,
-    filtersBudgets,
-    monthSelected,
-    present
-  ])
+  }, [refreshKeyBudgets, sortByBudgets, sortOrderBudgets, filtersBudgets, monthSelected, present])
 
   useEffect(() => {
     document.title = 'Configuración - Mis Finanzas'
@@ -275,8 +245,8 @@ export default function Settings() {
         })
       })
       .then(() => {
-        refreshCategories(pageCategories, limitCategories, sortByCategories, sortOrderCategories, filtersCategories)
-        refreshBudgets(pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets, filtersBudgets)
+        refreshCategories(sortByCategories, sortOrderCategories, filtersCategories)
+        refreshBudgets(sortByBudgets, sortOrderBudgets, filtersBudgets)
         refreshAllCategories && refreshAllCategories()
       })
       .catch(error => {
@@ -408,16 +378,11 @@ export default function Settings() {
           <SettingsCategoriesContext.Provider
             value={{
               categories,
-              totalItems: totalItemsCategories,
               refreshCategories,
               refreshKey: refreshKeyCategories,
-              page: pageCategories,
-              limit: limitCategories,
               sortBy: sortByCategories,
               sortOrder: sortOrderCategories,
               filters: filtersCategories,
-              handleChangeLimit: (newLimit: number) => setLimitCategories(newLimit),
-              handleChangePage: (newPage: number) => setPageCategories(newPage),
               handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderCategories(newOrder),
               handleChangeSort: (newSortBy: string) => setSortByCategories(newSortBy),
               handleChangeFilters: (newFilters: Record<string, string>) => setFiltersCategories(newFilters)
@@ -426,16 +391,11 @@ export default function Settings() {
             <SettingsBudgetsContext.Provider
               value={{
                 budgets,
-                totalItems: totalItemsBudgets,
                 refreshBudgets,
                 refreshKey: refreshKeyBudgets,
-                page: pageBudgets,
-                limit: limitBudgets,
                 sortBy: sortByBudgets,
                 sortOrder: sortOrderBudgets,
                 filters: filtersBudgets,
-                handleChangeLimit: (newLimit: number) => setLimitBudgets(newLimit),
-                handleChangePage: (newPage: number) => setPageBudgets(newPage),
                 handleChangeOrder: (newOrder: 'asc' | 'desc') => setSortOrderBudgets(newOrder),
                 handleChangeSort: (newSortBy: string) => setSortByBudgets(newSortBy),
                 handleChangeFilters: (newFilters: Record<string, string>) => setFiltersBudgets(newFilters),

@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { BaseContextType, IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
+import { BaseContextTypeWithPagination, IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
 import { createContext } from 'react'
 
-export interface BudgetsContextType extends BaseContextType {
+export interface BudgetsContextType extends BaseContextTypeWithPagination {
   transactions: ITransaction[] | null
 
   budgets: IBudget[] | IBudgetHistoric[] | null

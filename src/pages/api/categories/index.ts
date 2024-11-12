@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '@/lib/prisma'
-import { parseIntSafe } from '@/utils/utils'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 // pages/api/categories/index.js
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -9,15 +8,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (method) {
     case 'GET':
       try {
-        const { page, limit, sortBy, sortOrder, excludeCategory, filters } = req.query
+        const {  sortBy, sortOrder, excludeCategory, filters } = req.query
 
-        const parsedPage = parseIntSafe(page as string)
-        const parsedLimit = parseIntSafe(limit as string)
         const filtersJson = filters && filters !== '{}' ? JSON.parse(filters as string) : undefined
 
-        const paginationOptions = {
-          skip: parsedPage && parsedLimit ? (parsedPage - 1) * parsedLimit : undefined,
-          take: parsedLimit,
+        const orderOptions = {
           orderBy: sortBy
             ? {
                 [sortBy as string]: sortOrder === 'asc' ? 'asc' : sortOrder === 'desc' ? 'desc' : 'asc' // Default to ascending if sortOrder is incorrect
@@ -46,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Fetching monthly transactions with pagination and sorting options
         const categories = await prisma.category.findMany({
-          ...paginationOptions,
+          ...orderOptions,
           ...filterOptions
         })
 

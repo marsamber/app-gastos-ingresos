@@ -30,16 +30,12 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
   } = useContext(SettingsMonthlyExpenseTransactionsContext)
   const {
     refreshCategories: refreshTableCategories,
-    page,
-    limit,
     sortBy,
     sortOrder,
     filters
   } = useContext(SettingsCategoriesContext)
   const {
     refreshBudgets,
-    page: pageBudgets,
-    limit: limitBudgets,
     sortBy: sortByBudgets,
     sortOrder: sortOrderBudgets,
     filters: filtersBudgets
@@ -180,8 +176,8 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
       })
 
       if (response.ok) {
-        refreshBudgets(pageBudgets, limitBudgets, sortByBudgets, sortOrderBudgets, filtersBudgets)
-        refreshTableCategories(page, limit, sortBy, sortOrder, filters)
+        refreshBudgets(sortByBudgets, sortOrderBudgets, filtersBudgets)
+        refreshTableCategories(sortBy, sortOrder, filters)
         refreshMonthlyTransactions(
           pageMonthlyExpenseTransactions,
           limitMonthlyExpenseTransactions,

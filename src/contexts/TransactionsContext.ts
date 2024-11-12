@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { BaseContextType, ITransaction } from '@/types/index'
+import { BaseContextTypeWithPagination, ITransaction } from '@/types/index'
 import { createContext } from 'react'
 
-export interface TransactionsContextType extends BaseContextType {
+export interface TransactionsContextType extends BaseContextTypeWithPagination {
   transactions: ITransaction[] | null
 
   refreshTransactions: (

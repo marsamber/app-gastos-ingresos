@@ -71,18 +71,22 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
   }
 
   const {
-    totalItems,
-    page,
-    limit,
     sortBy,
     sortOrder,
     filters,
-    handleChangePage,
-    handleChangeLimit,
     handleChangeSort,
     handleChangeOrder,
-    handleChangeFilters
-  } = context
+    handleChangeFilters,
+    ...rest
+  } = context;
+  
+  const {
+    totalItems,
+    page,
+    limit,
+    handleChangePage,
+    handleChangeLimit
+  } = context !== settingsBudgetsContext && context !== settingsCategoriesContext ? rest : {};
 
   const [localFilters, setLocalFilters] = useState<Record<string, string>>(filters)
 
@@ -161,14 +165,14 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
+      {context !== settingsBudgetsContext && context !== settingsCategoriesContext && <TablePagination
         totalItems={totalItems}
         page={page}
         limit={limit}
         handleChangePage={handleChangePage}
         handleChangeLimit={handleChangeLimit}
         containerRef={containerRef}
-      />
+      />}
     </Paper>
   )
 }
