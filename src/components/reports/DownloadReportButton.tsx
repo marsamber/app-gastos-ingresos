@@ -496,8 +496,9 @@ const DownloadReportButton = () => {
             }
             fileName="InformeIngresosGastos.pdf"
           >
-            {({ loading }) => (
-              <>
+            {params => {
+              const { loading } = params
+              return (
                 <Fab
                   style={{
                     position: 'fixed',
@@ -513,8 +514,8 @@ const DownloadReportButton = () => {
                     <Download />
                   )}
                 </Fab>
-              </>
-            )}
+              )
+            }}
           </PDFDownloadLink>
         </>
       ) : (
