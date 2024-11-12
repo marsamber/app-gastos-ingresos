@@ -497,21 +497,23 @@ const DownloadReportButton = () => {
             fileName="InformeIngresosGastos.pdf"
           >
             {({ loading }) => (
-              <Fab
-                style={{
-                  position: 'fixed',
-                  bottom: '86px',
-                  right: '20px'
-                }}
-                color="error"
-                disabled={loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc}
-              >
-                {loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc ? (
-                  <CircularProgress />
-                ) : (
-                  <Download />
-                )}
-              </Fab>
+              <>
+                <Fab
+                  style={{
+                    position: 'fixed',
+                    bottom: '86px',
+                    right: '20px'
+                  }}
+                  color="error"
+                  disabled={loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc}
+                >
+                  {loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc ? (
+                    <CircularProgress />
+                  ) : (
+                    <Download />
+                  )}
+                </Fab>
+              </>
             )}
           </PDFDownloadLink>
         </>

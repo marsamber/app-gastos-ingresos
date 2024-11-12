@@ -81,11 +81,11 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
   } = context;
   
   const {
-    totalItems,
-    page,
-    limit,
-    handleChangePage,
-    handleChangeLimit
+    totalItems = 0,
+    page = 0,
+    limit = 10,
+    handleChangePage = () => {},
+    handleChangeLimit = () => {}
   } = context !== settingsBudgetsContext && context !== settingsCategoriesContext ? rest : {};
 
   const [localFilters, setLocalFilters] = useState<Record<string, string>>(filters)

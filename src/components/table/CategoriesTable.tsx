@@ -14,7 +14,7 @@ interface CategoriesTableProps {
 export default function CategoriesTable({ handleDeleteCategory }: CategoriesTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const containerRef = useRef<HTMLDivElement>(null)
-  const { categories, totalItems, page, limit, handleChangeLimit, handleChangePage } =
+  const { categories } =
     useContext(SettingsCategoriesContext)
   const [rows, setRows] = useState<any[]>([])
 
@@ -51,14 +51,6 @@ export default function CategoriesTable({ handleDeleteCategory }: CategoriesTabl
           {rows.map(row => (
             <OneCategoryCard key={row.id} data={row} />
           ))}
-          <TablePagination
-            totalItems={totalItems}
-            page={page}
-            limit={limit}
-            handleChangePage={handleChangePage}
-            handleChangeLimit={handleChangeLimit}
-            containerRef={containerRef}
-          />
         </div>
       ) : (
         <BasicTable headCells={headCells} rows={rows} type="settingsCategories" />
