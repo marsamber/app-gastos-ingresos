@@ -4,7 +4,7 @@ import { ICategories, IMonthlyTransactions, ITransactions, TableReportData } fro
 import { formatDate, formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, monthNames } from '@/utils/utils'
 import { Download, PictureAsPdf } from '@mui/icons-material'
 import { CircularProgress, Fab, useMediaQuery } from '@mui/material'
-import { PDFDownloadLink } from '@react-pdf/renderer'
+import { BlobProviderParams, PDFDownloadLink } from '@react-pdf/renderer'
 import { useContext, useEffect, useState } from 'react'
 import BarChart from './BarChart'
 import { ConfirmGenerateReportModal } from './ConfirmGenerateReportModal'
@@ -496,7 +496,7 @@ const DownloadReportButton = () => {
             }
             fileName="InformeIngresosGastos.pdf"
           >
-            {params => {
+            {(params: BlobProviderParams) => {
               const { loading } = params
               return (
                 <Fab
