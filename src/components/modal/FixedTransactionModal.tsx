@@ -108,7 +108,7 @@ export default function FixedTransactionModal({
 
     setLoading(true)
 
-    const signedAmount = transactionType === 'income' ? parseFloat(amount) : -parseFloat(amount)
+    const signedAmount = transactionType === 'income' ? Number(amount) : -Number(amount)
     const transactionData = { title, amount: signedAmount, category }
 
     try {
@@ -128,7 +128,7 @@ export default function FixedTransactionModal({
         } else {
           refreshExpense(pageExpense, limitExpense, sortByExpense, sortOrderExpense, filtersExpense)
         }
-        handleResetModal(false)
+        handleResetModal(method === 'PUT')
       }
     } catch (error) {
       console.error('Failed to process transaction', error)
@@ -231,7 +231,7 @@ export default function FixedTransactionModal({
             color="primary"
             label="Cantidad"
             type="text"
-            value={amount}
+            value={amount ? Math.abs(Number(amount)).toString() : ''}
             error={errors.amount}
             onChange={e => handleChangeAmount(e)}
             inputProps={{

@@ -108,7 +108,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
     setLoading(true)
 
-    const signedAmount = type === 'income' ? parseFloat(amount) : -parseFloat(amount)
+    const signedAmount = type === 'income' ? Number(amount) : -Number(amount)
     const transactionData = {
       title,
       amount: signedAmount,
@@ -128,7 +128,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
         if (refreshTransactions) {
           refreshTransactions()
         }
-        handleResetModal(false)
+        handleResetModal(!!transaction)
       }
     } catch (error) {
       console.error('Failed to save transaction', error)
@@ -241,7 +241,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             color="primary"
             label="Cantidad"
             type="text"
-            value={amount}
+            value={amount ? Math.abs(Number(amount)).toString() : ''}
             error={errors.amount}
             onChange={e => handleChangeAmount(e)}
             inputProps={{

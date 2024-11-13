@@ -113,7 +113,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     setLoading(true)
     const budgetData = {
       category: category.title,
-      amount: parseFloat(amount),
+      amount: Number(amount),
       date: present ? undefined : new Date(monthSelected).toISOString()
     }
 

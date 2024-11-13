@@ -60,7 +60,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     setLoading(true)
     const newCategoryBudget = {
       category: category,
-      amount: parseFloat(amount)
+      amount: Number(amount)
     }
 
     try {
@@ -85,7 +85,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
 
       if (response.ok) {
         refreshBudgets(sortBy, sortOrder, filters)
-        handleResetModal(false)
+        handleResetModal()
       }
     } catch (error) {
       console.error('Failed to update budget', error)
@@ -94,14 +94,14 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     setLoading(false)
   }
 
-  const handleResetModal = (close = true) => {
+  const handleResetModal = () => {
     setErrorAmount(false)
     setErrorCategory(false)
 
     setAmount('')
     setCategory('')
 
-    if (close) handleClose()
+     handleClose()
   }
 
   const handleChangeAmount = (value: string) => {
@@ -181,7 +181,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
           <Button variant="contained" color="primary" onClick={handleEditCategoryBudget} disabled={loading}>
             Agregar
           </Button>
-          <Button variant="text" color="primary" onClick={() => handleResetModal(true)} disabled={loading}>
+          <Button variant="text" color="primary" onClick={handleResetModal} disabled={loading}>
             Cancelar
           </Button>
         </div>
