@@ -36,6 +36,8 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
         clearTimeout(timeout)
       }
     }
+
+    return;
   }, [open])
 
   useEffect(() => {

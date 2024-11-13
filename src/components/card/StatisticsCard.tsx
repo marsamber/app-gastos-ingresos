@@ -110,7 +110,7 @@ export default function StatisticsCard() {
 
   const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload
+      const data = payload[0].payload as IStatisticsChart
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
@@ -120,6 +120,8 @@ export default function StatisticsCard() {
         </div>
       )
     }
+
+    return null
   }
 
   return (
@@ -146,12 +148,12 @@ export default function StatisticsCard() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ percent }: any) => `${(percent * 100).toFixed(0)}%`}
+                label={({ percent }: { percent: number }) => `${(percent * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
               >
-                {data.map((entry, index) => (
+                {data.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

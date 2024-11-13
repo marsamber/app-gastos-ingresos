@@ -86,13 +86,13 @@ export default function Settings() {
         `/api/monthly_transactions?type=income&page=${pageMonthlyIncomeTransactions + 1}&limit=${limitMonthlyIncomeTransactions}&sortBy=${sortByMonthlyIncomeTransactions}&sortOrder=${sortOrderMonthlyIncomeTransactions}&filters=${JSON.stringify(filtersMonthlyIncomeTransactions)}`
       )
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as { monthlyTransactions: IMonthlyTransaction[]; totalItems: number }
         setMonthlyIncomeTransactions(data.monthlyTransactions)
         setTotalItemsMonthlyIncomeTransactions(data.totalItems)
       }
     }
 
-    fetchMonthlyIncomeTransactions()
+    fetchMonthlyIncomeTransactions().catch(error => console.error('Error fetching monthly income transactions:', error))
   }, [
     refreshKeyMonthlyIncomeTransactions,
     pageMonthlyIncomeTransactions,
@@ -126,13 +126,13 @@ export default function Settings() {
         `/api/monthly_transactions?type=expense&page=${pageMonthlyExpenseTransactions + 1}&limit=${limitMonthlyExpenseTransactions}&sortBy=${sortByMonthlyExpenseTransactions}&sortOrder=${sortOrderMonthlyExpenseTransactions}&filters=${JSON.stringify(filtersMonthlyExpenseTransactions)}`
       )
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as { monthlyTransactions: IMonthlyTransaction[]; totalItems: number }
         setMonthlyExpenseTransactions(data.monthlyTransactions)
         setTotalItemsMonthlyExpenseTransactions(data.totalItems)
       }
     }
 
-    fetchMonthlyExpenseTransactions()
+    fetchMonthlyExpenseTransactions().catch(error => console.error('Error fetching monthly expense transactions:', error))
   }, [
     refreshKeyMonthlyExpenseTransactions,
     pageMonthlyExpenseTransactions,
@@ -159,18 +159,18 @@ export default function Settings() {
         `/api/categories?sortBy=${sortByCategories}&sortOrder=${sortOrderCategories}&excludeCategory=Sin categoría&filters=${JSON.stringify(filtersCategories)}`
       )
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as { categories: ICategory[] }
         setCategories(data.categories.map((category: ICategory) => category.id))
         setLoadingCategories(false)
       }
     }
 
-    fetchCategories()
+    fetchCategories().catch(error => console.error('Error fetching categories:', error))
   }, [refreshKeyCategories, sortByCategories, sortOrderCategories, filtersCategories])
 
   const refreshBudgets = useCallback(
     (newSortBy: string, newSortOrder: 'asc' | 'desc', newFilters: Record<string, string>) => {
-      console.log("refresh",newSortBy, newSortOrder, newFilters)
+      console.log('refresh', newSortBy, newSortOrder, newFilters)
       setSortByBudgets(newSortBy)
       setSortOrderBudgets(newSortOrder)
       setFiltersBudgets(newFilters)
@@ -183,18 +183,22 @@ export default function Settings() {
     const fetchBudgets = async () => {
       const endDate = new Date(dayjs(monthSelected).endOf('month').toISOString())
       const formattedEndDate = formatDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59)
-      console.log("FRONT",sortByBudgets, sortOrderBudgets, filtersBudgets)
+      console.log('FRONT', sortByBudgets, sortOrderBudgets, filtersBudgets)
       const url = present
         ? `/api/budgets?sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
         : `/api/budget_historics?startDate=${monthSelected}&endDate=${formattedEndDate}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
       const response = await customFetch(url)
       if (response.ok) {
-        const data = await response.json()
-        setBudgets(present ? data.budgets : data.budgetHistorics)
+        const data = (await response.json()) as { budgets: IBudget[] } | { budgetHistorics: IBudgetHistoric[] }
+        if ('budgets' in data) {
+          setBudgets(data.budgets)
+        } else if ('budgetHistorics' in data) {
+          setBudgets(data.budgetHistorics)
+        }
       }
     }
 
-    fetchBudgets()
+    fetchBudgets().catch(error => console.error('Error fetching budgets:', error))
   }, [refreshKeyBudgets, sortByBudgets, sortOrderBudgets, filtersBudgets, monthSelected, present])
 
   useEffect(() => {
@@ -247,7 +251,9 @@ export default function Settings() {
       .then(() => {
         refreshCategories(sortByCategories, sortOrderCategories, filtersCategories)
         refreshBudgets(sortByBudgets, sortOrderBudgets, filtersBudgets)
-        refreshAllCategories && refreshAllCategories()
+        if (refreshAllCategories) {
+          refreshAllCategories();
+        }
       })
       .catch(error => {
         console.error('Failed to create category or budget', error)
@@ -290,7 +296,7 @@ export default function Settings() {
     setRestingBudget(getTwoFirstDecimals((totalIncome ?? 0) - (totalBudget ?? 0)))
   }, [budgets, categories, monthlyIncomeTransactions])
 
-  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setValue(newValue)
     if (newValue === 1) {
       setMonthSelected(formatDate(new Date().getFullYear(), new Date().getMonth(), 1, 0, 0))

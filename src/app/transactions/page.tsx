@@ -58,12 +58,12 @@ export default function Transactions() {
         `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&type=${type}&filters=${JSON.stringify(filters)}`
       )
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as { transactions: ITransaction[]; totalItems: number }
         setTransactions(data.transactions)
         setTotalItems(data.totalItems)
       }
     }
-    fetchTransactions()
+    fetchTransactions().catch(error => console.error('Failed to fetch transactions:', error))
   }, [refreshKey, monthsSelected, page, limit, sortBy, sortOrder, type, filters])
 
   const filterOptions = [
@@ -74,7 +74,7 @@ export default function Transactions() {
     { label: 'Todo', value: 'all' }
   ]
 
-  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setValue(newValue)
     if (newValue === 1) {
       setType('expense')
@@ -162,7 +162,7 @@ export default function Transactions() {
                 size="small"
                 options={filterOptions}
                 value={filterOptions.find(option => option.value === filter)}
-                onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                onChange={(_, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
                 getOptionLabel={option => option.label}
                 renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
                 disableClearable
@@ -206,7 +206,7 @@ export default function Transactions() {
                   size="small"
                   options={filterOptions}
                   value={filterOptions.find(option => option.value === filter)}
-                  onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                  onChange={(_, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
                   getOptionLabel={option => option.label}
                   renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
                   disableClearable

@@ -122,11 +122,13 @@ export default function BudgetCard() {
         </div>
       )
     }
+
+    return null
   }
 
   const splitTextIntoLines = (text: string, maxCharsPerLine: number): string[] => {
     const words = text.split(' ')
-    let lines: string[] = []
+    const lines: string[] = []
     let currentLine = ''
 
     words.forEach(word => {
@@ -143,8 +145,21 @@ export default function BudgetCard() {
     return lines
   }
 
-  const CustomizedTick = (props: any) => {
-    const { x, y, payload } = props
+  interface CustomizedTickProps {
+    x: number;
+    y: number;
+    payload: {
+      value: string;
+      offset: number;
+    };
+    textAnchor?: string;
+    angle?: number;
+    fill?: string;
+    fontSize?: number | string;
+  }
+
+  const CustomizedTick = (props: CustomizedTickProps) => {
+    const { x, y, payload, textAnchor='end' } = props
 
     const lines = splitTextIntoLines(payload.value, 12)
 
@@ -154,7 +169,7 @@ export default function BudgetCard() {
           x={0}
           y={0}
           dy={10}
-          textAnchor="end"
+          textAnchor={textAnchor}
           fill="#666"
           transform={isMobile ? 'rotate(-45)' : 'rotate(-25)'}
           fontSize={isMobile ? '10px' : '12px'}
@@ -199,7 +214,7 @@ export default function BudgetCard() {
               <XAxis
                 dataKey="name"
                 xAxisId={0}
-                tick={<CustomizedTick />}
+                tick={(props) => <CustomizedTick {...props} />}
                 angle={isMobile ? -45 : -25}
                 textAnchor="end"
               />

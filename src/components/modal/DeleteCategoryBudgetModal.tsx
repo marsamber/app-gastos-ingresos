@@ -49,12 +49,12 @@ export default function DeleteCategoryBudgetModal({
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData: ICategories = await response.json()
+        const categoriesData = (await response.json()) as ICategories
         setCategories(categoriesData.categories.map(category => category.id))
       }
     }
 
-    fetchCategories()
+    fetchCategories().catch(error => console.error('Error fetching categories:', error))
   }, [refreshKeyCategories])
 
   const handleDeleteBudget = async () => {
@@ -92,7 +92,7 @@ export default function DeleteCategoryBudgetModal({
             category: 'Sin categoría'
           })
         })
-      } catch (error) {
+      } catch {
         console.error('Error creating category')
       }
     }
@@ -165,7 +165,7 @@ export default function DeleteCategoryBudgetModal({
         },
         body: JSON.stringify({ category: categoryBudget.category })
       })
-    } catch (error) {
+    } catch {
       console.error('Error deleting budgets')
     }
   }
@@ -181,7 +181,7 @@ export default function DeleteCategoryBudgetModal({
         },
         body: JSON.stringify({ category: categoryBudget.category })
       })
-    } catch (error) {
+    } catch {
       console.error('Error deleting budgets historics')
     }
   }
@@ -195,12 +195,8 @@ export default function DeleteCategoryBudgetModal({
       })
 
       if (response.ok) {
-        refreshBudgets( sortBy, sortOrder, filters)
-        refreshTableCategories(
-          sortByCategories,
-          sortOrderCategories,
-          filtersCategories
-        )
+        refreshBudgets(sortBy, sortOrder, filters)
+        refreshTableCategories(sortByCategories, sortOrderCategories, filtersCategories)
         refreshMonthlyTransactions(
           pageMonthlyExpenseTransactions,
           limitMonthlyExpenseTransactions,
@@ -208,7 +204,7 @@ export default function DeleteCategoryBudgetModal({
           sortOrderMonthlyExpenseTransactions,
           filtersMonthlyExpenseTransactions
         )
-        refreshCategories && refreshCategories()
+        if (refreshCategories) refreshCategories()
         handleClose()
       }
     } catch (error) {

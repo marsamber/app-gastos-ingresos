@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import html2canvas from 'html2canvas'
-import React, { use, useEffect, useRef, useState } from 'react'
-import { CartesianGrid, Legend, Line, LineChart as Lines, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useEffect, useRef } from 'react'
+import { CartesianGrid, Legend, Line, LineChart as Lines, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
 interface LineChartProps {
   data: Array<{
@@ -19,14 +19,16 @@ const LineChart = ({ data, setImage, image }: LineChartProps) => {
     const renderChart = () => {
       setTimeout(async () => {
         if (chartRef.current) {
-          const canvas = await html2canvas(chartRef.current!, { scale: 4 })
+          const canvas = await html2canvas(chartRef.current, { scale: 4 })
           const imageData = canvas.toDataURL('image/png')
           setImage(imageData)
         }
       }, 2000)
     }
 
-    image === null && data && renderChart()
+    if (image === null && data) {
+      renderChart()
+    }
   }, [setImage, image, data])
 
   return (

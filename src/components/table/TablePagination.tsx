@@ -41,7 +41,7 @@ export const TablePagination = ({
     }
   }
 
-  const handleChangePageMui = (event: unknown, newPage: number) => {
+  const handleChangePageMui = (_: unknown, newPage: number) => {
     handleChangePage(newPage)
 
     if (containerRef && containerRef.current) {

@@ -22,7 +22,9 @@ export default function IconButtonWithDropdown({
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     if (open) return setAnchorEl(null)
     setAnchorEl(event.currentTarget)
-    onClick && onClick(event)
+    if (onClick) {
+      onClick(event);
+    }
   }
 
   return (

@@ -14,6 +14,15 @@ interface FixedTransactionsTableProps {
   isIncome?: boolean
 }
 
+interface RowProps {
+  id: number
+  title: string
+  category: string
+  amount: number
+  actions: JSX.Element
+  [key: string]: unknown
+}
+
 export default function FixedTransactionsTable({
   handleDeleteMonthlyTransaction,
   handleEditMonthlyTransaction,
@@ -21,7 +30,7 @@ export default function FixedTransactionsTable({
 }: FixedTransactionsTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const containerRef = useRef<HTMLDivElement>(null)
-  const [rows, setRows] = useState<any[]>([])
+  const [rows, setRows] = useState<RowProps[]>([])
   const { monthlyTransactions, totalItems, page, limit, handleChangeLimit, handleChangePage } = useContext(
     isIncome ? SettingsMonthlyIncomeTransactionsContext : SettingsMonthlyExpenseTransactionsContext
   )
@@ -73,7 +82,7 @@ export default function FixedTransactionsTable({
           />
         </div>
       ) : (
-        <BasicTable
+        <BasicTable<RowProps>
           headCells={headCells}
           rows={rows}
           type={isIncome ? 'settingsMonthlyIncomeTransactions' : 'settingsMonthlyExpenseTransactions'}

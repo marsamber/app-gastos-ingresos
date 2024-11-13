@@ -44,6 +44,8 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
         clearTimeout(timeout)
       }
     }
+
+    return;
   }, [open])
 
   const handleAddCategory = async () => {
@@ -78,7 +80,9 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
 
       if (response.ok) {
         refreshTableCategories(sortBy, sortOrder, filters)
-        refreshCategories && refreshCategories()
+        if (refreshCategories) {
+          refreshCategories()
+        }
         setLoading(false)
         handleCloseModal()
       }

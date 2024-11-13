@@ -50,12 +50,12 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData: ICategories = await response.json()
+        const categoriesData = await response.json() as ICategories
         setCategories(categoriesData.categories.map(category => category.id))
       }
     }
 
-    fetchCategories()
+    fetchCategories().catch(error => console.error('Failed to fetch categories', error))
   }, [refreshKeyCategories])
 
   useEffect(() => {
@@ -70,6 +70,8 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
         clearTimeout(timeout)
       }
     }
+
+    return;
   }, [open])
 
   useEffect(() => {
@@ -117,7 +119,9 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
       if (response.ok) {
         refreshTransactionsTable(page, limit, sortBy, sortOrder, typeTable, filters)
-        refreshTransactions && refreshTransactions()
+        if (refreshTransactions) {
+          refreshTransactions()
+        }
         handleClose()
       }
     } catch (error) {
@@ -204,7 +208,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
               options={categoriesOptions}
               getOptionLabel={option => option.label}
               value={categoriesOptions.find(opt => opt.value === category)}
-              onChange={(event, newValue) => setCategory(newValue.value)}
+              onChange={(_, newValue) => setCategory(newValue.value)}
               isOptionEqualToValue={(option, value) => option.value === value.value}
               renderInput={params => <TextField {...params} label="Categoría" error={errors.category} required />}
               disableClearable
@@ -245,7 +249,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             label="Fecha"
             type="date"
             error={errors.date}
-            value={formatDate(date as Date)}
+            value={formatDate(date)}
             onChange={e => setDate(new Date(e.target.value))}
             required
           />

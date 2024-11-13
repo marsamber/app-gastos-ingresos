@@ -1,16 +1,14 @@
-/* eslint-disable no-unused-vars */
-import useFetch from '@/hooks/useFetch'
-import { IBudget, IBudgets } from '@/types/index'
+import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
+import { IBudget } from '@/types/index'
 import { Add } from '@mui/icons-material'
 import { Button, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useEffect, useState } from 'react'
+import { CSSProperties, useContext, useState } from 'react'
 import MonthPicker from '../MonthPicker'
 import AddCategoryBudgetModal from '../modal/AddCategoryBudgetModal'
 import DeleteCategoryBudgetModal from '../modal/DeleteCategoryBudgetModal'
 import EditCategoryBudgetModal from '../modal/EditCategoryBudgetModal'
 import CategoriesBudgetTable from '../table/CategoriesBudgetTable'
 import BasicCard from './BasicCard'
-import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
 
 interface CategoriesBudgetCardProps {
   setMonthSelected: (month: string) => void

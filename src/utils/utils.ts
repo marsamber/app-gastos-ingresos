@@ -32,7 +32,7 @@ export const formatMonthYear = (year: number, month: number, day: number, hour: 
 }
 
 export const convertDate = (date: string) => {
-  let [month, year] = date.split(' ')
+  const [month, year] = date.split(' ')
   return { month: monthMap[month as keyof typeof monthMap], year: parseInt(year) }
 }
 

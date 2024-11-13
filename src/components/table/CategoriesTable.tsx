@@ -5,10 +5,15 @@ import { IconButton, useMediaQuery } from '@mui/material'
 import { useContext, useEffect, useRef, useState } from 'react'
 import OneCategoryCard from '../card/OneCategoryCard'
 import BasicTable from './BasicTable'
-import { TablePagination } from './TablePagination'
 
 interface CategoriesTableProps {
   handleDeleteCategory: (category: string) => void
+}
+
+interface CategoriesTableData {
+  id: string
+  actions: JSX.Element
+  [key: string]: unknown
 }
 
 export default function CategoriesTable({ handleDeleteCategory }: CategoriesTableProps) {
@@ -16,7 +21,7 @@ export default function CategoriesTable({ handleDeleteCategory }: CategoriesTabl
   const containerRef = useRef<HTMLDivElement>(null)
   const { categories } =
     useContext(SettingsCategoriesContext)
-  const [rows, setRows] = useState<any[]>([])
+  const [rows, setRows] = useState<CategoriesTableData[]>([])
 
   const headCells = [
     { id: 'id', label: 'Categoría' },
@@ -53,7 +58,7 @@ export default function CategoriesTable({ handleDeleteCategory }: CategoriesTabl
           ))}
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} type="settingsCategories" />
+        <BasicTable<CategoriesTableData> headCells={headCells} rows={rows} type="settingsCategories" />
       )}
     </>
   )

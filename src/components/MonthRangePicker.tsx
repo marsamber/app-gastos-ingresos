@@ -2,19 +2,18 @@
 import { formatDate } from '@/utils/utils'
 import {
   KeyboardArrowRight,
-  KeyboardArrowLeft,
-  KeyboardDoubleArrowRight,
-  KeyboardDoubleArrowLeft
+  KeyboardDoubleArrowLeft,
+  KeyboardDoubleArrowRight
 } from '@mui/icons-material'
-import { useMediaQuery, IconButton } from '@mui/material'
+import { IconButton, useMediaQuery } from '@mui/material'
 import { DatePicker } from 'antd'
 import locale from 'antd/es/date-picker/locale/es_ES'
 import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/es'
 import utc from 'dayjs/plugin/utc'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import '../styles.css'
-import { use, useEffect, useState } from 'react'
 
 interface MonthRangePickerProps {
   monthsSelected: [string, string]

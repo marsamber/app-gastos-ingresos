@@ -48,6 +48,8 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
         clearTimeout(timeout)
       }
     }
+
+    return;
   }, [open])
 
   const categoriesOptions = useMemo(() => {
@@ -68,12 +70,12 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData: ICategories = await response.json()
+        const categoriesData: ICategories = await response.json() as ICategories
         setCategories(categoriesData.categories.map((category: ICategory) => category.id))
       }
     }
 
-    fetchCategories()
+    fetchCategories().catch(error => console.error('Error fetching categories:', error))
   }, [refreshKeyCategories])
 
   const handleAddCategoryBudget = async () => {
@@ -123,7 +125,9 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     })
 
     if (response.ok) {
-      refreshCategories && refreshCategories()
+      if (refreshCategories) {
+        refreshCategories();
+      }
       refreshBudgets(sortBy, sortOrder, filters)
       handleCloseModal()
     } else {
@@ -179,7 +183,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
             style={{ width: isMobile ? '192px' : '200px', margin: '8px' }}
             size="small"
             value={category}
-            onChange={(event, newValue) => {
+            onChange={(_, newValue) => {
               if (typeof newValue === 'string') {
                 // Direct string input from freeSolo
                 setCategory({ title: newValue })

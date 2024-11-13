@@ -15,6 +15,7 @@ interface ITransactionTable {
   date: Date
   amount: number
   actions: ReactNode
+  [key: string]: unknown
 }
 
 interface TransactionsTableProps {
@@ -94,7 +95,7 @@ export default function TransactionsTable({
           />
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} type="transactions" />
+        <BasicTable<ITransactionTable> headCells={headCells} rows={rows} type="transactions" />
       )}
     </>
   )

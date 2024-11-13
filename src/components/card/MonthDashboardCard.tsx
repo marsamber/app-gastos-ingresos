@@ -34,7 +34,7 @@ export default function MonthDashboardCard() {
 
   // DATA
   const getWeekData = () => {
-    const dataMap = new Map()
+    const dataMap: Map<string, ISummaryChart> = new Map()
     const months: string[] = []
     transactions
       ?.filter(transaction => transaction.category !== 'Ingresos fijos')
@@ -88,7 +88,7 @@ export default function MonthDashboardCard() {
   }
 
   const getMonthData = () => {
-    const dataMap = new Map()
+    const dataMap: Map<string, ISummaryChart> = new Map()
     const [startDate, endDate] = monthsSelected.map(date => {
       const [year, month] = date.split('-').map(part => parseInt(part))
       return new Date(Date.UTC(year, month - 1, 1, 0, 0))
@@ -134,7 +134,7 @@ export default function MonthDashboardCard() {
   }
 
   const getDayData = () => {
-    const dataMap = new Map()
+    const dataMap: Map<string, ISummaryChart> = new Map()
 
     // Filter and process transactions
     transactions
@@ -270,6 +270,8 @@ export default function MonthDashboardCard() {
         </div>
       )
     }
+
+    return null
   }
 
   return (
@@ -281,7 +283,7 @@ export default function MonthDashboardCard() {
           size="small"
           options={filterOptions}
           value={filterOptions.find(option => option.value === filter)}
-          onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+          onChange={(_, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
           getOptionLabel={option => option.label}
           renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
           disableClearable

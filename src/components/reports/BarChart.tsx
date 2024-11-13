@@ -1,18 +1,6 @@
-/* eslint-disable no-unused-vars */
-import React, { useEffect, useRef } from 'react'
-import { Bar, BarChart as Bars, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-// import { Canvg } from 'canvg'
 import html2canvas from 'html2canvas'
-
-const data = [
-  { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
-  { name: 'Page B', uv: 3000, pv: 1398, amt: 2210 },
-  { name: 'Page C', uv: 2000, pv: 9800, amt: 2290 },
-  { name: 'Page D', uv: 2780, pv: 3908, amt: 2000 },
-  { name: 'Page E', uv: 1890, pv: 4800, amt: 2181 },
-  { name: 'Page F', uv: 2390, pv: 3800, amt: 2500 },
-  { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 }
-]
+import { useEffect, useRef } from 'react'
+import { Bar, BarChart as Bars, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 interface BarChartProps {
   data: Array<{
@@ -31,7 +19,7 @@ const BarChart = ({ data, setImage, image }: BarChartProps) => {
     const renderChart = () => {
       setTimeout(async () => {
         if (chartRef.current) {
-          const canvas = await html2canvas(chartRef.current!, { scale: 4 })
+          const canvas = await html2canvas(chartRef.current, { scale: 4 })
           const imageData = canvas.toDataURL('image/png')
           setImage(imageData)
         } else {
@@ -40,12 +28,14 @@ const BarChart = ({ data, setImage, image }: BarChartProps) => {
       }, 2000)
     }
 
-    image === null && data && renderChart()
+    if (image === null && data) {
+      renderChart()
+    }
   }, [setImage, image, data])
 
   const splitTextIntoLines = (text: string, maxCharsPerLine: number): string[] => {
     const words = text.split(' ')
-    let lines: string[] = []
+    const lines: string[] = []
     let currentLine = ''
 
     words.forEach(word => {
@@ -62,22 +52,27 @@ const BarChart = ({ data, setImage, image }: BarChartProps) => {
     return lines
   }
 
-  const CustomizedTick = (props: any) => {
+  interface CustomizedTickProps {
+    x: number
+    y: number
+    payload: {
+      value: string
+      offset: number
+    }
+    textAnchor?: string
+    angle?: number
+    fill?: string
+    fontSize?: number | string
+  }
+
+  const CustomizedTick = (props: CustomizedTickProps) => {
     const { x, y, payload } = props
 
     const lines = splitTextIntoLines(payload.value, 12)
 
     return (
       <g transform={`translate(${x},${y})`}>
-        <text
-          x={0}
-          y={0}
-          dy={10}
-          textAnchor="end"
-          fill="#666"
-          transform={'rotate(-25)'}
-          fontSize={'16px'}
-        >
+        <text x={0} y={0} dy={10} textAnchor="end" fill="#666" transform={'rotate(-25)'} fontSize={'16px'}>
           {lines.map((line, index) => (
             <tspan x={0} dy={index > 0 ? 14 : 10} key={index}>
               {line}
@@ -97,7 +92,7 @@ const BarChart = ({ data, setImage, image }: BarChartProps) => {
       <ResponsiveContainer width="100%" height="100%">
         <Bars data={data} margin={{ bottom: 100 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="Categoria" tick={<CustomizedTick/>} angle={-25} textAnchor="end" />
+          <XAxis dataKey="Categoria" tick={props => <CustomizedTick {...props} />} angle={-25} textAnchor="end" />
           <YAxis fontSize={18} unit="€" />
           <Tooltip />
           <Legend verticalAlign="top" height={36} />

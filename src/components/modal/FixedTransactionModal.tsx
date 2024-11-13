@@ -64,12 +64,12 @@ export default function FixedTransactionModal({
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData: ICategories = await response.json()
+        const categoriesData = await response.json() as ICategories
         setCategories(categoriesData.categories.map(category => category.id))
       }
     }
 
-    fetchCategories()
+    fetchCategories().catch(error => console.error('Failed to fetch categories', error))
   }, [refreshKeyCategories])
 
   useEffect(() => {
@@ -84,6 +84,8 @@ export default function FixedTransactionModal({
         clearTimeout(timeout)
       }
     }
+
+    return;
   }, [open])
 
   useEffect(() => {
@@ -197,7 +199,7 @@ export default function FixedTransactionModal({
             options={categoriesOptions}
             getOptionLabel={option => option.label}
             value={categoriesOptions.find(opt => opt.value === category)}
-            onChange={(event, newValue) => setCategory(newValue.value)}
+            onChange={(_, newValue) => setCategory(newValue.value)}
             isOptionEqualToValue={(option, value) => option.value === value.value}
             renderInput={params => (
               <TextField

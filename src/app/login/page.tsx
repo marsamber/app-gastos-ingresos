@@ -18,7 +18,7 @@ export default function LoginPage() {
       }
     })
 
-    const { success } = await response.json()
+    const { success } = (await response.json()) as { success: boolean }
 
     if (success) {
       localStorage.setItem('apiKey', password)
@@ -49,7 +49,9 @@ export default function LoginPage() {
           borderRadius: '10px'
         }}
       >
-        <form onSubmit={saveToken}>
+        <form
+          onSubmit={saveToken}
+        >
           <CardContent>
             <TextField type="password" label="Clave" onChange={event => setPassword(event.target.value)} required />
           </CardContent>

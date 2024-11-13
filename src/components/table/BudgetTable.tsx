@@ -15,6 +15,7 @@ interface BudgetTableData {
   spent: number
   remaining: number
   total: number
+  [key: string]: unknown
 }
 
 export default function BudgetTable({ includeHistorics = false }: BudgetTableProps) {
@@ -32,7 +33,7 @@ export default function BudgetTable({ includeHistorics = false }: BudgetTablePro
   ]
 
   useEffect(() => {
-    let data: BudgetTableData[] = []
+    const data: BudgetTableData[] = []
 
     // Lógica común para presupuestos
     if (budgets) {
@@ -80,7 +81,7 @@ export default function BudgetTable({ includeHistorics = false }: BudgetTablePro
           />
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} type="budgets" />
+        <BasicTable<BudgetTableData> headCells={headCells} rows={rows} type="budgets" />
       )}
     </>
   )

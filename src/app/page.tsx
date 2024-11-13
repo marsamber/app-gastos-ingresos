@@ -17,7 +17,7 @@ import { Info } from '@mui/icons-material'
 import { CircularProgress, Tooltip, useMediaQuery } from '@mui/material'
 import { CSSProperties, Suspense, useContext, useEffect, useState } from 'react'
 import '../styles.css'
-import SearchParamsHandler from '@/components/SearchParamsHandler '
+import SearchParamsHandler from '@/components/SearchParamsHandler'
 
 export default function Home() {
   const today = new Date()
@@ -48,12 +48,12 @@ export default function Home() {
         `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&sortBy=date&sortOrder=desc`
       )
 
-      const { transactions } = await response.json()
+      const { transactions } = await response.json() as { transactions: ITransaction[] }
       setTransactions(transactions)
       setLoadingTransactions(false)
     }
 
-    fetchTransactions()
+    fetchTransactions().catch(error => console.error('Error fetching transactions:', error))
   }, [monthsSelected, refreshKeyTransactions])
 
   const { data: budgetsData, loading: loadingBudgets } = useFetch<IBudgets>('/api/budgets')

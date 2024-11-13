@@ -4,25 +4,36 @@
     "es2021": true,
     "node": true
   },
+  "parser": "@typescript-eslint/parser",
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
-    "next/core-web-vitals"
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
     },
     "ecmaVersion": 12,
-    "sourceType": "module"
+    "sourceType": "module",
+    // Ruta al archivo tsconfig.json para proporcionar la información de tipos
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "."
   },
+  "ignorePatterns": ["src/pages/", "src/lib/", "node_modules/"],
   "plugins": [
     "react"
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",  // Necesario para Next.js desde React 17
     "react/prop-types": "off",          // Desactiva las advertencias de PropTypes si usas TypeScript
-    "react-hooks/exhaustive-deps": "off" // Desactiva las advertencias de dependencias en useEffect
+    "react-hooks/exhaustive-deps": "off", // Desactiva las advertencias de dependencias en useEffect
+    "@typescript-eslint/no-misused-promises": "off", // Desactiva las advertencias de promesas mal utilizadas
+    "@typescript-eslint/no-explicit-any": "error", // Evita el uso de any
+    "@typescript-eslint/no-unused-vars": "error", // Evita variables no usadas
+    "@typescript-eslint/await-thenable": "error" // Evita el uso de await en promesas no thenables
   },
   "settings": {
     "react": {

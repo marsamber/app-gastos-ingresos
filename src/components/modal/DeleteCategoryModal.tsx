@@ -51,12 +51,12 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData: ICategories = await response.json()
+        const categoriesData = (await response.json()) as ICategories
         setCategories(categoriesData.categories.map(category => category.id))
       }
     }
 
-    fetchCategories()
+    fetchCategories().catch(error => console.error('Error fetching categories:', error))
   }, [refreshKeyCategories])
 
   const createCategory = async () => {
@@ -73,7 +73,7 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
             category: 'Sin categoría'
           })
         })
-      } catch (error) {
+      } catch {
         console.error('Error creating category')
       }
     }
@@ -146,7 +146,7 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
         },
         body: JSON.stringify({ category: category })
       })
-    } catch (error) {
+    } catch {
       console.error('Error deleting budgets')
     }
   }
@@ -162,7 +162,7 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
         },
         body: JSON.stringify({ category: category })
       })
-    } catch (error) {
+    } catch {
       console.error('Error deleting budgets historics')
     }
   }
@@ -185,7 +185,7 @@ export default function DeleteCategoryModal({ open, handleClose, category }: Del
           sortOrderMonthlyExpenseTransactions,
           filtersMonthlyExpenseTransactions
         )
-        refreshCategories && refreshCategories()
+        if (refreshCategories) refreshCategories()
         handleClose()
       }
     } catch (error) {

@@ -44,7 +44,7 @@ export default function HistoricDashboardCard() {
     }
 
     const monthsHistoric = calculateMonthsHistoric()
-    setMonthsHistoric([monthsHistoric, monthsSelected[1]!])
+    setMonthsHistoric([monthsHistoric, monthsSelected[1]])
   }, [monthsSelected])
 
   const { data: transactionsData, loading: loadingTransactions } = useFetch<ITransactions>(
@@ -55,11 +55,11 @@ export default function HistoricDashboardCard() {
   )
 
   useEffect(() => {
-    const dataMap = new Map()
+    const dataMap: Map<string, IHistoricChart> = new Map()
 
     // Initialize with current month from budgets
     if (budgets) {
-      const [year, month, day] = monthsSelected[1]!.split('-').map(date => parseInt(date))
+      const [year, month, day] = monthsSelected[1].split('-').map(date => parseInt(date))
       const currentMonthKey = formatMonthYear(year, month - 1, day, 0, 0)
       dataMap.set(currentMonthKey, {
         name: currentMonthKey,
@@ -76,7 +76,7 @@ export default function HistoricDashboardCard() {
       .forEach(historic => {
         const [year, month, day] = (historic.date as string).split('-').map(date => parseInt(date))
         const monthKey = formatMonthYear(year, month - 1, day, 0, 0)
-        const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 }
+        const entry = dataMap.get(monthKey) || { name: monthKey, Gastado: 0, Presupuestado: 0 } 
         entry.Presupuestado = getTwoFirstDecimals(entry.Presupuestado + historic.amount)
         dataMap.set(monthKey, entry)
       })
@@ -141,6 +141,8 @@ export default function HistoricDashboardCard() {
         </div>
       )
     }
+
+    return null
   }
 
   return (

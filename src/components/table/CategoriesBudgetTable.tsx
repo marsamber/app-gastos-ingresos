@@ -11,13 +11,21 @@ interface CategoriesBudgetTableProps {
   handleDeleteCategoryBudget: (id: number) => void
 }
 
+interface CategoriesBudgetTableData {
+  id: number
+  category: string
+  budget: number
+  actions: JSX.Element
+  [key: string]: unknown
+}
+
 export default function CategoriesBudgetTable({
   handleEditCategoryBudget,
   handleDeleteCategoryBudget
 }: CategoriesBudgetTableProps) {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const { budgets } = useContext(SettingsBudgetsContext)
-  const [rows, setRows] = useState<any[]>([])
+  const [rows, setRows] = useState<CategoriesBudgetTableData[]>([])
 
   const headCells = [
     { id: 'category', label: 'Categoría' },
@@ -60,7 +68,7 @@ export default function CategoriesBudgetTable({
           ))}
         </div>
       ) : (
-        <BasicTable headCells={headCells} rows={rows} type="settingsBudgets" />
+        <BasicTable<CategoriesBudgetTableData> headCells={headCells} rows={rows} type="settingsBudgets" />
       )}
     </>
   )

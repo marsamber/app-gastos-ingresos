@@ -5,11 +5,29 @@ import { formatDate, formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, m
 import { Download, PictureAsPdf } from '@mui/icons-material'
 import { CircularProgress, Fab, useMediaQuery } from '@mui/material'
 import { BlobProviderParams, PDFDownloadLink } from '@react-pdf/renderer'
-import { ReactNode, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import BarChart from './BarChart'
 import { ConfirmGenerateReportModal } from './ConfirmGenerateReportModal'
 import IncomeExpenseReport from './IncomeExpenseReport'
 import LineChart from './LineChart'
+
+interface ILineChartData {
+  name: string
+  Gastado: number
+}
+
+interface ITableData {
+  month: string
+  income: number
+  expense: number
+  balance?: number
+}
+
+interface IBarChartData {
+  Categoria: string
+  Ingresado: number
+  Gastado: number
+}
 
 const DownloadReportButton = () => {
   const isDesktop = useMediaQuery('(min-width:1000px)')
@@ -33,11 +51,11 @@ const DownloadReportButton = () => {
   const [percentageChangeExpense, setPercentageChangeExpense] = useState<number>(0)
   const [percentageChangeBalance, setPercentageChangeBalance] = useState<number>(0)
 
-  const [firstLineChartData, setFirstLineChartData] = useState<any[]>([])
-  const [secondLineChartData, setSecondLineChartData] = useState<any[]>([])
+  const [firstLineChartData, setFirstLineChartData] = useState<ILineChartData[]>([])
+  const [secondLineChartData, setSecondLineChartData] = useState<ILineChartData[]>([])
   const [firstLineChartSrc, setFirstChartSrc] = useState<string | null>(null)
   const [secondLineChartSrc, setSecondLineChartSrc] = useState<string | null>(null)
-  const [barChartData, setBarChartData] = useState<any[]>([])
+  const [barChartData, setBarChartData] = useState<IBarChartData[]>([])
   const [barChartSrc, setBarChartSrc] = useState<string | null>(null)
 
   const [tableData, setTableData] = useState<TableReportData | null>(null)
@@ -50,7 +68,7 @@ const DownloadReportButton = () => {
 
   // Retrieve data for the charts
   const getDailyData = () => {
-    const dataMap = new Map()
+    const dataMap: Map<string, ILineChartData> = new Map()
     transactions
       ?.filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
@@ -90,7 +108,7 @@ const DownloadReportButton = () => {
   }
 
   const getWeeklyData = () => {
-    const dataMap = new Map()
+    const dataMap: Map<string, ILineChartData> = new Map()
     const months: string[] = []
     transactions
       ?.filter(transaction => transaction.category !== 'Ingresos fijos')
@@ -144,7 +162,7 @@ const DownloadReportButton = () => {
   }
 
   const getMonthlyData = () => {
-    const dataMap = new Map()
+    const dataMap: Map<string, ILineChartData> = new Map()
 
     // Add the months with no transactions
     const startDate = monthsSelected[0].split('-')
@@ -194,7 +212,7 @@ const DownloadReportButton = () => {
   const getTransactionsByCategory = () => {
     const categories = categoriesData?.categories
 
-    const dataMap = new Map()
+    const dataMap: Map<string, IBarChartData> = new Map()
     transactions
       ?.filter(transaction => transaction.category !== 'Ingresos fijos' && transaction.category !== 'Sin categoría')
       .forEach(transaction => {
@@ -228,7 +246,7 @@ const DownloadReportButton = () => {
       }
     })
 
-    let data = Array.from(dataMap.values()).sort((a, b) => (a.Categoria > b.Categoria ? 1 : -1))
+    const data = Array.from(dataMap.values()).sort((a, b) => (a.Categoria > b.Categoria ? 1 : -1))
 
     return data
   }
@@ -305,7 +323,7 @@ const DownloadReportButton = () => {
   }
 
   const getTableData = () => {
-    const dataMap = new Map()
+    const dataMap: Map<string, ITableData> = new Map()
     // data must be type TableReportData ({headers: string[], items: Array<{month: string, income: number, expense: number, balance: number}
     // Add the monthly transactions from the previous month to the second month selected
     transactionsSincePreviousMonthData?.transactions.forEach(transaction => {
@@ -410,7 +428,7 @@ const DownloadReportButton = () => {
 
   useEffect(() => {
     if (generateReport) {
-      let previous = new Date(monthsSelected[0])
+      const previous = new Date(monthsSelected[0])
       previous.setMonth(previous.getMonth() - 1)
 
       setPreviousMonth([
@@ -470,6 +488,20 @@ const DownloadReportButton = () => {
     setOpenModalConfirm(true)
   }
 
+  const DownloadButtonContent = ({ loading }: { loading: boolean }) => (
+    <Fab
+      style={{
+        position: 'fixed',
+        bottom: '86px',
+        right: '20px'
+      }}
+      color="error"
+      disabled={loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc}
+    >
+      {loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc ? <CircularProgress /> : <Download />}
+    </Fab>
+  )
+
   return !isClient ? (
     <></>
   ) : (
@@ -496,26 +528,7 @@ const DownloadReportButton = () => {
             }
             fileName="InformeIngresosGastos.pdf"
           >
-            {(params: BlobProviderParams): ReactNode => {
-              const { loading } = params
-              return (
-                <Fab
-                  style={{
-                    position: 'fixed',
-                    bottom: '86px',
-                    right: '20px'
-                  }}
-                  color="error"
-                  disabled={loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc}
-                >
-                  {loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc ? (
-                    <CircularProgress />
-                  ) : (
-                    <Download />
-                  )}
-                </Fab>
-              )
-            }}
+            {({ loading }: BlobProviderParams) => <DownloadButtonContent loading={loading} />}
           </PDFDownloadLink>
         </>
       ) : (

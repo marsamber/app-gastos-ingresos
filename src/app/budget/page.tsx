@@ -2,7 +2,7 @@
 import BudgetTable from '@/components/table/BudgetTable'
 import { BudgetsContext } from '@/contexts/BudgetsContext'
 import { RefreshContext } from '@/contexts/RefreshContext'
-import { IBudget, IBudgetHistoric } from '@/types/index'
+import { IBudget, IBudgetHistoric, ITransaction } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
 import { formatDate, handleDateFilterChange } from '@/utils/utils'
 import { Autocomplete, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
@@ -18,7 +18,7 @@ export default function Budget() {
   const [present, setPresent] = useState(true)
   const isMobile = useMediaQuery('(max-width: 600px)')
   const sideBarCollapsed = useMediaQuery('(max-width: 899px)')
-  const [transactions, setTransactions] = useState([])
+  const [transactions, setTransactions] = useState<ITransaction[]>([])
   const { refreshKeyTransactions } = useContext(RefreshContext)
 
   const [page, setPage] = useState(0)
@@ -56,13 +56,13 @@ export default function Budget() {
         : `/api/budget_historics?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&filters=${JSON.stringify(filters)}&excludeCategory=Ingresos fijos`
       const response = await customFetch(url)
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as { budgets: IBudget[] | IBudgetHistoric[]; totalItems: number }
         setBudgets(data.budgets)
         setTotalItems(data.totalItems)
       }
     }
 
-    fetchBudgets()
+    fetchBudgets().catch(error => console.error('Error fetching budgets:', error))
   }, [refreshKeyBudgets, page, limit, sortBy, sortOrder, filters, monthsSelected])
 
   const filterOptions = [
@@ -72,7 +72,7 @@ export default function Budget() {
     { label: 'Todo', value: 'all' }
   ]
 
-  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setValue(newValue)
     if (newValue === 1) {
       setFilter('all')
@@ -98,11 +98,11 @@ export default function Budget() {
         `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}`
       )
 
-      const { transactions } = await response.json()
+      const { transactions } = await response.json() as { transactions: ITransaction[] }
       setTransactions(transactions)
     }
 
-    fetchTransactions()
+    fetchTransactions().catch(error => console.error('Error fetching transactions:', error))
   }, [monthsSelected, refreshKeyTransactions])
 
   useEffect(() => {
@@ -166,7 +166,7 @@ export default function Budget() {
                 size="small"
                 options={filterOptions}
                 value={filterOptions.find(option => option.value === filter)}
-                onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                onChange={(_, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
                 getOptionLabel={option => option.label}
                 renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
                 disableClearable
@@ -197,7 +197,7 @@ export default function Budget() {
                   size="small"
                   options={filterOptions}
                   value={filterOptions.find(option => option.value === filter)}
-                  onChange={(event, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
+                  onChange={(_, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
                   getOptionLabel={option => option.label}
                   renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
                   disableClearable

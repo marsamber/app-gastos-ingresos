@@ -1,10 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable no-unused-vars */
-import { BudgetsContext } from '@/contexts/BudgetsContext'
-import { SettingsBudgetsContext } from '@/contexts/SettingsBudgetsContext'
-import { SettingsCategoriesContext } from '@/contexts/SettingsCategoriesContext'
-import { SettingsMonthlyExpenseTransactionsContext } from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
-import { SettingsMonthlyIncomeTransactionsContext } from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
-import { TransactionsContext } from '@/contexts/TransactionsContext'
+import { BudgetsContext, BudgetsContextType } from '@/contexts/BudgetsContext'
+import { SettingsBudgetsContext, SettingsBudgetsContextType } from '@/contexts/SettingsBudgetsContext'
+import { SettingsCategoriesContext, SettingsCategoriesContextType } from '@/contexts/SettingsCategoriesContext'
+import {
+  SettingsMonthlyExpenseTransactionsContext,
+  SettingsMonthlyExpenseTransactionsContextType
+} from '@/contexts/SettingsMonthlyExpenseTransactionsContext'
+import {
+  SettingsMonthlyIncomeTransactionsContext,
+  SettingsMonthlyIncomeTransactionsContextType
+} from '@/contexts/SettingsMonthlyIncomeTransactionsContext'
+import { TransactionsContext, TransactionsContextType } from '@/contexts/TransactionsContext'
 import { Clear, FilterAlt, Search } from '@mui/icons-material'
 import { IconButton, InputAdornment, TextField } from '@mui/material'
 import Box from '@mui/material/Box'
@@ -26,9 +33,10 @@ export interface HeadCell {
   id: string
   label: string
 }
-export interface BasicTableProps {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface BasicTableProps<T extends { id: string | number } = { id: string } & Record<string, unknown>> {
   headCells: HeadCell[]
-  rows: any[]
+  rows: T[]
   type:
     | 'transactions'
     | 'budgets'
@@ -38,7 +46,20 @@ export interface BasicTableProps {
     | 'settingsCategories'
 }
 
-export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
+type Context =
+  | TransactionsContextType
+  | BudgetsContextType
+  | SettingsBudgetsContextType
+  | SettingsMonthlyIncomeTransactionsContextType
+  | SettingsMonthlyExpenseTransactionsContextType
+  | SettingsCategoriesContextType
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function BasicTable<T extends { id: string | number } & Record<string, unknown>>({
+  headCells,
+  rows,
+  type
+}: BasicTableProps<T>) {
   const transactionsContext = useContext(TransactionsContext)
   const budgetsContext = useContext(BudgetsContext)
   const settingsBudgetsContext = useContext(SettingsBudgetsContext)
@@ -46,7 +67,7 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
   const settingsMonthlyExpenseTransactionsContext = useContext(SettingsMonthlyExpenseTransactionsContext)
   const settingsCategoriesContext = useContext(SettingsCategoriesContext)
 
-  let context: any
+  let context: Context
   switch (type) {
     case 'transactions':
       context = transactionsContext
@@ -67,30 +88,33 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
       context = settingsCategoriesContext
       break
     default:
-      context = null
+      context = transactionsContext
   }
 
-  const {
-    sortBy,
-    sortOrder,
-    filters,
-    handleChangeSort,
-    handleChangeOrder,
-    handleChangeFilters,
-    ...rest
-  } = context;
-  
-  const {
-    totalItems = 0,
-    page = 0,
-    limit = 10,
-    handleChangePage = () => {},
-    handleChangeLimit = () => {}
-  } = context !== settingsBudgetsContext && context !== settingsCategoriesContext ? rest : {};
+  const { sortBy, sortOrder, filters, handleChangeSort, handleChangeOrder, handleChangeFilters } = context
+
+  let totalItems: number = 0
+  let page: number = 0
+  let limit: number = 10
+  let handleChangePage: (page: number) => void = () => {}
+  let handleChangeLimit: (limit: number) => void = () => {}
+  if (
+    'totalItems' in context &&
+    'page' in context &&
+    'limit' in context &&
+    'handleChangePage' in context &&
+    'handleChangeLimit' in context
+  ) {
+    totalItems = context.totalItems
+    page = context.page
+    limit = context.limit
+    handleChangePage = context.handleChangePage
+    handleChangeLimit = context.handleChangeLimit
+  }
 
   const [localFilters, setLocalFilters] = useState<Record<string, string>>(filters)
 
-  const handleRequestSort = (event: MouseEvent<unknown>, property: string) => {
+  const handleRequestSort = (_: MouseEvent<unknown>, property: string) => {
     const isAsc = sortBy === property && sortOrder === 'asc'
     handleChangeSort(property)
     handleChangeOrder(isAsc ? 'desc' : 'asc')
@@ -140,22 +164,26 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
                           align="left"
                           style={{
                             color:
-                              cell === 'amount' || cell === 'remaining' ? (row[cell] > 0 ? 'green' : 'red') : 'black'
+                              cell === 'amount' || cell === 'remaining'
+                                ? (row[cell] as number) > 0
+                                  ? 'green'
+                                  : 'red'
+                                : 'black'
                           }}
                         >
-                          {row[cell]} €
+                          {row[cell] as number} €
                         </TableCell>
                       ) : row[cell] instanceof Date ? (
                         <TableCell key={index} align="left">
-                          {row[cell].toLocaleDateString()}
+                          {(row[cell] as Date).toLocaleDateString()}
                         </TableCell>
                       ) : cell === 'actions' ? (
                         <TableCell key={index} align="left">
-                          {row[cell]}
+                          {row[cell] as React.ReactNode}
                         </TableCell>
                       ) : (
                         <TableCell key={index} align="left" style={{ paddingLeft: 52 }}>
-                          {row[cell]}
+                          {row[cell] as React.ReactNode}
                         </TableCell>
                       )
                     )}
@@ -165,14 +193,16 @@ export default function BasicTable({ headCells, rows, type }: BasicTableProps) {
           </TableBody>
         </Table>
       </TableContainer>
-      {context !== settingsBudgetsContext && context !== settingsCategoriesContext && <TablePagination
-        totalItems={totalItems}
-        page={page}
-        limit={limit}
-        handleChangePage={handleChangePage}
-        handleChangeLimit={handleChangeLimit}
-        containerRef={containerRef}
-      />}
+      {context !== settingsBudgetsContext && context !== settingsCategoriesContext && (
+        <TablePagination
+          totalItems={totalItems}
+          page={page}
+          limit={limit}
+          handleChangePage={handleChangePage}
+          handleChangeLimit={handleChangeLimit}
+          containerRef={containerRef}
+        />
+      )}
     </Paper>
   )
 }
@@ -182,12 +212,12 @@ interface EnhancedTableProps {
   order: 'asc' | 'desc'
   orderBy: string
   headCells: HeadCell[]
-  filters: any
+  filters: Record<string, string>
   onFilterChange: (filter: string, value: string) => void
   onClearFilter: (property: string) => void
   onApplyFilters: () => void
-  setLocalFilters: any
-  getFilters: any
+  setLocalFilters: (filters: Record<string, string>) => void
+  getFilters: Record<string, string>
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -207,7 +237,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     onRequestSort(event, property)
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
+  const handleClick = () => {
     setLocalFilters(getFilters)
   }
 
@@ -217,40 +247,34 @@ function EnhancedTableHead(props: EnhancedTableProps) {
         {headCells.map(headCell => (
           <TableCell key={headCell.id} align="left" sortDirection={orderBy === headCell.id ? order : false}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              {(headCell.id === 'title' ||
-                headCell.id === 'category' ||
-                headCell.id === 'id') && (
-                  <IconButtonWithDropdown
-                    icon={<FilterAlt fontSize="small" />}
-                    onClick={event => handleClick(event, headCell.id)}
-                    options={[
-                      <TextField
-                        key={headCell.id}
-                        label="Filtrar"
-                        value={filters[headCell.id] || ''}
-                        onChange={event => onFilterChange(headCell.id, event.target.value)}
-                        size="small"
-                        style={{ width: 200 }}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="clear filter"
-                                onClick={() => onClearFilter(headCell.id)}
-                                edge="end"
-                              >
-                                <Clear fontSize="small" />
-                              </IconButton>
-                              <IconButton aria-label="apply filter" onClick={() => onApplyFilters()} edge="end">
-                                <Search fontSize="small" />
-                              </IconButton>
-                            </InputAdornment>
-                          )
-                        }}
-                      />
-                    ]}
-                  />
-                )}
+              {(headCell.id === 'title' || headCell.id === 'category' || headCell.id === 'id') && (
+                <IconButtonWithDropdown
+                  icon={<FilterAlt fontSize="small" />}
+                  onClick={handleClick}
+                  options={[
+                    <TextField
+                      key={headCell.id}
+                      label="Filtrar"
+                      value={filters[headCell.id] || ''}
+                      onChange={event => onFilterChange(headCell.id, event.target.value)}
+                      size="small"
+                      style={{ width: 200 }}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton aria-label="clear filter" onClick={() => onClearFilter(headCell.id)} edge="end">
+                              <Clear fontSize="small" />
+                            </IconButton>
+                            <IconButton aria-label="apply filter" onClick={() => onApplyFilters()} edge="end">
+                              <Search fontSize="small" />
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  ]}
+                />
+              )}
               {headCell.id !== 'actions' &&
               headCell.id !== 'spent' &&
               headCell.id !== 'remaining' &&
