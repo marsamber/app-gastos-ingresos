@@ -5,7 +5,7 @@ import { formatDate, formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, m
 import { Download, PictureAsPdf } from '@mui/icons-material'
 import { CircularProgress, Fab, useMediaQuery } from '@mui/material'
 import { BlobProviderParams, PDFDownloadLink } from '@react-pdf/renderer'
-import { useContext, useEffect, useState } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import BarChart from './BarChart'
 import { ConfirmGenerateReportModal } from './ConfirmGenerateReportModal'
 import IncomeExpenseReport from './IncomeExpenseReport'
@@ -488,7 +488,7 @@ const DownloadReportButton = () => {
     setOpenModalConfirm(true)
   }
 
-  const DownloadButtonContent = ({ loading }: { loading: boolean }) => (
+  const DownloadButtonContent: FC<{ loading: boolean }> = ({ loading }) => (
     <Fab
       style={{
         position: 'fixed',
