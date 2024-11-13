@@ -57,6 +57,9 @@ export default function BudgetTable({ includeHistorics = false }: BudgetTablePro
           if (index !== -1) {
             data[index].spent -= transaction.amount
             data[index].remaining += transaction.amount
+
+            data[index].spent = Number(data[index].spent.toFixed(2))
+            data[index].remaining = Number(data[index].remaining.toFixed(2))
           }
         })
     }
