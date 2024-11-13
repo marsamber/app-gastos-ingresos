@@ -45,7 +45,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
       }
     }
 
-    return;
+    return
   }, [open])
 
   const handleAddCategory = async () => {
@@ -84,17 +84,17 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
           refreshCategories()
         }
         setLoading(false)
-        handleCloseModal()
+        handleResetModal(false)
       }
     } catch (error) {
       console.error(error)
     }
   }
 
-  const handleCloseModal = () => {
+  const handleResetModal = (close = true) => {
     setError({ category: false, message: '' })
     setCategory('')
-    handleClose()
+    if (close) handleClose()
   }
 
   // STYLES
@@ -121,7 +121,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
   }
 
   return (
-    <BasicModal style={modalStyle} open={open} handleClose={handleCloseModal}>
+    <BasicModal style={modalStyle} open={open} handleClose={handleResetModal}>
       <div>
         <h3 style={titleStyle}>Agregar categoría</h3>
         <div style={rowStyle}>
@@ -141,7 +141,7 @@ export default function AddCategoryModal({ open, handleClose }: AddCategoryModal
           <Button variant="contained" color="primary" onClick={handleAddCategory} disabled={loading}>
             Agregar
           </Button>
-          <Button color="primary" onClick={handleCloseModal} disabled={loading}>
+          <Button color="primary" onClick={() => handleResetModal(true)} disabled={loading}>
             Cancelar
           </Button>
         </div>

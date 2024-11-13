@@ -64,7 +64,7 @@ export default function FixedTransactionModal({
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData = await response.json() as ICategories
+        const categoriesData = (await response.json()) as ICategories
         setCategories(categoriesData.categories.map(category => category.id))
       }
     }
@@ -85,7 +85,7 @@ export default function FixedTransactionModal({
       }
     }
 
-    return;
+    return
   }, [open])
 
   useEffect(() => {
@@ -107,7 +107,9 @@ export default function FixedTransactionModal({
     }
 
     setLoading(true)
-    const transactionData = { title, amount: parseFloat(amount), category }
+
+    const signedAmount = transactionType === 'income' ? parseFloat(amount) : -parseFloat(amount)
+    const transactionData = { title, amount: signedAmount, category }
 
     try {
       const method = monthlyTransaction ? 'PUT' : 'POST'
@@ -126,7 +128,7 @@ export default function FixedTransactionModal({
         } else {
           refreshExpense(pageExpense, limitExpense, sortByExpense, sortOrderExpense, filtersExpense)
         }
-        handleCloseModal()
+        handleResetModal(false)
       }
     } catch (error) {
       console.error('Failed to process transaction', error)
@@ -135,21 +137,19 @@ export default function FixedTransactionModal({
     }
   }
 
-  const handleCloseModal = () => {
+  const handleResetModal = (close = true) => {
     setAmount('')
     setTitle('')
     setCategory('')
     setErrors({ amount: false, title: false, category: false })
 
-    handleClose()
+    if (close) handleClose()
   }
 
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = e.target.value
 
-    if (transactionType === 'income' && /^\d*\.?\d*$/.test(newValue)) {
-      setAmount(newValue)
-    } else if (transactionType === 'expense' && /^-\d*\.?\d*$/.test(newValue)) {
+    if (/^\d*\.?\d*$/.test(newValue)) {
       setAmount(newValue)
     }
   }
@@ -178,7 +178,7 @@ export default function FixedTransactionModal({
   }
 
   return (
-    <BasicModal open={open} handleClose={handleCloseModal} style={modalStyle}>
+    <BasicModal open={open} handleClose={handleResetModal} style={modalStyle}>
       <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' } : {}}>
         <h3 style={titleStyle}>{monthlyTransaction ? 'Editar transacción' : 'Agregar transacción'}</h3>
         <div style={rowStyle}>
@@ -198,8 +198,8 @@ export default function FixedTransactionModal({
             size="small"
             options={categoriesOptions}
             getOptionLabel={option => option.label}
-            value={categoriesOptions.find(opt => opt.value === category)}
-            onChange={(_, newValue) => setCategory(newValue.value)}
+            value={category ? categoriesOptions.find(opt => opt.value === category) : { value: '', label: '' }}
+            onChange={(_, newValue) => setCategory(newValue ? newValue.value : '')}
             isOptionEqualToValue={(option, value) => option.value === value.value}
             renderInput={params => (
               <TextField
@@ -235,7 +235,7 @@ export default function FixedTransactionModal({
             error={errors.amount}
             onChange={e => handleChangeAmount(e)}
             inputProps={{
-              pattern: transactionType === 'income' ? '^\\d*\\.?\\d*$' : '^-\\d*\\.?\\d*$'
+              pattern: '^\\d*\\.?\\d*$'
             }}
             required
           />
@@ -244,7 +244,7 @@ export default function FixedTransactionModal({
           <Button variant="contained" color="primary" onClick={handleSaveTransaction} disabled={loading}>
             {monthlyTransaction ? 'Actualizar' : 'Agregar'}
           </Button>
-          <Button variant="text" color="primary" onClick={handleClose} disabled={loading}>
+          <Button variant="text" color="primary" onClick={() => handleResetModal(true)} disabled={loading}>
             Cancelar
           </Button>
         </div>

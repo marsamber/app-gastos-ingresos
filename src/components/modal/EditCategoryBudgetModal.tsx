@@ -37,7 +37,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
       }
     }
 
-    return;
+    return
   }, [open])
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
 
       if (response.ok) {
         refreshBudgets(sortBy, sortOrder, filters)
-        handleCloseModal()
+        handleResetModal(false)
       }
     } catch (error) {
       console.error('Failed to update budget', error)
@@ -94,14 +94,14 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     setLoading(false)
   }
 
-  const handleCloseModal = () => {
+  const handleResetModal = (close = true) => {
     setErrorAmount(false)
     setErrorCategory(false)
 
     setAmount('')
     setCategory('')
 
-    handleClose()
+    if (close) handleClose()
   }
 
   const handleChangeAmount = (value: string) => {
@@ -147,7 +147,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
   }
 
   return (
-    <BasicModal open={open} style={modalStyle} handleClose={handleCloseModal}>
+    <BasicModal open={open} style={modalStyle} handleClose={handleResetModal}>
       <div>
         <h3 style={titleStyle}>Editar presupuesto</h3>
         <div style={rowStyle}>
@@ -181,7 +181,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
           <Button variant="contained" color="primary" onClick={handleEditCategoryBudget} disabled={loading}>
             Agregar
           </Button>
-          <Button variant="text" color="primary" onClick={handleCloseModal} disabled={loading}>
+          <Button variant="text" color="primary" onClick={() => handleResetModal(true)} disabled={loading}>
             Cancelar
           </Button>
         </div>

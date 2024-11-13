@@ -16,13 +16,13 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   const inputRef = useRef<HTMLInputElement>()
 
   const isMobile = useMediaQuery('(max-width: 600px)')
-  const [type, setType] = useState<'income' | 'expense'>('income')
+  const [type, setType] = useState<'income' | 'expense'>('expense')
   const [amount, setAmount] = useState<string>('')
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('')
   const [date, setDate] = useState(new Date())
   const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState({ amount: false, date: false, title: false, category: false })
+  const [errors, setErrors] = useState({ amount: false, date: false, type: false, title: false, category: false })
   const [categories, setCategories] = useState<string[] | null>(null)
 
   const {
@@ -35,6 +35,10 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
     filters
   } = useContext(TransactionsContext)
   const { refreshTransactions, refreshKeyCategories } = useContext(RefreshContext)
+  const typeOptions = [
+    { value: 'income', label: 'Ingreso' },
+    { value: 'expense', label: 'Gasto' }
+  ]
 
   const categoriesOptions = useMemo(
     () =>
@@ -50,7 +54,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData = await response.json() as ICategories
+        const categoriesData = (await response.json()) as ICategories
         setCategories(categoriesData.categories.map(category => category.id))
       }
     }
@@ -71,7 +75,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
       }
     }
 
-    return;
+    return
   }, [open])
 
   useEffect(() => {
@@ -82,7 +86,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
       setCategory(transaction.category)
       setDate(new Date(transaction.date))
     } else {
-      setType('income')
+      setType('expense')
       setAmount('')
       setTitle('')
       setCategory('')
@@ -91,11 +95,12 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   }, [transaction, open])
 
   const handleSaveTransaction = async () => {
-    if (!amount || !title || !category || !date) {
+    if (!amount || !title || !type || !category || !date) {
       setErrors({
         amount: !amount,
         title: !title,
         category: !category,
+        type: !type,
         date: date.toString() === 'Invalid Date'
       })
       return
@@ -103,9 +108,10 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
     setLoading(true)
 
+    const signedAmount = type === 'income' ? parseFloat(amount) : -parseFloat(amount)
     const transactionData = {
       title,
-      amount: parseFloat(amount),
+      amount: signedAmount,
       category,
       date: date.toISOString()
     }
@@ -122,7 +128,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
         if (refreshTransactions) {
           refreshTransactions()
         }
-        handleClose()
+        handleResetModal(false)
       }
     } catch (error) {
       console.error('Failed to save transaction', error)
@@ -133,21 +139,21 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value
-    if (/^-?\d*\.?\d*$/.test(value)) {
+    if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value)
-      setType(parseFloat(value) < 0 ? 'expense' : 'income')
     }
   }
 
-  const handleCloseModal = () => {
-    setErrors({ amount: false, date: false, title: false, category: false })
+  const handleResetModal = (close = true) => {
+    setErrors({ amount: false, date: false, type: false, title: false, category: false })
 
     setAmount('')
     setTitle('')
+    setType('expense')
     setCategory('')
     setDate(new Date())
 
-    handleClose()
+    if (close) handleClose()
   }
 
   const formatDate = (date: Date) => {
@@ -186,7 +192,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   }
 
   return (
-    <BasicModal open={open} style={modalStyle} handleClose={handleCloseModal}>
+    <BasicModal open={open} style={modalStyle} handleClose={handleResetModal}>
       <div style={isMobile ? { display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' } : {}}>
         <h3 style={titleStyle}>{transaction ? 'Editar transacción' : 'Agregar transacción'}</h3>
         <div style={firstRowStyle}>
@@ -207,8 +213,8 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
               size="small"
               options={categoriesOptions}
               getOptionLabel={option => option.label}
-              value={categoriesOptions.find(opt => opt.value === category)}
-              onChange={(_, newValue) => setCategory(newValue.value)}
+              value={category ? categoriesOptions.find(opt => opt.value === category) : { value: '', label: '' }}
+              onChange={(_, newValue) => setCategory(newValue ? newValue.value : '')}
               isOptionEqualToValue={(option, value) => option.value === value.value}
               renderInput={params => <TextField {...params} label="Categoría" error={errors.category} required />}
               disableClearable
@@ -218,18 +224,19 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
           )}
         </div>
         <div style={firstRowStyle}>
-          <TextField
-            style={{ width: isMobile ? '192px' : '110px', margin: '8px' }}
-            disabled
+          <Autocomplete
+            style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
             size="small"
-            color="primary"
-            label="Tipo"
-            type="text"
-            value={type === 'income' ? 'Ingreso' : 'Gasto'}
-            required
+            options={typeOptions}
+            getOptionLabel={option => option.label}
+            value={typeOptions.find(opt => opt.value === type) || { value: '', label: '' }}
+            onChange={(_, newValue) => setType(newValue.value as 'income' | 'expense')}
+            isOptionEqualToValue={(option, value) => option.value === value.value}
+            renderInput={params => <TextField {...params} label="Tipo" required />}
+            disableClearable
           />
           <TextField
-            style={{ width: isMobile ? '192px' : '115px', margin: '8px' }}
+            style={{ width: isMobile ? '192px' : '110px', margin: '8px' }}
             size="small"
             color="primary"
             label="Cantidad"
@@ -238,7 +245,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             error={errors.amount}
             onChange={e => handleChangeAmount(e)}
             inputProps={{
-              pattern: '^-?\\d*\\.?\\d*$'
+              pattern: '^\\d*\\.?\\d*$'
             }}
             required
           />
@@ -258,7 +265,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
           <Button variant="contained" color="primary" onClick={handleSaveTransaction} disabled={loading}>
             {transaction ? 'Editar' : 'Agregar'}
           </Button>
-          <Button variant="text" color="primary" onClick={handleCloseModal} disabled={loading}>
+          <Button variant="text" color="primary" onClick={() => handleResetModal(true)} disabled={loading}>
             Cancelar
           </Button>
         </div>

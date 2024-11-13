@@ -29,8 +29,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   const [error, setError] = useState({ category: false, amount: false, message: '' })
   const [categories, setCategories] = useState<string[] | null>(null)
 
-  const { budgets, monthSelected, refreshBudgets, sortBy, sortOrder, filters } =
-    useContext(SettingsBudgetsContext)
+  const { budgets, monthSelected, refreshBudgets, sortBy, sortOrder, filters } = useContext(SettingsBudgetsContext)
   const currentDate = useMemo(() => new Date().toISOString().substring(0, 7), [])
   const present = useMemo(() => monthSelected.substring(0, 7) === currentDate, [monthSelected, currentDate])
 
@@ -49,7 +48,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
       }
     }
 
-    return;
+    return
   }, [open])
 
   const categoriesOptions = useMemo(() => {
@@ -70,7 +69,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
       const response = await customFetch('/api/categories')
 
       if (response.ok) {
-        const categoriesData: ICategories = await response.json() as ICategories
+        const categoriesData: ICategories = (await response.json()) as ICategories
         setCategories(categoriesData.categories.map((category: ICategory) => category.id))
       }
     }
@@ -126,10 +125,10 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
 
     if (response.ok) {
       if (refreshCategories) {
-        refreshCategories();
+        refreshCategories()
       }
       refreshBudgets(sortBy, sortOrder, filters)
-      handleCloseModal()
+      handleResetModal(false)
     } else {
       setError({ ...error, message: 'Error al guardar el presupuesto.' })
     }
@@ -137,11 +136,12 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
     setLoading(false)
   }
 
-  const handleCloseModal = () => {
+  const handleResetModal = (close = true) => {
     setError({ category: false, amount: false, message: '' })
     setCategory({ title: '' })
     setAmount('')
-    handleClose()
+
+    if (close) handleClose()
   }
 
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -175,7 +175,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
   }
 
   return (
-    <BasicModal style={modalStyle} open={open} handleClose={handleCloseModal}>
+    <BasicModal style={modalStyle} open={open} handleClose={handleResetModal}>
       <div>
         <h3 style={titleStyle}>Agregar presupuesto</h3>
         <div style={rowStyle}>
@@ -239,7 +239,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
           <Button variant="contained" color="primary" onClick={handleAddCategoryBudget} disabled={loading}>
             Agregar
           </Button>
-          <Button color="primary" onClick={handleCloseModal} disabled={loading}>
+          <Button color="primary" onClick={() => handleResetModal(true)} disabled={loading}>
             Cancelar
           </Button>
         </div>
