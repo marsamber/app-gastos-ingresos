@@ -123,6 +123,16 @@ export default function BudgetCard() {
 
     return lines
   }
+  const chartWidth = isMobile ? 300 : isTablet ? 600 : 800; // Ancho dinámico del gráfico
+  const maxBarWidth = 42; // Ancho máximo de las barras
+  const minBarWidth = 10; // Ancho mínimo de las barras
+  
+  const calculateBarWidth = () => {
+    const availableWidth = chartWidth - 100; // Restamos márgenes
+    const totalBars = data.length;
+    const calculatedWidth = availableWidth / (totalBars * 2); // Espacio para barras y separación
+    return Math.max(minBarWidth, Math.min(maxBarWidth, calculatedWidth));
+  };
 
   return (
     <BasicCard style={cardStyle}>
@@ -160,11 +170,12 @@ export default function BudgetCard() {
               }}
             />
             <VictoryGroup>
-              {/* Presupuestado */}
+              {/* Gastado */}
               <VictoryBar
                 data={data}
                 x="x"
-                y={(d: IBudgetChart) => transformValue(d.Presupuestado)}
+                y={(d: IBudgetChart) => transformValue(d.Gastado)}
+                barWidth={calculateBarWidth()} // Calcular el ancho de la barra
                 labels={({ datum }: { datum: IBudgetChart }) => {
                   const restante = datum.Presupuestado - datum.Gastado
                   return [
@@ -174,9 +185,8 @@ export default function BudgetCard() {
                     `Restante: ${restante} €`
                   ].join('\n')
                 }}
-                barWidth={42}
                 style={{
-                  data: { stroke: '#257CA3', strokeWidth: 2, fillOpacity: 0, strokeDasharray: '5 5' }
+                  data: { fill: ({ datum }: { datum?: IBudgetChart }) => datum?.color || '#000' }
                 }}
                 labelComponent={
                   <VictoryTooltip
@@ -191,12 +201,11 @@ export default function BudgetCard() {
                   />
                 }
               />
-              {/* Gastado */}
+              {/* Presupuestado */}
               <VictoryBar
                 data={data}
                 x="x"
-                y={(d: IBudgetChart) => transformValue(d.Gastado)}
-                barWidth={42}
+                y={(d: IBudgetChart) => transformValue(d.Presupuestado)}
                 labels={({ datum }: { datum: IBudgetChart }) => {
                   const restante = datum.Presupuestado - datum.Gastado
                   return [
@@ -206,8 +215,9 @@ export default function BudgetCard() {
                     `Restante: ${restante} €`
                   ].join('\n')
                 }}
+                barWidth={calculateBarWidth()} // Calcular el ancho de la barra
                 style={{
-                  data: { fill: ({ datum }: { datum?: IBudgetChart }) => datum?.color || '#000' }
+                  data: { stroke: '#257CA3', strokeWidth: 2, fillOpacity: 0, strokeDasharray: '5 5' }
                 }}
                 labelComponent={
                   <VictoryTooltip
