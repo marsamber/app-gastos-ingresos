@@ -1,14 +1,7 @@
 import { HomeContext } from '@/contexts/HomeContext'
 import { CircularProgress, useMediaQuery } from '@mui/material'
-import { CSSProperties, useContext, useEffect, useState } from 'react'
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryGroup,
-  VictoryTheme,
-  VictoryTooltip
-} from 'victory'
+import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
+import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryTheme, VictoryTooltip } from 'victory'
 import BasicCard from './BasicCard'
 
 interface IBudgetChart {
@@ -25,6 +18,7 @@ export default function BudgetCard() {
   const [data, setData] = useState<IBudgetChart[]>([])
   const isMobile = useMediaQuery('(max-width: 600px)')
   const isTablet = useMediaQuery('(max-width: 1024px)')
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // STYLES
   const titleStyle = {
@@ -97,12 +91,14 @@ export default function BudgetCard() {
         }
       })
 
-    const sortedData = Array.from(budgetData.values()).map((value, index) => ({
-      ...value,
-      color: value.Gastado >= value.Presupuestado ? '#FF0042' : value.Gastado < 0 ? '#00C49F' : '#FF6384',
-      x: index + 1
-    })).sort((a, b) => a.name.localeCompare(b.name))
-    
+    const sortedData = Array.from(budgetData.values())
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((value, index) => ({
+        ...value,
+        color: value.Gastado >= value.Presupuestado ? '#FF0042' : value.Gastado < 0 ? '#00C49F' : '#FF6384',
+        x: index + 1
+      }))
+
     setData(sortedData)
   }, [budgets, transactions, budgetHistorics])
 
@@ -124,21 +120,39 @@ export default function BudgetCard() {
 
     return lines
   }
-  const chartWidth = isMobile ? 300 : isTablet ? 600 : 800; // Ancho dinámico del gráfico
-  const maxBarWidth = 42; // Ancho máximo de las barras
-  const minBarWidth = 10; // Ancho mínimo de las barras
+
+  const [chartWidth, setChartWidth] = useState<number>(800) // Valor inicial predeterminado
+
+  // Calcular el ancho del contenedor solo en el cliente
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setChartWidth(containerRef.current.offsetWidth)
+      }
+    }
+
+    updateWidth() // Calcular el ancho inicial
+    window.addEventListener('resize', updateWidth)
+
+    return () => {
+      window.removeEventListener('resize', updateWidth)
+    }
+  }, [])
+
+  const maxBarWidth = 42 // Ancho máximo de las barras
+  const minBarWidth = 10 // Ancho mínimo de las barras
 
   const calculateBarWidth = () => {
-  const availableWidth = chartWidth - 100; // Espacio disponible en el gráfico (restamos márgenes)
-  const totalBars = data.length;
-  const maxPossibleWidth = availableWidth / totalBars * 0.8; // Ajustar con un factor (e.g., 80% del espacio disponible)
-  return Math.max(minBarWidth, Math.min(maxBarWidth, maxPossibleWidth));
-};
+    const availableWidth = chartWidth - 60 // Espacio disponible en el gráfico (restamos márgenes mínimos)
+    const totalBars = data.length
+    const maxPossibleWidth = (availableWidth / totalBars) * 0.9 // Ajustar con un factor (e.g., 90% del espacio disponible)
+    return Math.max(minBarWidth, Math.min(maxBarWidth, maxPossibleWidth))
+  }
 
   return (
     <BasicCard style={cardStyle}>
       <h3 style={titleStyle}>Presupuesto</h3>
-      <div style={containerStyle}>
+      <div style={containerStyle} ref={containerRef}>
         {loadingTransactions || loadingBudgets || loadingBudgetHistorics ? (
           <div style={circularProgressStyle}>
             <CircularProgress />
@@ -156,7 +170,7 @@ export default function BudgetCard() {
                 transformValue(Math.max(...data.flatMap(d => [d.Gastado, d.Presupuestado])))
               ]
             }}
-            padding={{ top: 30, bottom: 50, left: 70, right: 50 }}
+            padding={{ top: 30, bottom: 50, left: 70, right: 30 }}
             // Ajustar dinámicamente el tamaño al ancho del contenedor
             width={window.innerWidth * 0.8} // Ancho dinámico basado en el viewport
             height={400}
@@ -235,9 +249,13 @@ export default function BudgetCard() {
               />
             </VictoryGroup>
             <VictoryAxis
-              tickValues={data.map((_, i) => i + 1)} // Centrar las etiquetas
-              tickFormat={(_, index: number) => {
-                const lines = splitTextIntoLines(data[index]?.name || '', 12) // Divide el texto en líneas
+              tickValues={data.map(d => d.x)} // Usa directamente los valores 'x' de las barras
+              tickFormat={t => {
+                // Encuentra el dato correspondiente basado en 't'
+                const matchedDatum = data.find(d => d.x === t)
+                if (!matchedDatum) return '' // Si no hay dato correspondiente, retorna vacío
+                // Divide el texto del nombre en líneas
+                const lines = splitTextIntoLines(matchedDatum.name || '', 12)
                 return lines.join('\n') // Une las líneas con saltos de línea
               }}
               style={{
