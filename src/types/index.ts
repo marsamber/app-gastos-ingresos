@@ -2,6 +2,7 @@
 export interface ITransaction {
   id: number
   title: string
+  type: string
   amount: number
   date: Date | string
   category: string
@@ -17,7 +18,7 @@ export interface IMonthlyTransaction {
   title: string
   amount: number
   category: string
-  type: 'income' | 'expense'
+  type: string
 }
 
 export interface IMonthlyTransactions {

@@ -24,7 +24,8 @@
     "prettier": "^3.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "recharts": "^2.12.3"
+    "recharts": "^2.12.3",
+    "victory": "^37.3.2"
   },
   "devDependencies": {
     "@types/node": "^20",

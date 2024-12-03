@@ -108,7 +108,8 @@ export default function FixedTransactionModal({
 
     setLoading(true)
 
-    const signedAmount = transactionType === 'income' ? Number(amount) : -Number(amount)
+    const amountValue = amount.replace(',', '.')
+    const signedAmount = transactionType === 'income' ? Number(amountValue) : -Number(amountValue)
     const transactionData = { title, amount: signedAmount, category }
 
     try {
@@ -149,7 +150,7 @@ export default function FixedTransactionModal({
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = e.target.value
 
-    if (/^\d*\.?\d*$/.test(newValue)) {
+    if (/^\d*[.,]?\d*$/.test(newValue)) {
       setAmount(newValue)
     }
   }
@@ -191,6 +192,7 @@ export default function FixedTransactionModal({
             error={errors.title}
             onChange={e => setTitle(e.target.value)}
             inputRef={inputRef}
+            autoComplete='on'
             required
           />
           <Autocomplete
@@ -231,11 +233,11 @@ export default function FixedTransactionModal({
             color="primary"
             label="Cantidad"
             type="text"
-            value={amount ? Math.abs(Number(amount)).toString() : ''}
+            value={amount ||''}
             error={errors.amount}
-            onChange={e => handleChangeAmount(e)}
+            onChange={handleChangeAmount}
             inputProps={{
-              pattern: '^\\d*\\.?\\d*$'
+              pattern: '^\\d*[.,]?\\d*$'
             }}
             required
           />

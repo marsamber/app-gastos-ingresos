@@ -146,7 +146,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
 
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value
-    if (/^-?\d*\.?\d*$/.test(value)) {
+    if (/^-?\d*[.,]?\d*$/.test(value)) {
       setAmount(value)
     }
   }
@@ -229,7 +229,7 @@ export default function AddCategoryBudgetModal({ open, handleClose }: AddCategor
             type="text"
             error={error.amount}
             inputProps={{
-              pattern: '^-?\\d*\\.?\\d*$'
+              pattern: '^-?\\d*[.,]?\\d*$'
             }}
             required
           />

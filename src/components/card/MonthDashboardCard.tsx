@@ -15,7 +15,8 @@ import BasicCard from './BasicCard'
 
 export interface ISummaryChart {
   name: string
-  Gastado: number
+  Gastado?: number
+  Ingresado?: number
 }
 
 export default function MonthDashboardCard() {
@@ -52,9 +53,22 @@ export default function MonthDashboardCard() {
         const key = `${week} (${monthYear})`
         const existingEntry = dataMap.get(key)
         if (existingEntry) {
-          existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
+          if (transaction.type === 'INCOME') {
+            existingEntry.Ingresado = getTwoFirstDecimals((existingEntry.Ingresado ?? 0) + transaction.amount)
+          }
+          if (transaction.type === 'EXPENSE') {
+            existingEntry.Gastado = getTwoFirstDecimals((existingEntry.Gastado ?? 0) - transaction.amount)
+          }
         } else {
-          dataMap.set(key, { name: `Sem. ${week} (${monthYear})`, Gastado: getTwoFirstDecimals(-transaction.amount) })
+          if (transaction.type === 'INCOME') {
+            dataMap.set(key, {
+              name: `Sem. ${week} (${monthYear})`,
+              Ingresado: getTwoFirstDecimals(transaction.amount)
+            })
+          }
+          if (transaction.type === 'EXPENSE') {
+            dataMap.set(key, { name: `Sem. ${week} (${monthYear})`, Gastado: getTwoFirstDecimals(-transaction.amount) })
+          }
         }
       })
 
@@ -63,7 +77,7 @@ export default function MonthDashboardCard() {
       for (const month of months) {
         const key = `${i} (${month})`
         if (!dataMap.has(key)) {
-          dataMap.set(key, { name: `Sem. ${i} (${month})`, Gastado: 0 })
+          dataMap.set(key, { name: `Sem. ${i} (${month})`, Gastado: 0, Ingresado: 0 })
         }
       }
     }
@@ -98,7 +112,7 @@ export default function MonthDashboardCard() {
     while (currentDate <= endDate) {
       const key = formatMonthYear(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0)
       if (!dataMap.has(key)) {
-        dataMap.set(key, { name: key, Gastado: 0 })
+        dataMap.set(key, { name: key, Gastado: 0, Ingresado: 0 })
       }
       currentDate.setMonth(currentDate.getMonth() + 1)
     }
@@ -114,9 +128,22 @@ export default function MonthDashboardCard() {
         const key = formatMonthYear(year, month - 1, day, 0, 0)
         const existingEntry = dataMap.get(key)
         if (existingEntry) {
-          existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
+          if (transaction.type === 'INCOME') {
+            existingEntry.Ingresado = getTwoFirstDecimals((existingEntry.Ingresado ?? 0) + transaction.amount)
+          }
+          if (transaction.type === 'EXPENSE') {
+            existingEntry.Gastado = getTwoFirstDecimals((existingEntry.Gastado ?? 0) - transaction.amount)
+          }
+        } else {
+          if (transaction.type === 'INCOME') {
+            dataMap.set(key, { name: key, Ingresado: getTwoFirstDecimals(transaction.amount) })
+          }
+          if (transaction.type === 'EXPENSE') {
+            dataMap.set(key, { name: key, Gastado: getTwoFirstDecimals(-transaction.amount) })
+          }
         }
       })
+
 
     // key format: 'Ene 21'
     return Array.from(dataMap.values()).sort((a, b) => {
@@ -147,9 +174,19 @@ export default function MonthDashboardCard() {
 
         // Update existing entry or add new entry to data map
         if (existingEntry) {
-          existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
+          if (transaction.type === 'INCOME') {
+            existingEntry.Ingresado = getTwoFirstDecimals((existingEntry.Ingresado ?? 0) + transaction.amount)
+          }
+          if (transaction.type === 'EXPENSE') {
+            existingEntry.Gastado = getTwoFirstDecimals((existingEntry.Gastado ?? 0) - transaction.amount)
+          }
         } else {
-          dataMap.set(dayKey, { name: dateString, Gastado: getTwoFirstDecimals(-transaction.amount) })
+          if (transaction.type === 'INCOME') {
+            dataMap.set(dayKey, { name: dateString, Ingresado: getTwoFirstDecimals(transaction.amount) })
+          }
+          if (transaction.type === 'EXPENSE') {
+            dataMap.set(dayKey, { name: dateString, Gastado: getTwoFirstDecimals(-transaction.amount) })
+          }
         }
       })
 
@@ -171,7 +208,7 @@ export default function MonthDashboardCard() {
       )
 
       if (!dataMap.has(dayKey)) {
-        dataMap.set(dayKey, { name: dateString, Gastado: 0 })
+        dataMap.set(dayKey, { name: dateString, Gastado: 0, Ingresado: 0 })
       }
       currentDate.setDate(currentDate.getDate() + 1)
     }
@@ -261,12 +298,15 @@ export default function MonthDashboardCard() {
 
   const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
+      console.log(active, payload, label)
       const gastado: number = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0
+      const ingresado: number = Number(payload.find(entry => entry.name === 'Ingresado')?.value) || 0
 
       return (
         <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
           <b>{label}</b>
           <p style={{ color: '#FF6384' }}>{`Gastado: ${gastado} €`}</p>
+          <p style={{ color: '#00C49F' }}>{`Ingresado: ${ingresado} €`}</p>
         </div>
       )
     }
@@ -320,6 +360,7 @@ export default function MonthDashboardCard() {
               <Tooltip content={props => <CustomTooltip {...props} />} />
               <Legend verticalAlign="top" height={36} />
               <Line dataKey="Gastado" type="monotone" fill="#FF6384" stroke="#FF6384" />
+              <Line dataKey="Ingresado" type="monotone" fill="#00C49F" stroke="#00C49F" />
             </LineChart>
           </ResponsiveContainer>
         )}

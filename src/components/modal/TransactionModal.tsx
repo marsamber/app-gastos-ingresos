@@ -108,7 +108,8 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
     setLoading(true)
 
-    const signedAmount = type === 'income' ? Number(amount) : -Number(amount)
+    const amountValue = amount.replace(',', '.')
+    const signedAmount = type === 'income' ? Number(amountValue) : -Number(amountValue)
     const transactionData = {
       title,
       amount: signedAmount,
@@ -128,7 +129,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
         if (refreshTransactions) {
           refreshTransactions()
         }
-        handleResetModal(!!transaction)
+        handleResetModal(!!transaction, date)
       }
     } catch (error) {
       console.error('Failed to save transaction', error)
@@ -139,19 +140,20 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
 
   const handleChangeAmount = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value
-    if (/^\d*\.?\d*$/.test(value)) {
+
+    if (/^\d*[.,]?\d*$/.test(value)) {
       setAmount(value)
     }
   }
 
-  const handleResetModal = (close = true) => {
+  const handleResetModal = (close = true, previousDate = new Date()) => {
     setErrors({ amount: false, date: false, type: false, title: false, category: false })
 
     setAmount('')
     setTitle('')
     setType('expense')
     setCategory('')
-    setDate(new Date())
+    setDate(previousDate)
 
     if (close) handleClose()
   }
@@ -205,6 +207,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             error={errors.title}
             onChange={e => setTitle(e.target.value)}
             inputRef={inputRef}
+            autoComplete='on'
             required
           />
           {categories && categories.length > 0 ? (
@@ -241,11 +244,11 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
             color="primary"
             label="Cantidad"
             type="text"
-            value={amount ? Math.abs(Number(amount)).toString() : ''}
+            value={amount || ''}
             error={errors.amount}
-            onChange={e => handleChangeAmount(e)}
+            onChange={handleChangeAmount}
             inputProps={{
-              pattern: '^\\d*\\.?\\d*$'
+              pattern: '^\\d*[.,]?\\d*$'
             }}
             required
           />

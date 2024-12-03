@@ -60,7 +60,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
     setLoading(true)
     const newCategoryBudget = {
       category: category,
-      amount: Number(amount)
+      amount: Number(amount.replace(',', '.'))
     }
 
     try {
@@ -105,7 +105,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
   }
 
   const handleChangeAmount = (value: string) => {
-    if (/^\d*\.?\d*$/.test(value)) {
+    if (/^\d*[.,]?\d*$/.test(value)) {
       setAmount(value)
     }
   }
@@ -168,7 +168,7 @@ export default function EditCategoryBudgetModal({ open, handleClose, categoryBud
             label="Cantidad"
             type="text"
             inputProps={{
-              pattern: '^\\d*\\.?\\d*$'
+              pattern: '^\\d*[.,]?\\d*$'
             }}
             value={amount}
             error={errorAmount}
