@@ -23,7 +23,7 @@ const defaultValue: SettingsMonthlyExpenseTransactionsContextType = {
   refreshKey: 0,
 
   page: 0,
-  limit: 10,
+  limit: 25,
   sortBy: 'title',
   sortOrder: 'asc',
   filters: {},

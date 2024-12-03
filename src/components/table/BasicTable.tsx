@@ -95,7 +95,7 @@ export default function BasicTable<T extends { id: string | number } & Record<st
 
   let totalItems: number = 0
   let page: number = 0
-  let limit: number = 10
+  let limit: number = 25
   let handleChangePage: (page: number) => void = () => {}
   let handleChangeLimit: (limit: number) => void = () => {}
   if (

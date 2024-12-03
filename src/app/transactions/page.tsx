@@ -23,7 +23,7 @@ export default function Transactions() {
   const [transaction, setTransaction] = useState<ITransaction | null>(null)
 
   const [page, setPage] = useState(0)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(25)
   const [sortBy, setSortBy] = useState('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [type, setType] = useState<'income' | 'expense' | null>(null)

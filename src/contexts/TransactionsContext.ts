@@ -26,7 +26,7 @@ const defaultValue: TransactionsContextType = {
   refreshKey: 0,
 
   page: 0,
-  limit: 10,
+  limit: 25,
   sortBy: 'date',
   sortOrder: 'desc',
   type: null,

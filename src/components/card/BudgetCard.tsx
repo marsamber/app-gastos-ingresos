@@ -101,7 +101,8 @@ export default function BudgetCard() {
       ...value,
       color: value.Gastado >= value.Presupuestado ? '#FF0042' : value.Gastado < 0 ? '#00C49F' : '#FF6384',
       x: index + 1
-    }))
+    })).sort((a, b) => a.name.localeCompare(b.name))
+    
     setData(sortedData)
   }, [budgets, transactions, budgetHistorics])
 
@@ -126,13 +127,13 @@ export default function BudgetCard() {
   const chartWidth = isMobile ? 300 : isTablet ? 600 : 800; // Ancho dinámico del gráfico
   const maxBarWidth = 42; // Ancho máximo de las barras
   const minBarWidth = 10; // Ancho mínimo de las barras
-  
+
   const calculateBarWidth = () => {
-    const availableWidth = chartWidth - 100; // Restamos márgenes
-    const totalBars = data.length;
-    const calculatedWidth = availableWidth / (totalBars * 2); // Espacio para barras y separación
-    return Math.max(minBarWidth, Math.min(maxBarWidth, calculatedWidth));
-  };
+  const availableWidth = chartWidth - 100; // Espacio disponible en el gráfico (restamos márgenes)
+  const totalBars = data.length;
+  const maxPossibleWidth = availableWidth / totalBars * 0.8; // Ajustar con un factor (e.g., 80% del espacio disponible)
+  return Math.max(minBarWidth, Math.min(maxBarWidth, maxPossibleWidth));
+};
 
   return (
     <BasicCard style={cardStyle}>

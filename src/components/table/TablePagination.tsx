@@ -51,7 +51,7 @@ export const TablePagination = ({
 
   return (
     <TablePaginationMui
-      rowsPerPageOptions={[5, 10, 15, 20, 25]}
+      rowsPerPageOptions={[25, 50, 100]}
       component="div"
       count={totalItems}
       rowsPerPage={limit}

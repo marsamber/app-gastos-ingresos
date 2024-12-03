@@ -22,7 +22,7 @@ export default function Budget() {
   const { refreshKeyTransactions } = useContext(RefreshContext)
 
   const [page, setPage] = useState(0)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(25)
   const [sortBy, setSortBy] = useState('category')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [filters, setFilters] = useState<Record<string, string>>({})
