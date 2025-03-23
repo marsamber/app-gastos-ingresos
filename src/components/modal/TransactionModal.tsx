@@ -81,7 +81,7 @@ export default function TransactionModal({ open, handleClose, transaction }: Tra
   useEffect(() => {
     if (transaction) {
       setType(transaction.amount < 0 ? 'expense' : 'income')
-      setAmount(transaction.amount.toString())
+      setAmount(Math.abs(transaction.amount).toString())
       setTitle(transaction.title)
       setCategory(transaction.category)
       setDate(new Date(transaction.date))

@@ -90,7 +90,7 @@ export default function FixedTransactionModal({
 
   useEffect(() => {
     if (monthlyTransaction) {
-      setAmount(monthlyTransaction.amount.toString())
+      setAmount(Math.abs(monthlyTransaction.amount).toString())
       setTitle(monthlyTransaction.title)
       setCategory(monthlyTransaction.category)
     } else {

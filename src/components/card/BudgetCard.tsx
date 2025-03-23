@@ -64,12 +64,12 @@ export default function BudgetCard() {
       if (item.amount > 0) {
         const existingEntry = budgetData.get(item.category)
         if (existingEntry) {
-          existingEntry.Presupuestado += item.amount
+          existingEntry.Presupuestado += Number(item.amount.toFixed(2))
         } else {
           budgetData.set(item.category, {
             name: item.category,
             Gastado: 0,
-            Presupuestado: item.amount
+            Presupuestado: Number(item.amount.toFixed(2))
           })
         }
       }
@@ -81,11 +81,11 @@ export default function BudgetCard() {
       .forEach(transaction => {
         const category = budgetData.get(transaction.category)
         if (category) {
-          category.Gastado -= transaction.amount
+          category.Gastado -= Number(transaction.amount.toFixed(2))
         } else {
           budgetData.set(transaction.category, {
             name: transaction.category,
-            Gastado: -transaction.amount,
+            Gastado: Number((-transaction.amount).toFixed(2)),
             Presupuestado: 0
           })
         }
