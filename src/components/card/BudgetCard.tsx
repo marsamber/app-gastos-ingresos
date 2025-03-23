@@ -64,12 +64,12 @@ export default function BudgetCard() {
       if (item.amount > 0) {
         const existingEntry = budgetData.get(item.category)
         if (existingEntry) {
-          existingEntry.Presupuestado += Number(item.amount.toFixed(2))
+          existingEntry.Presupuestado += item.amount
         } else {
           budgetData.set(item.category, {
             name: item.category,
             Gastado: 0,
-            Presupuestado: Number(item.amount.toFixed(2))
+            Presupuestado: item.amount
           })
         }
       }
@@ -81,11 +81,11 @@ export default function BudgetCard() {
       .forEach(transaction => {
         const category = budgetData.get(transaction.category)
         if (category) {
-          category.Gastado -= Number(transaction.amount.toFixed(2))
+          category.Gastado -= transaction.amount
         } else {
           budgetData.set(transaction.category, {
             name: transaction.category,
-            Gastado: Number((-transaction.amount).toFixed(2)),
+            Gastado: -transaction.amount,
             Presupuestado: 0
           })
         }
@@ -95,6 +95,8 @@ export default function BudgetCard() {
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((value, index) => ({
         ...value,
+        Gastado: Math.round(value.Gastado),
+        Presupuestado: Math.round(value.Presupuestado),
         color: value.Gastado >= value.Presupuestado ? '#FF0042' : value.Gastado < 0 ? '#00C49F' : '#FF6384',
         x: index + 1
       }))
@@ -192,7 +194,7 @@ export default function BudgetCard() {
                 y={(d: IBudgetChart) => transformValue(d.Gastado)}
                 barWidth={calculateBarWidth()} // Calcular el ancho de la barra
                 labels={({ datum }: { datum: IBudgetChart }) => {
-                  const restante = datum.Presupuestado - datum.Gastado
+                  const restante = Math.round(datum.Presupuestado - datum.Gastado)
                   return [
                     `Categoría: ${datum.name}`,
                     `Presupuestado: ${datum.Presupuestado} €`,
@@ -222,7 +224,7 @@ export default function BudgetCard() {
                 x="x"
                 y={(d: IBudgetChart) => transformValue(d.Presupuestado)}
                 labels={({ datum }: { datum: IBudgetChart }) => {
-                  const restante = datum.Presupuestado - datum.Gastado
+                  const restante = Math.round(datum.Presupuestado - datum.Gastado)
                   return [
                     `Categoría: ${datum.name}`,
                     `Presupuestado: ${datum.Presupuestado} €`,
