@@ -95,8 +95,8 @@ export default function BudgetCard() {
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((value, index) => ({
         ...value,
-        Gastado: Math.round(value.Gastado),
-        Presupuestado: Math.round(value.Presupuestado),
+        Gastado: Number(value.Gastado.toFixed(2)),
+        Presupuestado: Number(value.Presupuestado.toFixed(2)),
         color: value.Gastado >= value.Presupuestado ? '#FF0042' : value.Gastado < 0 ? '#00C49F' : '#FF6384',
         x: index + 1
       }))
@@ -224,7 +224,7 @@ export default function BudgetCard() {
                 x="x"
                 y={(d: IBudgetChart) => transformValue(d.Presupuestado)}
                 labels={({ datum }: { datum: IBudgetChart }) => {
-                  const restante = Math.round(datum.Presupuestado - datum.Gastado)
+                  const restante = Number(datum.Presupuestado - datum.Gastado).toFixed(2)
                   return [
                     `Categoría: ${datum.name}`,
                     `Presupuestado: ${datum.Presupuestado} €`,
