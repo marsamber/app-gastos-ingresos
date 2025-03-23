@@ -194,7 +194,7 @@ export default function BudgetCard() {
                 y={(d: IBudgetChart) => transformValue(d.Gastado)}
                 barWidth={calculateBarWidth()} // Calcular el ancho de la barra
                 labels={({ datum }: { datum: IBudgetChart }) => {
-                  const restante = Math.round(datum.Presupuestado - datum.Gastado)
+                  const restante = Number(datum.Presupuestado - datum.Gastado).toFixed(2)
                   return [
                     `Categoría: ${datum.name}`,
                     `Presupuestado: ${datum.Presupuestado} €`,
