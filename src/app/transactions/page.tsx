@@ -6,14 +6,13 @@ import { ITransaction } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
 import { handleDateFilterChange } from '@/utils/utils'
 import { Add } from '@mui/icons-material'
-import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
-import { SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import { Button, CircularProgress, Tab, Tabs, useMediaQuery } from '@mui/material'
+import { Suspense, SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import '../../styles.css'
 import MonthRangePicker from '@/components/MonthRangePicker'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
-  const [filter, setFilter] = useState('this_month')
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>(
     handleDateFilterChange('this_month') as [string, string]
   )
@@ -67,14 +66,6 @@ export default function Transactions() {
     fetchTransactions().catch(error => console.error('Failed to fetch transactions:', error))
   }, [refreshKey, monthsSelected, page, limit, sortBy, sortOrder, type, filters])
 
-  const filterOptions = [
-    { label: 'Este mes', value: 'this_month' },
-    { label: 'Mes pasado', value: 'last_month' },
-    { label: 'Este año', value: 'this_year' },
-    { label: 'Año pasado', value: 'last_year' },
-    { label: 'Todo', value: 'all' }
-  ]
-
   const handleChangeTab = (_: SyntheticEvent, newTabValue: number) => {
     setValue(newTabValue)
     switch (newTabValue) {
@@ -88,12 +79,6 @@ export default function Transactions() {
         setType('income')
         break
     }
-  }
-
-  const handleChangeFilter = (newValue: { label: string; value: string }) => {
-    setFilter(newValue.value)
-
-    setMonthsSelected(handleDateFilterChange(newValue.value) as [string, string])
   }
 
   const handleEditTransaction = (id: number) => {
@@ -151,41 +136,11 @@ export default function Transactions() {
         }}
       >
         {!sideBarCollapsed && <h2 style={titleStyle}>Transacciones</h2>}
-        <div>
-          {isMobile && (
-            <div style={buttonsStyle}>
-              <MonthRangePicker
-                monthsSelected={monthsSelected}
-                setMonthsSelected={setMonthsSelected}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                endIcon={<Add />}
-                onClick={() => setAddTransactionTable(true)}
-              >
-                Añadir
-              </Button>
-            </div>
-          )}
-          <div style={tabsStyle}>
-            <Tabs
-              textColor="secondary"
-              indicatorColor="secondary"
-              value={value}
-              onChange={handleChangeTab}
-              variant={isMobile ? 'fullWidth' : 'standard'}
-            >
-              <Tab classes={{ selected: 'tabSelected' }} label="Todo" value={0} />
-              <Tab classes={{ selected: 'tabSelected' }} label="Gastos" value={1} />
-              <Tab classes={{ selected: 'tabSelected' }} label="Ingresos" value={2} />
-            </Tabs>
-            {!isMobile && (
+        <Suspense fallback={<CircularProgress />}>
+          <div>
+            {isMobile && (
               <div style={buttonsStyle}>
-                <MonthRangePicker
-                  monthsSelected={monthsSelected}
-                  setMonthsSelected={setMonthsSelected}
-                />
+                <MonthRangePicker monthsSelected={monthsSelected} setMonthsSelected={setMonthsSelected} />
                 <Button
                   variant="contained"
                   color="primary"
@@ -196,40 +151,66 @@ export default function Transactions() {
                 </Button>
               </div>
             )}
+            <div style={tabsStyle}>
+              <Tabs
+                textColor="secondary"
+                indicatorColor="secondary"
+                value={value}
+                onChange={handleChangeTab}
+                variant={isMobile ? 'fullWidth' : 'standard'}
+              >
+                <Tab classes={{ selected: 'tabSelected' }} label="Todo" value={0} />
+                <Tab classes={{ selected: 'tabSelected' }} label="Gastos" value={1} />
+                <Tab classes={{ selected: 'tabSelected' }} label="Ingresos" value={2} />
+              </Tabs>
+              {!isMobile && (
+                <div style={buttonsStyle}>
+                  <MonthRangePicker monthsSelected={monthsSelected} setMonthsSelected={setMonthsSelected} />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    endIcon={<Add />}
+                    onClick={() => setAddTransactionTable(true)}
+                  >
+                    Añadir
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div>
+              {value === 0 && (
+                <TransactionsTable
+                  key={0}
+                  handleEditTransaction={handleEditTransaction}
+                  handleDeleteTransaction={handleDeleteTransaction}
+                  filterFunction={() => true}
+                />
+              )}
+              {value === 1 && (
+                <TransactionsTable
+                  key={1}
+                  handleEditTransaction={handleEditTransaction}
+                  handleDeleteTransaction={handleDeleteTransaction}
+                  filterFunction={transaction => transaction.amount < 0}
+                />
+              )}
+              {value === 2 && (
+                <TransactionsTable
+                  key={2}
+                  handleEditTransaction={handleEditTransaction}
+                  handleDeleteTransaction={handleDeleteTransaction}
+                  filterFunction={transaction => transaction.amount > 0}
+                />
+              )}
+            </div>
           </div>
-          <div>
-            {value === 0 && (
-              <TransactionsTable
-                key={0}
-                handleEditTransaction={handleEditTransaction}
-                handleDeleteTransaction={handleDeleteTransaction}
-                filterFunction={() => true}
-              />
-            )}
-            {value === 1 && (
-              <TransactionsTable
-                key={1}
-                handleEditTransaction={handleEditTransaction}
-                handleDeleteTransaction={handleDeleteTransaction}
-                filterFunction={transaction => transaction.amount < 0}
-              />
-            )}
-            {value === 2 && (
-              <TransactionsTable
-                key={2}
-                handleEditTransaction={handleEditTransaction}
-                handleDeleteTransaction={handleDeleteTransaction}
-                filterFunction={transaction => transaction.amount > 0}
-              />
-            )}
-          </div>
-        </div>
-        <TransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
-        <TransactionModal
-          open={openEditTransaction}
-          handleClose={() => setOpenEditTransaction(false)}
-          transaction={transaction}
-        />
+          <TransactionModal open={addTransactionTable} handleClose={() => setAddTransactionTable(false)} />
+          <TransactionModal
+            open={openEditTransaction}
+            handleClose={() => setOpenEditTransaction(false)}
+            transaction={transaction}
+          />
+        </Suspense>
       </TransactionsContext.Provider>
     </main>
   )

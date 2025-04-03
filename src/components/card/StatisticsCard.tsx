@@ -22,7 +22,7 @@ export default function StatisticsCard() {
   // DATA
   const mergeStatisticsData = (statisticsData: Map<string, IStatisticsChart>) => {
     // Safe check and merge both budgets and budget historics if they are not null
-    ;[...(budgets ?? []), ...(budgetHistorics ?? [])].forEach(item => {
+    [...(budgets ?? []), ...(budgetHistorics ?? [])].forEach(item => {
       if (item.amount > 0) {
         const existingEntry = statisticsData.get(item.category)
         if (!existingEntry) {
@@ -34,7 +34,7 @@ export default function StatisticsCard() {
 
   const addTransactionData = (statisticsData: Map<string, IStatisticsChart>) => {
     // Safe check and aggregate transactions if they are not null
-    ;(transactions ?? [])
+    (transactions ?? [])
       .filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
         const category = statisticsData.get(transaction.category)

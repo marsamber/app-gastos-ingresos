@@ -5,7 +5,7 @@ import { formatDate, formatMonthYear, getDateWeekOfMonth, getTwoFirstDecimals, m
 import { Download, PictureAsPdf } from '@mui/icons-material'
 import { CircularProgress, Fab, useMediaQuery } from '@mui/material'
 import { BlobProviderParams, PDFDownloadLink } from '@react-pdf/renderer'
-import { FC, useContext, useEffect, useState } from 'react'
+import { FC, ReactNode, useContext, useEffect, useState } from 'react'
 import BarChart from './BarChart'
 import { ConfirmGenerateReportModal } from './ConfirmGenerateReportModal'
 import IncomeExpenseReport from './IncomeExpenseReport'
@@ -74,11 +74,7 @@ const DownloadReportButton = () => {
       .forEach(transaction => {
         const date = new Date(transaction.date)
         const dayKey = date.toISOString().split('T')[0] // Formato YYYY-MM-DD
-        const dateString = date.toLocaleDateString('es-ES', {
-          day: '2-digit',
-          month: 'short',
-          year: '2-digit'
-        })
+        const dateString = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' })
         const existingEntry = dataMap.get(dayKey)
         if (existingEntry) {
           existingEntry.Gastado = getTwoFirstDecimals(existingEntry.Gastado - transaction.amount)
@@ -93,11 +89,7 @@ const DownloadReportButton = () => {
 
     while (currentDate <= endDate) {
       const dayKey = currentDate.toISOString().split('T')[0]
-      const dateString = currentDate.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: '2-digit'
-      })
+      const dateString = currentDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' })
       if (!dataMap.has(dayKey)) {
         dataMap.set(dayKey, { name: dateString, Gastado: 0 })
       }
@@ -489,11 +481,7 @@ const DownloadReportButton = () => {
 
   const DownloadButtonContent: FC<{ loading: boolean }> = ({ loading }) => (
     <Fab
-      style={{
-        position: 'fixed',
-        bottom: '86px',
-        right: '20px'
-      }}
+      style={{ position: 'fixed', bottom: '86px', right: '20px' }}
       color="error"
       disabled={loading || !firstLineChartSrc || !secondLineChartSrc || !barChartSrc}
     >
@@ -527,17 +515,13 @@ const DownloadReportButton = () => {
             }
             fileName="InformeIngresosGastos.pdf"
           >
-            {(({ loading }: BlobProviderParams) => <DownloadButtonContent loading={loading} />) as any}
+            {(({ loading }: BlobProviderParams) => <DownloadButtonContent loading={loading} />) as unknown as ReactNode}
           </PDFDownloadLink>
         </>
       ) : (
         <>
           <Fab
-            style={{
-              position: 'fixed',
-              bottom: '86px',
-              right: '20px'
-            }}
+            style={{ position: 'fixed', bottom: '86px', right: '20px' }}
             color="error"
             onClick={handleClickGenerateReport}
           >
