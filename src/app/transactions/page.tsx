@@ -6,14 +6,13 @@ import { ITransaction } from '@/types/index'
 import customFetch from '@/utils/fetchWrapper'
 import { handleDateFilterChange } from '@/utils/utils'
 import { Add } from '@mui/icons-material'
-import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
+import { Button, Tab, Tabs, useMediaQuery } from '@mui/material'
 import { SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import '../../styles.css'
 import MonthRangePicker from '@/components/MonthRangePicker'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
-  const [filter, setFilter] = useState('this_month')
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>(
     handleDateFilterChange('this_month') as [string, string]
   )
@@ -67,14 +66,6 @@ export default function Transactions() {
     fetchTransactions().catch(error => console.error('Failed to fetch transactions:', error))
   }, [refreshKey, monthsSelected, page, limit, sortBy, sortOrder, type, filters])
 
-  const filterOptions = [
-    { label: 'Este mes', value: 'this_month' },
-    { label: 'Mes pasado', value: 'last_month' },
-    { label: 'Este año', value: 'this_year' },
-    { label: 'Año pasado', value: 'last_year' },
-    { label: 'Todo', value: 'all' }
-  ]
-
   const handleChangeTab = (_: SyntheticEvent, newTabValue: number) => {
     setValue(newTabValue)
     switch (newTabValue) {
@@ -88,12 +79,6 @@ export default function Transactions() {
         setType('income')
         break
     }
-  }
-
-  const handleChangeFilter = (newValue: { label: string; value: string }) => {
-    setFilter(newValue.value)
-
-    setMonthsSelected(handleDateFilterChange(newValue.value) as [string, string])
   }
 
   const handleEditTransaction = (id: number) => {
@@ -154,10 +139,7 @@ export default function Transactions() {
         <div>
           {isMobile && (
             <div style={buttonsStyle}>
-              <MonthRangePicker
-                monthsSelected={monthsSelected}
-                setMonthsSelected={setMonthsSelected}
-              />
+              <MonthRangePicker monthsSelected={monthsSelected} setMonthsSelected={setMonthsSelected} />
               <Button
                 variant="contained"
                 color="primary"
@@ -182,10 +164,7 @@ export default function Transactions() {
             </Tabs>
             {!isMobile && (
               <div style={buttonsStyle}>
-                <MonthRangePicker
-                  monthsSelected={monthsSelected}
-                  setMonthsSelected={setMonthsSelected}
-                />
+                <MonthRangePicker monthsSelected={monthsSelected} setMonthsSelected={setMonthsSelected} />
                 <Button
                   variant="contained"
                   color="primary"
