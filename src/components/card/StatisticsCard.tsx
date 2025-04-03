@@ -22,7 +22,7 @@ export default function StatisticsCard() {
   // DATA
   const mergeStatisticsData = (statisticsData: Map<string, IStatisticsChart>) => {
     // Safe check and merge both budgets and budget historics if they are not null
-    [...(budgets ?? []), ...(budgetHistorics ?? [])].forEach(item => {
+    ;[...(budgets ?? []), ...(budgetHistorics ?? [])].forEach(item => {
       if (item.amount > 0) {
         const existingEntry = statisticsData.get(item.category)
         if (!existingEntry) {
@@ -34,7 +34,7 @@ export default function StatisticsCard() {
 
   const addTransactionData = (statisticsData: Map<string, IStatisticsChart>) => {
     // Safe check and aggregate transactions if they are not null
-    (transactions ?? [])
+    ;(transactions ?? [])
       .filter(transaction => transaction.category !== 'Ingresos fijos')
       .forEach(transaction => {
         const category = statisticsData.get(transaction.category)
@@ -57,18 +57,13 @@ export default function StatisticsCard() {
     mergeStatisticsData(statisticsData)
     addTransactionData(statisticsData)
 
-    setData(Array.from(statisticsData.values())) // Convert map values to array for rendering or further processing
+    setData(Array.from(statisticsData.values()).map(item => ({ ...item, value: Math.abs(item.value) }))) // Convert map values to array for rendering or further processing
   }, [budgets, transactions, budgetHistorics])
 
   // STYLES
-  const titleStyle = {
-    margin: '10px 0'
-  }
+  const titleStyle = { margin: '10px 0' }
 
-  const cardStyle = {
-    width: isMobile ? '100%' : '40%',
-    height: isTablet ? '520px' : '450px'
-  }
+  const cardStyle = { width: isMobile ? '100%' : '40%', height: isTablet ? '520px' : '450px' }
 
   const containerStyle: CSSProperties = {
     display: 'flex',
@@ -136,13 +131,7 @@ export default function StatisticsCard() {
           <p>No hay datos para mostrar</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart
-              width={400}
-              height={isTablet ? 500 : 300}
-              style={{
-                fontSize: '14px'
-              }}
-            >
+            <PieChart width={400} height={isTablet ? 500 : 300} style={{ fontSize: '14px' }}>
               <Pie
                 data={data}
                 cx="50%"

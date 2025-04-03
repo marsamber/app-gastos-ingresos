@@ -298,7 +298,6 @@ export default function MonthDashboardCard() {
 
   const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
-      console.log(active, payload, label)
       const gastado: number = Number(payload.find(entry => entry.name === 'Gastado')?.value) || 0
       const ingresado: number = Number(payload.find(entry => entry.name === 'Ingresado')?.value) || 0
 

@@ -1,68 +1,53 @@
 /* eslint-disable no-unused-vars */
 import { formatDate } from '@/utils/utils'
-import {
-  KeyboardArrowRight,
-  KeyboardDoubleArrowLeft,
-  KeyboardDoubleArrowRight
-} from '@mui/icons-material'
+import { KeyboardArrowRight, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight } from '@mui/icons-material'
 import { IconButton, useMediaQuery } from '@mui/material'
 import { DatePicker } from 'antd'
 import locale from 'antd/es/date-picker/locale/es_ES'
 import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/es'
 import utc from 'dayjs/plugin/utc'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import '../styles.css'
+import SearchParamsHandler from './SearchParamsHandler'
 
 interface MonthRangePickerProps {
   monthsSelected: [string, string]
   setMonthsSelected: (dates: [string, string]) => void
 }
 
-export default function MonthRangePicker({ monthsSelected, setMonthsSelected }: MonthRangePickerProps) {
+export default function MonthRangePicker({ monthsSelected, setMonthsSelected }: Readonly<MonthRangePickerProps>) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
   const isMobile = useMediaQuery('(max-width: 600px)')
   const [disabledNext, setDisabledNext] = useState(false)
   dayjs.extend(utc)
 
+  const saveDatesToRoute = (start: string, end: string) => {
+    const params = new URLSearchParams(searchParams?.toString())
+    params.set('startDate', start)
+    params.set('endDate', end)
+    router.push(`?${params.toString()}`)
+  }
   // Method to handle the change of the dates, it will update the state and the URL
   const handleOnChangeDates = (dates: [Dayjs, Dayjs]) => {
     const start = dates[0]
     const end = dates[1]
-    setMonthsSelected([
-      formatDate(start.year(), start.month(), 1, 0, 0),
-      formatDate(end.year(), end.month() + 1, 0, 23, 59)
-    ])
-
-    router.push(
-      `/?startDate=${formatDate(start.year(), start.month(), 1, 0, 0)}&endDate=${formatDate(
-        end.year(),
-        end.month() + 1,
-        0,
-        23,
-        59
-      )}`
-    )
+    const startDate = formatDate(start.year(), start.month(), 1, 0, 0)
+    const endDate = formatDate(end.year(), end.month() + 1, 0, 23, 59)
+    setMonthsSelected([startDate, endDate])
+    saveDatesToRoute(startDate, endDate)
   }
 
   const handlePrevMonth = () => {
     const start = dayjs.utc(monthsSelected[0]).subtract(1, 'month')
     const end = dayjs.utc(monthsSelected[1]).subtract(1, 'month')
-    setMonthsSelected([
-      formatDate(start.year(), start.month(), 1, 0, 0),
-      formatDate(end.year(), end.month() + 1, 0, 23, 59)
-    ])
-
-    router.push(
-      `/?startDate=${formatDate(start.year(), start.month(), 1, 0, 0)}&endDate=${formatDate(
-        end.year(),
-        end.month() + 1,
-        0,
-        23,
-        59
-      )}`
-    )
+    const startDate = formatDate(start.year(), start.month(), 1, 0, 0)
+    const endDate = formatDate(end.year(), end.month() + 1, 0, 23, 59)
+    setMonthsSelected([startDate, endDate])
+    saveDatesToRoute(startDate, endDate)
   }
 
   const handleNextMonth = () => {
@@ -78,20 +63,10 @@ export default function MonthRangePicker({ monthsSelected, setMonthsSelected }: 
     if (endDateSelected.year() === currentYear && endDateSelected.month() === currentMonth) {
       end = dayjs.utc(monthsSelected[1])
     }
-    setMonthsSelected([
-      formatDate(start.year(), start.month(), 1, 0, 0),
-      formatDate(end.year(), end.month() + 1, 0, 23, 59)
-    ])
-
-    router.push(
-      `/?startDate=${formatDate(start.year(), start.month(), 1, 0, 0)}&endDate=${formatDate(
-        end.year(),
-        end.month() + 1,
-        0,
-        23,
-        59
-      )}`
-    )
+    const startDate = formatDate(start.year(), start.month(), 1, 0, 0)
+    const endDate = formatDate(end.year(), end.month() + 1, 0, 23, 59)
+    setMonthsSelected([startDate, endDate])
+    saveDatesToRoute(startDate, endDate)
   }
 
   useEffect(() => {
@@ -120,6 +95,7 @@ export default function MonthRangePicker({ monthsSelected, setMonthsSelected }: 
       <IconButton onClick={handlePrevMonth}>
         <KeyboardDoubleArrowLeft />
       </IconButton>
+      <SearchParamsHandler setMonthsSelected={setMonthsSelected} />
       <DatePicker.RangePicker
         className="monthRangePicker"
         picker="month"

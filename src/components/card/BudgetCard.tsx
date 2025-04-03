@@ -3,6 +3,7 @@ import { CircularProgress, useMediaQuery } from '@mui/material'
 import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryTheme, VictoryTooltip } from 'victory'
 import BasicCard from './BasicCard'
+import { interpolateColor } from '@/utils/utils'
 
 interface IBudgetChart {
   name: string
@@ -21,14 +22,9 @@ export default function BudgetCard() {
   const containerRef = useRef<HTMLDivElement>(null)
 
   // STYLES
-  const titleStyle = {
-    margin: '10px 0'
-  }
+  const titleStyle = { margin: '10px 0' }
 
-  const cardStyle = {
-    width: isMobile ? '100%' : '100%',
-    height: isTablet ? '500px' : '450px'
-  }
+  const cardStyle = { width: isMobile ? '100%' : '100%', height: isTablet ? '500px' : '450px' }
 
   const containerStyle: CSSProperties = {
     display: 'flex',
@@ -47,13 +43,15 @@ export default function BudgetCard() {
   }
 
   const transformValue = (value: number): number => {
-    if (value === 0) return 0 // Manejo para 0
-    return Math.sign(value) * Math.log10(Math.abs(value) + 1) // Escala logarítmica simétrica
+    if (Math.abs(value) < 1) return 0 // Manejo para 0
+    const log = Math.log10(Math.abs(value * value))
+    return Math.sign(value) * log * log // Escala logarítmica simétrica
   }
 
   const inverseTransformValue = (value: number): number => {
-    if (value === 0) return 0
-    return Math.sign(value) * (Math.pow(10, Math.abs(value)) - 1)
+    if (Math.abs(value) < 1) return 0
+    const log = Math.pow(10, Math.abs(Math.sqrt(Math.abs(value))))
+    return Math.sign(value) * Math.sqrt(log)
   }
 
   useEffect(() => {
@@ -66,11 +64,7 @@ export default function BudgetCard() {
         if (existingEntry) {
           existingEntry.Presupuestado += item.amount
         } else {
-          budgetData.set(item.category, {
-            name: item.category,
-            Gastado: 0,
-            Presupuestado: item.amount
-          })
+          budgetData.set(item.category, { name: item.category, Gastado: 0, Presupuestado: item.amount })
         }
       }
     })
@@ -93,13 +87,24 @@ export default function BudgetCard() {
 
     const sortedData = Array.from(budgetData.values())
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map((value, index) => ({
-        ...value,
-        Gastado: Number(value.Gastado.toFixed(2)),
-        Presupuestado: Number(value.Presupuestado.toFixed(2)),
-        color: value.Gastado >= value.Presupuestado ? '#FF0042' : value.Gastado < 0 ? '#00C49F' : '#FF6384',
-        x: index + 1
-      }))
+      .map((value, index) => {
+        let color
+        if (value.Gastado < 0) {
+          color = '#00C49F'
+        } else {
+          color =
+            value.Gastado > value.Presupuestado
+              ? '#FF0042'
+              : interpolateColor(value.Gastado / value.Presupuestado, '#f7ff00', '#ff6000')
+        }
+        return {
+          ...value,
+          Gastado: Number(value.Gastado.toFixed(2)),
+          Presupuestado: Number(value.Presupuestado.toFixed(2)),
+          color,
+          x: index + 1
+        }
+      })
 
     setData(sortedData)
   }, [budgets, transactions, budgetHistorics])
@@ -179,7 +184,7 @@ export default function BudgetCard() {
           >
             <VictoryAxis
               dependentAxis
-              tickCount={10} // Aumentar la cantidad de ticks
+              tickCount={12} // Aumentar la cantidad de ticks
               tickFormat={(t: number) => `${Math.round(inverseTransformValue(t))} €`}
               style={{
                 tickLabels: { fontSize: 14, padding: 5, fontFamily: 'Roboto, sans-serif' },
@@ -202,9 +207,7 @@ export default function BudgetCard() {
                     `Restante: ${restante} €`
                   ].join('\n')
                 }}
-                style={{
-                  data: { fill: ({ datum }: { datum?: IBudgetChart }) => datum?.color || '#000' }
-                }}
+                style={{ data: { fill: ({ datum }: { datum?: IBudgetChart }) => datum?.color || '#000' } }}
                 labelComponent={
                   <VictoryTooltip
                     flyoutStyle={{
@@ -233,9 +236,7 @@ export default function BudgetCard() {
                   ].join('\n')
                 }}
                 barWidth={calculateBarWidth()} // Calcular el ancho de la barra
-                style={{
-                  data: { stroke: '#257CA3', strokeWidth: 2, fillOpacity: 0, strokeDasharray: '5 5' }
-                }}
+                style={{ data: { stroke: '#257CA3', strokeWidth: 2, fillOpacity: 0, strokeDasharray: '5 5' } }}
                 labelComponent={
                   <VictoryTooltip
                     flyoutStyle={{
