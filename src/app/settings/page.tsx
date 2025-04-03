@@ -170,7 +170,6 @@ export default function Settings() {
 
   const refreshBudgets = useCallback(
     (newSortBy: string, newSortOrder: 'asc' | 'desc', newFilters: Record<string, string>) => {
-      console.log('refresh', newSortBy, newSortOrder, newFilters)
       setSortByBudgets(newSortBy)
       setSortOrderBudgets(newSortOrder)
       setFiltersBudgets(newFilters)
@@ -183,7 +182,6 @@ export default function Settings() {
     const fetchBudgets = async () => {
       const endDate = new Date(dayjs(monthSelected).endOf('month').toISOString())
       const formattedEndDate = formatDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59)
-      console.log('FRONT', sortByBudgets, sortOrderBudgets, filtersBudgets)
       const url = present
         ? `/api/budgets?sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`
         : `/api/budget_historics?startDate=${monthSelected}&endDate=${formattedEndDate}&sortBy=${sortByBudgets}&sortOrder=${sortOrderBudgets}&filters=${JSON.stringify(filtersBudgets)}`

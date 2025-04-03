@@ -274,7 +274,6 @@ const DownloadReportButton = () => {
 
       setTotalIncomePreviousMonth(incomePreviousMonth)
 
-      console.log('incomes', income, incomePreviousMonth)
       // Calculate the percentage of change
       if (incomePreviousMonth === 0) {
         setPercentageChangeIncome(100)
@@ -528,7 +527,7 @@ const DownloadReportButton = () => {
             }
             fileName="InformeIngresosGastos.pdf"
           >
-            {({ loading }: BlobProviderParams) => <DownloadButtonContent loading={loading} />}
+            {(({ loading }: BlobProviderParams) => <DownloadButtonContent loading={loading} />) as any}
           </PDFDownloadLink>
         </>
       ) : (

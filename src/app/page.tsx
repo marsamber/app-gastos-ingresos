@@ -17,7 +17,6 @@ import { Info } from '@mui/icons-material'
 import { CircularProgress, Tooltip, useMediaQuery } from '@mui/material'
 import { CSSProperties, Suspense, useContext, useEffect, useState } from 'react'
 import '../styles.css'
-import SearchParamsHandler from '@/components/SearchParamsHandler'
 
 export default function Home() {
   const today = new Date()
@@ -177,7 +176,6 @@ export default function Home() {
         }}
       >
         <Suspense fallback={<CircularProgress />}>
-          <SearchParamsHandler setMonthsSelected={setMonthsSelected} />
           <div style={headerStyle}>
             <div
               style={{
@@ -190,7 +188,7 @@ export default function Home() {
               {!sideBarCollapsed && <h2 style={titleStyle}>Dashboard</h2>}
               <MonthRangePicker
                 monthsSelected={monthsSelected}
-                setMonthsSelected={monthsSelected => setMonthsSelected(monthsSelected)}
+                setMonthsSelected={setMonthsSelected}
               />
             </div>
             {isMobile ? (

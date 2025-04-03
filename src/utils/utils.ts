@@ -47,11 +47,7 @@ export const formatDate = (year: number, month: number, day: number, hour: numbe
 
 export const formatDayMonthYear = (year: number, month: number, day: number, hour: number, minute: number): string => {
   const date = new Date(Date.UTC(year, month, day, hour, minute))
-  return date.toLocaleString('es-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: '2-digit'
-  })
+  return date.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' })
 }
 
 export const handleDateFilterChange = (value: string): string[] => {
@@ -92,4 +88,30 @@ export const parseDate = (dateStr: string | undefined): Date | undefined => {
 
 export const parseIntSafe = (numberStr: string | undefined): number | undefined => {
   return numberStr ? parseInt(numberStr) : undefined
+}
+
+export const interpolateColor = (value: number, start: string, end: string): string => {
+  // Clamp value to [0, 1]
+  const t = Math.min(1, Math.max(0, value))
+
+  // Convert hex to RGB
+  const hexToRgb = (hex: string) => {
+    const cleanHex = hex.replace('#', '')
+    const bigint = parseInt(cleanHex, 16)
+    const r = (bigint >> 16) & 255
+    const g = (bigint >> 8) & 255
+    const b = bigint & 255
+    return { r, g, b }
+  }
+
+  // Interpolate between start and end RGB
+  const startRgb = hexToRgb(start)
+  const endRgb = hexToRgb(end)
+
+  const r = Math.round(startRgb.r + (endRgb.r - startRgb.r) * t)
+  const g = Math.round(startRgb.g + (endRgb.g - startRgb.g) * t)
+  const b = Math.round(startRgb.b + (endRgb.b - startRgb.b) * t)
+
+  const toHex = (n: number) => n.toString(16).padStart(2, '0')
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }

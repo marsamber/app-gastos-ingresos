@@ -9,6 +9,7 @@ import { Add } from '@mui/icons-material'
 import { Autocomplete, Button, Tab, Tabs, TextField, useMediaQuery } from '@mui/material'
 import { SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import '../../styles.css'
+import MonthRangePicker from '@/components/MonthRangePicker'
 
 export default function Transactions() {
   const [value, setValue] = useState(0)
@@ -16,7 +17,7 @@ export default function Transactions() {
   const [monthsSelected, setMonthsSelected] = useState<[string, string]>(
     handleDateFilterChange('this_month') as [string, string]
   )
-  const isMobile = useMediaQuery('(max-width: 600px)')
+  const isMobile = useMediaQuery('(max-width: 1010px)')
   const sideBarCollapsed = useMediaQuery('(max-width: 899px)')
   const [addTransactionTable, setAddTransactionTable] = useState(false)
   const [openEditTransaction, setOpenEditTransaction] = useState(false)
@@ -58,7 +59,7 @@ export default function Transactions() {
         `/api/transactions?startDate=${monthsSelected[0]}&endDate=${monthsSelected[1]}&page=${page + 1}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&type=${type}&filters=${JSON.stringify(filters)}`
       )
       if (response.ok) {
-        const data = await response.json() as { transactions: ITransaction[]; totalItems: number }
+        const data = (await response.json()) as { transactions: ITransaction[]; totalItems: number }
         setTransactions(data.transactions)
         setTotalItems(data.totalItems)
       }
@@ -74,12 +75,18 @@ export default function Transactions() {
     { label: 'Todo', value: 'all' }
   ]
 
-  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
-    setValue(newValue)
-    if (newValue === 1) {
-      setType('expense')
-    } else if (newValue === 2) {
-      setType('income')
+  const handleChangeTab = (_: SyntheticEvent, newTabValue: number) => {
+    setValue(newTabValue)
+    switch (newTabValue) {
+      case 0:
+        setType(null)
+        break
+      case 1:
+        setType('expense')
+        break
+      case 2:
+        setType('income')
+        break
     }
   }
 
@@ -98,9 +105,7 @@ export default function Transactions() {
   }
 
   const handleDeleteTransaction = async (id: number) => {
-    const response = await customFetch(`/api/transactions/${id}`, {
-      method: 'DELETE'
-    })
+    const response = await customFetch(`/api/transactions/${id}`, { method: 'DELETE' })
 
     if (response.ok) {
       refreshTransactions(page, limit, sortBy, sortOrder, type, filters)
@@ -112,10 +117,7 @@ export default function Transactions() {
   }, [])
 
   // STYLES
-  const titleStyle = {
-    margin: '10px 0',
-    color: 'black'
-  }
+  const titleStyle = { margin: '10px 0', color: 'black' }
 
   const tabsStyle = {
     display: 'flex',
@@ -125,12 +127,7 @@ export default function Transactions() {
     marginBottom: '10px'
   }
 
-  const buttonsStyle = {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: '10px'
-  }
+  const buttonsStyle = { display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }
 
   return (
     <main className="main">
@@ -157,16 +154,18 @@ export default function Transactions() {
         <div>
           {isMobile && (
             <div style={buttonsStyle}>
-              <Autocomplete
-                sx={{ m: 1, width: 150 }}
-                size="small"
-                options={filterOptions}
-                value={filterOptions.find(option => option.value === filter)}
-                onChange={(_, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
-                getOptionLabel={option => option.label}
-                renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
-                disableClearable
+              <MonthRangePicker
+                monthsSelected={monthsSelected}
+                setMonthsSelected={setMonthsSelected}
               />
+              <Button
+                variant="contained"
+                color="primary"
+                endIcon={<Add />}
+                onClick={() => setAddTransactionTable(true)}
+              >
+                Añadir
+              </Button>
             </div>
           )}
           <div style={tabsStyle}>
@@ -177,39 +176,15 @@ export default function Transactions() {
               onChange={handleChangeTab}
               variant={isMobile ? 'fullWidth' : 'standard'}
             >
-              <Tab
-                classes={{
-                  selected: 'tabSelected'
-                }}
-                label="Todo"
-                value={0}
-              />
-              <Tab
-                classes={{
-                  selected: 'tabSelected'
-                }}
-                label="Gastos"
-                value={1}
-              />
-              <Tab
-                classes={{
-                  selected: 'tabSelected'
-                }}
-                label="Ingresos"
-                value={2}
-              />
+              <Tab classes={{ selected: 'tabSelected' }} label="Todo" value={0} />
+              <Tab classes={{ selected: 'tabSelected' }} label="Gastos" value={1} />
+              <Tab classes={{ selected: 'tabSelected' }} label="Ingresos" value={2} />
             </Tabs>
             {!isMobile && (
               <div style={buttonsStyle}>
-                <Autocomplete
-                  sx={{ m: 1, width: 150 }}
-                  size="small"
-                  options={filterOptions}
-                  value={filterOptions.find(option => option.value === filter)}
-                  onChange={(_, newValue) => handleChangeFilter(newValue as { label: string; value: string })}
-                  getOptionLabel={option => option.label}
-                  renderInput={params => <TextField {...params} label="Filtro" color="primary" />}
-                  disableClearable
+                <MonthRangePicker
+                  monthsSelected={monthsSelected}
+                  setMonthsSelected={setMonthsSelected}
                 />
                 <Button
                   variant="contained"
