@@ -164,14 +164,18 @@ export default function BasicTable<T extends { id: string | number } & Record<st
                           align="left"
                           style={{
                             color:
-                              cell === 'amount' || cell === 'remaining' ? (row[cell] > 0 ? 'green' : 'red') : 'black'
+                              cell === 'amount' || cell === 'remaining'
+                                ? (row[cell] as number) > 0
+                                  ? 'green'
+                                  : 'red'
+                                : 'black'
                           }}
                         >
-                          {row[cell]} €
+                          {row[cell] as number} €
                         </TableCell>
                       ) : row[cell] instanceof Date ? (
                         <TableCell key={index} align="left">
-                          {row[cell].toLocaleDateString()}
+                          {(row[cell] as Date).toLocaleDateString()}
                         </TableCell>
                       ) : cell === 'actions' ? (
                         <TableCell key={index} align="left">
